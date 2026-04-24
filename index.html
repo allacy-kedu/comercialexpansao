@@ -1429,47 +1429,48 @@ update();
 
   function calcForecast(monthly){
     const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1-12
-    const dayOfMonth = today.getDate();
-    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const currentYear  = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    const dayOfMonth   = today.getDate();
+    const daysInMonth  = new Date(currentYear, currentMonth, 0).getDate();
 
-    // Realized 2026 months
+    // Meses realizados de 2026 — valores reais sem extrapolar
     const realized = {};
     let lastRealizedMonth = 0;
+    let lastCompleteMonth = 0;
     for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){realized[m]=monthly[k]; lastRealizedMonth=m;}
+      if(monthly[k]){
+        realized[m] = monthly[k];
+        lastRealizedMonth = m;
+        if(!(currentYear===2026 && m===currentMonth)) lastCompleteMonth = m;
+      }
     }
 
-    // For the current month in 2026, extrapolate by daily rate
-    // partialSales ÷ daysElapsed × daysInMonth
-    if(currentYear === 2026 && realized[currentMonth]){
-      const partialSales = realized[currentMonth];
-      const daysElapsed = Math.max(1, dayOfMonth - 1); // days with data
-      const projected = Math.round(partialSales / daysElapsed * daysInMonth);
-      realized[currentMonth] = projected; // replace partial with extrapolated
+    // Cópia separada com mês atual extrapolado (só para o forecast)
+    const realizedForForecast = {...realized};
+    if(currentYear===2026 && realized[currentMonth]){
+      const daysElapsed = Math.max(1, dayOfMonth - 1);
+      realizedForForecast[currentMonth] = Math.round(realized[currentMonth] / daysElapsed * daysInMonth);
     }
 
-    // Growth factor from completed realized months (exclude current month)
+    // Fator de crescimento — apenas meses completos
     let rNum=0, rDen=0;
-    Object.entries(realized).forEach(([m,v])=>{
-      if(parseInt(m) === currentMonth && currentYear === 2026) return; // skip current
+    for(let m=1;m<=lastCompleteMonth;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
-      if(monthly[k2025]){rNum+=v; rDen+=monthly[k2025];}
-    });
+      if(realized[m] && monthly[k2025]){ rNum+=realized[m]; rDen+=monthly[k2025]; }
+    }
     const growthFactor = rDen>0 ? rNum/rDen : 1.0;
 
-    const forecast = {};
-    const expected = {};
+    const forecast = {}, expected = {};
     for(let m=1;m<=12;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
       const base2025 = monthly[k2025] || null;
-      const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
+      const exp = base2025 ? Math.round(base2025*growthFactor) : null;
       expected[m] = exp;
-      forecast[m] = realized[m] !== undefined ? realized[m] : exp;
+      forecast[m] = realizedForForecast[m] !== undefined ? realizedForForecast[m] : exp;
     }
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor};
+    return {forecast, expected, realized, lastRealizedMonth, lastCompleteMonth, growthFactor};
   }
 
   const _dots = []; // hit-test registry
@@ -1484,19 +1485,16 @@ update();
     // ── Dados base ──────────────────────────────────────────────
     const {agg:_agg, cnt:_cnt} = buildMonthly();
     const _monthly = {..._agg};
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL} = calcForecast(_monthly);
+    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, lastCompleteMonth:LAST_COMPLETE} = calcForecast(_monthly);
 
     // getVal usa os dados reais do RAW (sem extrapolação do mês atual)
     function getVal(y,m){ return _monthly[y+'-'+String(m).padStart(2,'0')]||null; }
 
-    // Mês atual: dados parciais — não tratamos como "realizado" nos dots
+    // NOW_YEAR/NOW_MONTH usados para excluir mês parcial da linha 2026
     const _today = new Date();
     const NOW_YEAR  = _today.getFullYear();
     const NOW_MONTH = _today.getMonth() + 1; // 1–12
-    // Último mês com dados completos (exclui o mês em andamento)
-    const LAST_COMPLETE = (NOW_YEAR === 2026 && REALIZED_2026[NOW_MONTH])
-      ? NOW_MONTH - 1   // mês atual tem dados parciais → último completo é o anterior
-      : REALIZED_UNTIL;
+    // LAST_COMPLETE vem do calcForecast — último mês com dados completos
 
     _dots.length = 0;
 
