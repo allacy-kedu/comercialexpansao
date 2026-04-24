@@ -26,6 +26,7 @@ def get_access_token(credentials: dict) -> str:
     import base64
     import time
     import urllib.request as _req
+    import urllib.parse as _parse
 
     try:
         from cryptography.hazmat.primitives import hashes, serialization
@@ -52,7 +53,7 @@ def get_access_token(credentials: dict) -> str:
         creds.refresh(google.auth.transport.requests.Request())
         return creds.token
 
-    data = _req.urlencode({"grant_type":"urn:ietf:params:oauth:grant-type:jwt-bearer","assertion":jwt}).encode()
+    data = _parse.urlencode({"grant_type":"urn:ietf:params:oauth:grant-type:jwt-bearer","assertion":jwt}).encode()
     resp = _req.urlopen(_req.Request(credentials["token_uri"], data=data))
     return json.loads(resp.read())["access_token"]
 
