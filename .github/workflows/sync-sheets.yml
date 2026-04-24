@@ -2,12 +2,11 @@ name: Sync Google Sheets → data.json
 
 on:
   schedule:
-    # A cada 15 minutos (mínimo do GitHub Actions)
     - cron: "*/15 * * * *"
-  workflow_dispatch:   # permite rodar manualmente pelo GitHub
+  workflow_dispatch:
 
 permissions:
-  contents: write      # necessário para fazer commit no repo
+  contents: write
 
 jobs:
   sync:
@@ -34,7 +33,6 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          # Só commita se o arquivo realmente mudou
           if git diff --staged --quiet; then
             echo "Sem mudanças em data.json — nada a commitar."
           else
@@ -42,4 +40,3 @@ jobs:
             git commit -m "chore: sync sheets → data.json [${TIMESTAMP}]"
             git push
           fi
-
