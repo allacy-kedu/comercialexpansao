@@ -1635,7 +1635,9 @@ update();
       ctx.setLineDash(y===2026?[6,3]:[]);
       ctx.lineWidth=y===2025||y===2026?2:1.5;
       ctx.strokeStyle=COLORS[y];ctx.stroke();ctx.setLineDash([]);
+      const _nowM=new Date().getMonth()+1;
       pts.forEach(p=>{
+        if(y===2026 && p.m===_nowM) return; // skip dot for current partial month
         const r=y===2026||y===2025?3:2;
         ctx.beginPath();ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);ctx.fillStyle=COLORS[y];ctx.fill();
         _dots.push({x:toX(p.m),y:toY(p.v),type:'year',year:y,month:p.m,val:p.v,color:COLORS[y],r});
