@@ -16,7 +16,7 @@ from io import StringIO
 
 import requests
 
-SPREADSHEET_ID = "1vSiZc_RmV8VxclJsUUyXhh39_jxF601vx5mXCnkM4GmPHtE3bdc8w15c3kZHHb0i7880Xq2889FIGys"
+SPREADSHEET_ID = "1_Q-Sf6qhQNoLKLqvkcIYpSKYN9H211ehSRt9Wq_GwQ8"
 SHEET_GID      = "0"
 OUTPUT_FILE    = "data.json"
 SCOPES         = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
