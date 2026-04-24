@@ -1412,301 +1412,326 @@ update();
 
 // ── Trend Chart ──────────────────────────────────────────────
 (function(){
-  const METAS_2026 = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,
-    '2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,
-    '2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
 
-  function buildMonthly(){
-    const agg = {}, cnt = {};
-    RAW.forEach(r => {
-      if(!r.assinatura || !r.fat_kedu) return;
-      const ym = r.assinatura.slice(0,7);
-      agg[ym] = (agg[ym]||0) + r.fat_kedu;
-      cnt[ym] = (cnt[ym]||0) + 1;
-    });
-    return {agg, cnt};
-  }
-
-  function calcForecast(monthly){
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1-12
-    const dayOfMonth = today.getDate();
-    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-
-    // Realized 2026 months
-    const realized = {};
-    let lastRealizedMonth = 0;
-    for(let m=1;m<=12;m++){
-      const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){realized[m]=monthly[k]; lastRealizedMonth=m;}
-    }
-
-    // For the current month in 2026, extrapolate by daily rate
-    if(currentYear === 2026 && realized[currentMonth]){
-      const partialSales = realized[currentMonth];
-      const daysElapsed = Math.max(1, dayOfMonth - 1);
-      const projected = Math.round(partialSales / daysElapsed * daysInMonth);
-      realized[currentMonth] = projected;
-    }
-
-    // Growth factor from completed realized months (exclude current month)
-    let rNum=0, rDen=0;
-    Object.entries(realized).forEach(([m,v])=>{
-      if(parseInt(m) === currentMonth && currentYear === 2026) return;
-      const k2025='2025-'+String(m).padStart(2,'0');
-      if(monthly[k2025]){rNum+=v; rDen+=monthly[k2025];}
-    });
-    const growthFactor = rDen>0 ? rNum/rDen : 1.0;
-
-    const forecast = {}, expected = {};
-    for(let m=1;m<=12;m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025 = monthly[k2025] || null;
-      const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
-      expected[m] = exp;
-      forecast[m] = realized[m] !== undefined ? realized[m] : exp;
-    }
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor};
-  }
-  const _dots = []; // hit-test registry
-
-  const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const YEARS = [2022,2023,2024,2025,2026];
+  const METAS_2026 = {
+    1:1500000,2:1200000,3:2100000,4:2800000,5:2800000,6:2800000,
+    7:2800000,8:2800000,9:2800000,10:2800000,11:2800000,12:2800000
+  };
+  const YEARS  = [2022,2023,2024,2025,2026];
   const COLORS = {2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
-  const FC_COLOR = '#74b9ff';
+  const FC_COLOR   = '#74b9ff';
+  const META_COLOR = 'rgba(255,255,255,0.22)';
+  const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const MONTHS_LONG  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
   const activeYears = new Set([2022,2023,2024,2025,2026,'meta','forecast']);
 
-  function drawChart(){
-    const MONTHLY_RAW = {};
-    RAW.forEach(r => {
-      if(!r.assinatura || !r.fat_kedu) return;
-      const ym = r.assinatura.slice(0,7);
-      MONTHLY_RAW[ym] = (MONTHLY_RAW[ym]||0) + r.fat_kedu;
+  // ── Dados mensais a partir do RAW ─────────────────────────────
+  function buildMonthly(){
+    const val={}, cnt={};
+    RAW.forEach(r=>{
+      if(!r.assinatura||!r.fat_kedu) return;
+      const ym=r.assinatura.slice(0,7);
+      val[ym]=(val[ym]||0)+r.fat_kedu;
+      cnt[ym]=(cnt[ym]||0)+1;
     });
-    function getVal(y,m){ return MONTHLY_RAW[y+'-'+String(m).padStart(2,'0')]||null; }
+    return {val,cnt};
+  }
 
-    const {agg:_agg, cnt:_cnt} = buildMonthly();
-    const _monthly = {..._agg};
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL} = calcForecast(_monthly);
+  function getMonthVal(val,y,m){
+    return val[y+'-'+String(m).padStart(2,'0')]||null;
+  }
 
-    // Mês atual em andamento — não exibir como "realizado" nos dots
-    const _nowDate = new Date();
-    const NOW_YEAR  = _nowDate.getFullYear();
-    const NOW_MONTH = _nowDate.getMonth() + 1;
+  // ── Forecast 2026 ─────────────────────────────────────────────
+  // Lógica:
+  //   - Meses encerrados (< mês atual): usa o realizado real
+  //   - Mês atual (em andamento): extrapola pelo ritmo diário
+  //   - Meses futuros: projeta com base no fator de crescimento vs 2025
+  function buildForecast(val){
+    const today      = new Date();
+    const nowYear    = today.getFullYear();
+    const nowMonth   = today.getMonth()+1;
+    const dayElapsed = Math.max(1, today.getDate()-1);
+    const daysTotal  = new Date(nowYear, nowMonth, 0).getDate();
 
-    _dots.length = 0;
+    // Coleta realizados de 2026
+    const realized = {};   // valor real (bruto) de cada mês
+    let lastComplete = 0;  // último mês ENCERRADO com dados
+    for(let m=1;m<=12;m++){
+      const v = getMonthVal(val, 2026, m);
+      if(v){
+        realized[m] = v;
+        if(nowYear===2026 && m < nowMonth) lastComplete = m;
+        if(nowYear!==2026) lastComplete = m; // fora de 2026 tudo é completo
+      }
+    }
 
+    // Valor extrapolado do mês atual (para exibir na previsão)
+    let currentProjected = null;
+    if(nowYear===2026 && realized[nowMonth]){
+      currentProjected = Math.round(realized[nowMonth] / dayElapsed * daysTotal);
+    }
+
+    // Fator de crescimento 2026 vs 2025 (só meses encerrados)
+    let rNum=0, rDen=0;
+    for(let m=1;m<=lastComplete;m++){
+      const r = realized[m];
+      const p = getMonthVal(val, 2025, m);
+      if(r && p){ rNum+=r; rDen+=p; }
+    }
+    const factor = rDen>0 ? rNum/rDen : 1.0;
+
+    // Monta arrays de forecast e expected
+    const forecast={}, expected={};
+    for(let m=1;m<=12;m++){
+      const base = getMonthVal(val, 2025, m);
+      const exp  = base ? Math.round(base*factor) : null;
+      expected[m] = exp;
+      if(m < nowMonth && realized[m])       forecast[m] = realized[m];         // encerrado: real
+      else if(m===nowMonth && currentProjected) forecast[m] = currentProjected; // atual: extrapolado
+      else                                   forecast[m] = exp;                  // futuro: projetado
+    }
+
+    return {forecast, expected, realized, lastComplete, currentProjected, nowMonth, nowYear, factor};
+  }
+
+  // ── Canvas helpers ────────────────────────────────────────────
+  let _dots=[];
+
+  function setupCanvas(canvas, W, H){
+    canvas.width  = W*devicePixelRatio;
+    canvas.height = H*devicePixelRatio;
+    canvas.style.width  = W+'px';
+    canvas.style.height = H+'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    return ctx;
+  }
+
+  // ── Desenho principal ─────────────────────────────────────────
+  function drawChart(){
+    const canvas = document.getElementById('trend-chart');
+    if(!canvas) return;
+    const W = canvas.parentElement.offsetWidth||800, H=220;
+    const ctx = setupCanvas(canvas, W, H);
+    const pad = {top:18, right:52, bottom:8, left:64};
+    const cW = W-pad.left-pad.right, cH = H-pad.top-pad.bottom;
+
+    const {val, cnt} = buildMonthly();
+    const {forecast, expected, realized, lastComplete, currentProjected, nowMonth, nowYear} = buildForecast(val);
+
+    // Subtitle
     const subEl = document.getElementById('trend-forecast-sub');
     if(subEl){
-      const total = Object.values(FORECAST_2026).reduce((s,v)=>s+(v||0),0);
-      subEl.textContent = 'Projeção anual 2026: R$ ' + (total>=1e6?(total/1e6).toFixed(1)+'M':(total/1000).toFixed(0)+'K');
+      const total = Object.values(forecast).reduce((s,v)=>s+(v||0),0);
+      subEl.textContent = 'Projeção anual 2026: R$ '+(total>=1e6?(total/1e6).toFixed(1)+'M':(total/1000).toFixed(0)+'K');
     }
-    const canvas=document.getElementById('trend-chart');
-    if(!canvas)return;
-    const wrap=canvas.parentElement;
-    const W=wrap.offsetWidth||800, H=220;
-    canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
-    canvas.style.width=W+'px'; canvas.style.height=H+'px';
-    const ctx=canvas.getContext('2d');
-    ctx.scale(devicePixelRatio,devicePixelRatio);
-    const pad={top:16,right:50,bottom:8,left:62};
-    const cW=W-pad.left-pad.right, cH=H-pad.top-pad.bottom;
 
+    // Escala Y
     let maxVal=0;
-    YEARS.forEach(y=>{
-      if(!activeYears.has(y))return;
-      for(let m=1;m<=12;m++){const v=getVal(y,m);if(v&&v>maxVal)maxVal=v;}
-    });
-    if(activeYears.has('meta'))Object.values(METAS_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
-    if(activeYears.has('forecast'))Object.values(FORECAST_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
-    if(!maxVal)maxVal=3000000;
+    YEARS.forEach(y=>{ if(!activeYears.has(y)) return; for(let m=1;m<=12;m++){const v=getMonthVal(val,y,m);if(v>maxVal)maxVal=v;} });
+    if(activeYears.has('meta'))    Object.values(METAS_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
+    if(activeYears.has('forecast'))Object.values(forecast).forEach(v=>{if(v&&v>maxVal)maxVal=v;});
+    if(!maxVal) maxVal=3000000;
     maxVal*=1.12;
 
-    const toX=m=>pad.left+(m-1)*(cW/11);
-    const toY=v=>pad.top+cH-(v/maxVal)*cH;
+    const toX = m => pad.left + (m-1)*(cW/11);
+    const toY = v => pad.top  + cH - (v/maxVal)*cH;
+    const fmtV= v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
 
     ctx.clearRect(0,0,W,H);
+    _dots=[];
 
     // Grid
-    ctx.strokeStyle='rgba(99,179,237,0.06)';ctx.lineWidth=1;
-    for(let i=0;i<=4;i++){const yy=pad.top+(cH/4)*i;ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+cW,yy);ctx.stroke();}
-
-    // Y labels
-    ctx.fillStyle='rgba(90,106,130,0.8)';ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
+    ctx.strokeStyle='rgba(99,179,237,0.06)'; ctx.lineWidth=1;
     for(let i=0;i<=4;i++){
-      const v=maxVal*(1-i/4),yy=pad.top+(cH/4)*i;
-      ctx.fillText('R$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),pad.left-6,yy+3);
+      const yy=pad.top+(cH/4)*i;
+      ctx.beginPath(); ctx.moveTo(pad.left,yy); ctx.lineTo(pad.left+cW,yy); ctx.stroke();
     }
 
-    // Meta
+    // Y labels
+    ctx.fillStyle='rgba(90,106,130,0.8)'; ctx.font='9px DM Mono,monospace'; ctx.textAlign='right';
+    for(let i=0;i<=4;i++){
+      const v=maxVal*(1-i/4), yy=pad.top+(cH/4)*i;
+      ctx.fillText('R$'+fmtV(v), pad.left-6, yy+3);
+    }
+
+    // ── META ──────────────────────────────────────────────────
     if(activeYears.has('meta')){
       ctx.beginPath();
-      for(let m=1;m<=12;m++){const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));}
-      ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
       for(let m=1;m<=12;m++){
-        const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;
-        ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-        ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fill();
+        const v=METAS_2026[m]||0;
+        m===1 ? ctx.moveTo(toX(m),toY(v)) : ctx.lineTo(toX(m),toY(v));
+      }
+      ctx.setLineDash([4,4]); ctx.strokeStyle=META_COLOR; ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
+      for(let m=1;m<=12;m++){
+        const v=METAS_2026[m]||0;
+        ctx.beginPath(); ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
+        ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fill();
         _dots.push({x:toX(m),y:toY(v),type:'meta',month:m,val:v});
       }
     }
 
-    // Forecast
+    // ── FORECAST ──────────────────────────────────────────────
     if(activeYears.has('forecast')){
-      if(REALIZED_UNTIL < 12){
+      // Área sombreada (apenas meses futuros ao mês atual)
+      const shadeFrom = nowYear===2026 ? nowMonth : lastComplete+1;
+      if(shadeFrom<=12){
+        const anchorV = forecast[shadeFrom]||0;
         ctx.beginPath();
-        ctx.moveTo(toX(REALIZED_UNTIL),toY(EXPECTED_2026[REALIZED_UNTIL]||FORECAST_2026[REALIZED_UNTIL]));
-        for(let m=REALIZED_UNTIL+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
-        ctx.lineTo(toX(12),toY(0));ctx.lineTo(toX(REALIZED_UNTIL),toY(0));ctx.closePath();
+        ctx.moveTo(toX(shadeFrom), toY(anchorV));
+        for(let m=shadeFrom+1;m<=12;m++){ const v=forecast[m]; if(v) ctx.lineTo(toX(m),toY(v)); }
+        ctx.lineTo(toX(12),toY(0)); ctx.lineTo(toX(shadeFrom),toY(0)); ctx.closePath();
         const g=ctx.createLinearGradient(0,pad.top,0,pad.top+cH);
-        g.addColorStop(0,'rgba(116,185,255,0.10)');g.addColorStop(1,'rgba(116,185,255,0.01)');
-        ctx.fillStyle=g;ctx.fill();
-      }
-      if(REALIZED_UNTIL > 0){
-        ctx.beginPath();
-        for(let m=1;m<=REALIZED_UNTIL;m++){
-          const v=EXPECTED_2026[m]; if(!v) continue;
-          m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));
-        }
-        ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(116,185,255,0.45)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
-      }
-      if(REALIZED_UNTIL < 12){
-        ctx.beginPath();
-        const startM = REALIZED_UNTIL > 0 ? REALIZED_UNTIL : 1;
-        ctx.moveTo(toX(startM), toY(EXPECTED_2026[startM]||FORECAST_2026[startM]));
-        for(let m=startM+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
-        ctx.setLineDash([5,4]);ctx.strokeStyle=FC_COLOR;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
+        g.addColorStop(0,'rgba(116,185,255,0.10)'); g.addColorStop(1,'rgba(116,185,255,0.01)');
+        ctx.fillStyle=g; ctx.fill();
       }
 
-      // Dots — mês atual tratado como projetado (sem dot colorido)
+      // Linha esperada sobre meses encerrados (tracejada fina azul)
+      if(lastComplete>0){
+        ctx.beginPath();
+        for(let m=1;m<=lastComplete;m++){
+          const v=expected[m]; if(!v) continue;
+          m===1 ? ctx.moveTo(toX(m),toY(v)) : ctx.lineTo(toX(m),toY(v));
+        }
+        ctx.setLineDash([3,3]); ctx.strokeStyle='rgba(116,185,255,0.40)'; ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
+      }
+
+      // Linha de projeção futura (tracejada azul grossa, a partir do último ponto conhecido)
+      const lineFrom = lastComplete>0 ? lastComplete : 1;
+      ctx.beginPath();
+      ctx.moveTo(toX(lineFrom), toY(forecast[lineFrom]||expected[lineFrom]||0));
+      for(let m=lineFrom+1;m<=12;m++){ const v=forecast[m]; if(v) ctx.lineTo(toX(m),toY(v)); }
+      ctx.setLineDash([5,4]); ctx.strokeStyle=FC_COLOR; ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]);
+
+      // Dots de forecast
       for(let m=1;m<=12;m++){
-        const isCurrent = (NOW_YEAR===2026 && m===NOW_MONTH);
-        if(m<=REALIZED_UNTIL && !isCurrent){
-          const exp=EXPECTED_2026[m]; if(!exp) continue;
-          const real=REALIZED_2026[m]; if(!real) continue;
-          const hit = real >= exp;
+        if(m<=lastComplete){
+          // Mês encerrado: dot colorido (verde=bateu expected, vermelho=não bateu)
+          const real=realized[m], exp=expected[m];
+          if(!real||!exp) continue;
+          const hit      = real>=exp;
           const dotColor = hit ? '#00b894' : '#e17055';
-          ctx.beginPath();ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
-          ctx.strokeStyle='rgba(116,185,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();
-          ctx.beginPath();ctx.arc(toX(m),toY(real),5,0,Math.PI*2);
-          ctx.fillStyle=dotColor;ctx.fill();
-          ctx.beginPath();ctx.arc(toX(m),toY(real),6.5,0,Math.PI*2);
-          ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();
+          // Hollow da expected
+          ctx.beginPath(); ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
+          ctx.strokeStyle='rgba(116,185,255,0.45)'; ctx.lineWidth=1.5; ctx.stroke();
+          // Preenchido do realizado
+          ctx.beginPath(); ctx.arc(toX(m),toY(real),5,0,Math.PI*2);
+          ctx.fillStyle=dotColor; ctx.fill();
+          ctx.beginPath(); ctx.arc(toX(m),toY(real),6.5,0,Math.PI*2);
+          ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=1; ctx.stroke();
           _dots.push({x:toX(m),y:toY(real),type:'forecast',month:m,val:real,expected:exp,hit,color:dotColor,projected:false});
         } else {
-          const v=FORECAST_2026[m]; if(!v) continue;
-          ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-          ctx.strokeStyle=FC_COLOR;ctx.lineWidth=1.5;ctx.stroke();
-          ctx.fillStyle='rgba(8,9,15,0.6)';ctx.fill();
-          _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,expected:v,color:FC_COLOR,projected:true});
+          // Mês atual (extrapolado) ou futuro: círculo aberto azul
+          const v=forecast[m]; if(!v) continue;
+          ctx.beginPath(); ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
+          ctx.strokeStyle=FC_COLOR; ctx.lineWidth=1.5; ctx.stroke();
+          ctx.fillStyle='rgba(8,9,15,0.6)'; ctx.fill();
+          _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,expected:expected[m]||v,color:FC_COLOR,projected:true});
         }
       }
     }
 
-    // Historical lines (2022–2026)
+    // ── LINHAS HISTÓRICAS ─────────────────────────────────────
     YEARS.forEach(y=>{
-      if(!activeYears.has(y))return;
+      if(!activeYears.has(y)) return;
+
+      // Para 2026: plota apenas meses encerrados (exclui mês atual com dados parciais)
       const pts=[];
       for(let m=1;m<=12;m++){
-        // Para 2026: exclui o mês atual (dados parciais) da linha
-        if(y===2026 && NOW_YEAR===2026 && m===NOW_MONTH) continue;
-        const v=getVal(y,m);if(v!==null)pts.push({m,v});
+        if(y===2026 && nowYear===2026 && m>=nowMonth) continue;
+        const v=getMonthVal(val,y,m);
+        if(v!==null) pts.push({m,v});
       }
-      if(!pts.length)return;
+      if(!pts.length) return;
+
+      // Linha com bezier suave
       ctx.beginPath();
       pts.forEach((p,i)=>{
-        const x=toX(p.m),yy=toY(p.v);
-        if(i===0){ctx.moveTo(x,yy);return;}
-        const prev=pts[i-1],px=toX(prev.m),py=toY(prev.v),cpx=px+(x-px)*0.5;
+        const x=toX(p.m), yy=toY(p.v);
+        if(i===0){ ctx.moveTo(x,yy); return; }
+        const prev=pts[i-1], px=toX(prev.m), py=toY(prev.v), cpx=px+(x-px)*0.5;
         ctx.bezierCurveTo(cpx,py,cpx,yy,x,yy);
       });
       ctx.setLineDash(y===2026?[6,3]:[]);
-      ctx.lineWidth=y===2025||y===2026?2:1.5;
-      ctx.strokeStyle=COLORS[y];ctx.stroke();ctx.setLineDash([]);
+      ctx.lineWidth  = (y===2025||y===2026) ? 2 : 1.5;
+      ctx.strokeStyle= COLORS[y];
+      ctx.stroke(); ctx.setLineDash([]);
+
+      // Dots
       pts.forEach(p=>{
-        const r=y===2026||y===2025?3:2;
-        ctx.beginPath();ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);ctx.fillStyle=COLORS[y];ctx.fill();
-        _dots.push({x:toX(p.m),y:toY(p.v),type:'year',year:y,month:p.m,val:p.v,color:COLORS[y],r});
+        const r=(y===2025||y===2026)?3:2;
+        ctx.beginPath(); ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);
+        ctx.fillStyle=COLORS[y]; ctx.fill();
+        _dots.push({x:toX(p.m),y:toY(p.v),type:'year',year:y,month:p.m,val:p.v,color:COLORS[y]});
       });
     });
-    buildMonthButtons(_dots, _cnt);
+
+    buildMonthButtons(cnt);
   }
 
-  function initButtons(){
-    // ── Year toggle buttons ──────────────────────────────────
-    document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const yr=btn.dataset.year==='meta'?'meta':btn.dataset.year==='forecast'?'forecast':parseInt(btn.dataset.year);
-        if(activeYears.has(yr)){activeYears.delete(yr);btn.classList.remove('active');}
-        else{activeYears.add(yr);btn.classList.add('active');}
-        drawChart();
-      });
-    });
-  }
-
-
-  function buildMonthButtons(dots, cnt){
-    const wrap = document.getElementById('trend-month-btns');
+  // ── Botões de mês + popup ─────────────────────────────────────
+  function buildMonthButtons(cnt){
+    const wrap=document.getElementById('trend-month-btns');
     if(!wrap) return;
-    wrap.innerHTML = '';
-
-    const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const fmtM = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-    const YEAR_LABELS = {2022:'2022',2023:'2023',2024:'2024',2025:'2025',2026:'2026 (real.)'};
+    wrap.innerHTML='';
 
     function removePopup(){ const o=document.getElementById('trend-popup'); if(o) o.remove(); }
     document.addEventListener('click', e=>{
       const p=document.getElementById('trend-popup');
-      if(p && !p.contains(e.target) && !e.target.closest('#trend-month-btns')) removePopup();
+      if(p&&!p.contains(e.target)&&!e.target.closest('#trend-month-btns')) removePopup();
     });
 
-    for(let m=1; m<=12; m++){
-      const btn = document.createElement('button');
-      btn.textContent = MONTHS_SHORT[m-1];
-      btn.style.cssText = 'background:transparent;border:none;border-bottom:1px solid rgba(99,179,237,0.15);color:rgba(90,106,130,0.8);font-size:9px;font-family:DM Mono,monospace;cursor:pointer;padding:2px 4px;transition:.15s;flex:1;text-align:center;';
-      btn.onmouseenter = ()=>{ btn.style.color='var(--accent)'; btn.style.borderBottomColor='var(--accent)'; };
-      btn.onmouseleave = ()=>{ btn.style.color='rgba(90,106,130,0.8)'; btn.style.borderBottomColor='rgba(99,179,237,0.15)'; };
+    for(let m=1;m<=12;m++){
+      const btn=document.createElement('button');
+      btn.textContent=MONTHS_SHORT[m-1];
+      btn.style.cssText='background:transparent;border:none;border-bottom:1px solid rgba(99,179,237,0.15);color:rgba(90,106,130,0.8);font-size:9px;font-family:DM Mono,monospace;cursor:pointer;padding:2px 4px;transition:.15s;flex:1;text-align:center;';
+      btn.onmouseenter=()=>{ btn.style.color='var(--accent)'; btn.style.borderBottomColor='var(--accent)'; };
+      btn.onmouseleave=()=>{ btn.style.color='rgba(90,106,130,0.8)'; btn.style.borderBottomColor='rgba(99,179,237,0.15)'; };
 
       btn.addEventListener('click', function(e){
         e.stopPropagation();
-        // Toggle — close if same month already open
-        const existing = document.getElementById('trend-popup');
-        const wasThisMonth = existing && existing.dataset.month === String(m);
+        const existing=document.getElementById('trend-popup');
+        const wasThis=existing&&existing.dataset.month===String(m);
         removePopup();
-        if(wasThisMonth) return;
+        if(wasThis) return;
 
-        const hits = dots.filter(d=>d.month===m);
+        const hits=_dots.filter(d=>d.month===m);
         if(!hits.length) return;
 
-        const popup = document.createElement('div');
-        popup.id = 'trend-popup';
-        popup.dataset.month = String(m);
-        popup.style.cssText = 'position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:200px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
+        const popup=document.createElement('div');
+        popup.id='trend-popup'; popup.dataset.month=String(m);
+        popup.style.cssText='position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:210px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
 
-        const title = document.createElement('div');
-        title.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
-        title.innerHTML = MONTHS_PT[m-1]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
+        const title=document.createElement('div');
+        title.style.cssText='font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
+        title.innerHTML=MONTHS_LONG[m-1]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
         popup.appendChild(title);
 
+        // Ordena: anos históricos primeiro, depois forecast, depois meta
         const order={year:0,forecast:1,meta:2};
-        hits.sort((a,b)=>{ const oa=order[a.type]||0,ob=order[b.type]||0; if(oa!==ob)return oa-ob; return(a.year||0)-(b.year||0); });
+        hits.sort((a,b)=>{
+          const oa=order[a.type]||0, ob=order[b.type]||0;
+          if(oa!==ob) return oa-ob;
+          return (a.year||0)-(b.year||0);
+        });
 
+        const fmtV=v=>v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
         hits.forEach(d=>{
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
+          const row=document.createElement('div');
+          row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
           if(d.type==='meta'){
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dfe6e9;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">R$ '+fmtM(d.val)+'</span>';
+            row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dfe6e9;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">R$ '+fmtV(d.val)+'</span>';
           } else if(d.type==='forecast'){
-            const valColor=(!d.projected&&d.expected)?(d.hit?'#00b894':'#e17055'):'#74b9ff';
-            const displayVal=(!d.projected&&d.expected)?d.expected:d.val;
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#74b9ff;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">PREVISÃO</span></span><span style="font-weight:700;color:'+valColor+';">R$ '+fmtM(displayVal)+'</span>';
+            const label = d.projected ? 'PREVISÃO' : (d.hit?'✓ ATINGIU':'✗ ABAIXO');
+            const ym='2026-'+String(m).padStart(2,'0');
+            const ctrTxt=cnt[ym]?'<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
+            row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+d.color+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+label+'</span></span><span style="font-weight:700;color:'+d.color+';text-align:right;">R$ '+fmtV(d.val)+ctrTxt+'</span>';
           } else {
-            const ym = d.year+'-'+String(m).padStart(2,'0');
-            const ctr = cnt[ym]?'<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+d.color+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+(YEAR_LABELS[d.year]||d.year)+'</span></span><span style="font-weight:700;color:'+d.color+';text-align:right;">R$ '+fmtM(d.val)+ctr+'</span>';
+            const ym=d.year+'-'+String(m).padStart(2,'0');
+            const ctrTxt=cnt[ym]?'<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
+            row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+d.color+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+d.year+'</span></span><span style="font-weight:700;color:'+d.color+';text-align:right;">R$ '+fmtV(d.val)+ctrTxt+'</span>';
           }
           popup.appendChild(row);
         });
@@ -1720,10 +1745,22 @@ update();
         if(px<8) px=8;
         if(py<8) py=br.bottom+8;
         popup.style.left=px+'px'; popup.style.top=py+'px';
-        document.getElementById('popup-close').addEventListener('click', e=>{ e.stopPropagation(); removePopup(); });
+        document.getElementById('popup-close').addEventListener('click',e=>{e.stopPropagation();removePopup();});
       });
       wrap.appendChild(btn);
     }
+  }
+
+  // ── Botões de ano ─────────────────────────────────────────────
+  function initButtons(){
+    document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const yr=btn.dataset.year==='meta'?'meta':btn.dataset.year==='forecast'?'forecast':parseInt(btn.dataset.year);
+        if(activeYears.has(yr)){activeYears.delete(yr);btn.classList.remove('active');}
+        else{activeYears.add(yr);btn.classList.add('active');}
+        drawChart();
+      });
+    });
   }
 
   if(document.readyState==='complete'||document.readyState==='interactive'){
@@ -1731,8 +1768,7 @@ update();
   } else {
     document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{drawChart();initButtons();},100));
   }
-  window.addEventListener('resize',drawChart);
-  // Expose globally so CSV import can trigger redraw
+  window.addEventListener('resize', drawChart);
   window._redrawTrendChart = drawChart;
 })();
 
