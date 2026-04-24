@@ -1589,7 +1589,9 @@ update();
 
       // Dots — realized months: green if hit, red if missed; future: open circle
       for(let m=1;m<=12;m++){
-        if(m<=REALIZED_UNTIL){
+        // Mês atual em andamento: trata como projetado (círculo aberto), não como realizado
+        const isCurrentMonth = (currentYear===2026 && m===currentMonth);
+        if(m<=REALIZED_UNTIL && !isCurrentMonth){
           // Draw expected dot (hollow)
           const exp=EXPECTED_2026[m]; if(!exp) continue;
           ctx.beginPath();ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
