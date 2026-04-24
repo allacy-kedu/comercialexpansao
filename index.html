@@ -1429,50 +1429,46 @@ update();
 
   function calcForecast(monthly){
     const today = new Date();
-    const currentYear  = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-    const dayOfMonth   = today.getDate();
-    const daysInMonth  = new Date(currentYear, currentMonth, 0).getDate();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // 1-12
+    const dayOfMonth = today.getDate();
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
-    // Meses realizados de 2026 — valores reais sem extrapolar
+    // Realized 2026 months
     const realized = {};
     let lastRealizedMonth = 0;
-    let lastCompleteMonth = 0;
     for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){
-        realized[m] = monthly[k];
-        lastRealizedMonth = m;
-        if(!(currentYear===2026 && m===currentMonth)) lastCompleteMonth = m;
-      }
+      if(monthly[k]){realized[m]=monthly[k]; lastRealizedMonth=m;}
     }
 
-    // Cópia separada com mês atual extrapolado (só para o forecast)
-    const realizedForForecast = {...realized};
-    if(currentYear===2026 && realized[currentMonth]){
+    // For the current month in 2026, extrapolate by daily rate
+    if(currentYear === 2026 && realized[currentMonth]){
+      const partialSales = realized[currentMonth];
       const daysElapsed = Math.max(1, dayOfMonth - 1);
-      realizedForForecast[currentMonth] = Math.round(realized[currentMonth] / daysElapsed * daysInMonth);
+      const projected = Math.round(partialSales / daysElapsed * daysInMonth);
+      realized[currentMonth] = projected;
     }
 
-    // Fator de crescimento — apenas meses completos
+    // Growth factor from completed realized months (exclude current month)
     let rNum=0, rDen=0;
-    for(let m=1;m<=lastCompleteMonth;m++){
+    Object.entries(realized).forEach(([m,v])=>{
+      if(parseInt(m) === currentMonth && currentYear === 2026) return;
       const k2025='2025-'+String(m).padStart(2,'0');
-      if(realized[m] && monthly[k2025]){ rNum+=realized[m]; rDen+=monthly[k2025]; }
-    }
+      if(monthly[k2025]){rNum+=v; rDen+=monthly[k2025];}
+    });
     const growthFactor = rDen>0 ? rNum/rDen : 1.0;
 
     const forecast = {}, expected = {};
     for(let m=1;m<=12;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
       const base2025 = monthly[k2025] || null;
-      const exp = base2025 ? Math.round(base2025*growthFactor) : null;
+      const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
       expected[m] = exp;
-      forecast[m] = realizedForForecast[m] !== undefined ? realizedForForecast[m] : exp;
+      forecast[m] = realized[m] !== undefined ? realized[m] : exp;
     }
-    return {forecast, expected, realized, lastRealizedMonth, lastCompleteMonth, growthFactor};
+    return {forecast, expected, realized, lastRealizedMonth, growthFactor};
   }
-
   const _dots = []; // hit-test registry
 
   const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -1482,165 +1478,159 @@ update();
   const activeYears = new Set([2022,2023,2024,2025,2026,'meta','forecast']);
 
   function drawChart(){
-    // ── Dados base ──────────────────────────────────────────────
+    const MONTHLY_RAW = {};
+    RAW.forEach(r => {
+      if(!r.assinatura || !r.fat_kedu) return;
+      const ym = r.assinatura.slice(0,7);
+      MONTHLY_RAW[ym] = (MONTHLY_RAW[ym]||0) + r.fat_kedu;
+    });
+    function getVal(y,m){ return MONTHLY_RAW[y+'-'+String(m).padStart(2,'0')]||null; }
+
     const {agg:_agg, cnt:_cnt} = buildMonthly();
     const _monthly = {..._agg};
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, lastCompleteMonth:LAST_COMPLETE} = calcForecast(_monthly);
+    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL} = calcForecast(_monthly);
 
-    // getVal usa os dados reais do RAW (sem extrapolação do mês atual)
-    function getVal(y,m){ return _monthly[y+'-'+String(m).padStart(2,'0')]||null; }
-
-    // NOW_YEAR/NOW_MONTH usados para excluir mês parcial da linha 2026
-    const _today = new Date();
-    const NOW_YEAR  = _today.getFullYear();
-    const NOW_MONTH = _today.getMonth() + 1; // 1–12
-    // LAST_COMPLETE vem do calcForecast — último mês com dados completos
+    // Mês atual em andamento — não exibir como "realizado" nos dots
+    const _nowDate = new Date();
+    const NOW_YEAR  = _nowDate.getFullYear();
+    const NOW_MONTH = _nowDate.getMonth() + 1;
 
     _dots.length = 0;
 
-    // ── Subtitle ────────────────────────────────────────────────
     const subEl = document.getElementById('trend-forecast-sub');
     if(subEl){
       const total = Object.values(FORECAST_2026).reduce((s,v)=>s+(v||0),0);
       subEl.textContent = 'Projeção anual 2026: R$ ' + (total>=1e6?(total/1e6).toFixed(1)+'M':(total/1000).toFixed(0)+'K');
     }
-
-    // ── Canvas setup ────────────────────────────────────────────
-    const canvas = document.getElementById('trend-chart');
-    if(!canvas) return;
-    const W = canvas.parentElement.offsetWidth||800, H = 220;
+    const canvas=document.getElementById('trend-chart');
+    if(!canvas)return;
+    const wrap=canvas.parentElement;
+    const W=wrap.offsetWidth||800, H=220;
     canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
     canvas.style.width=W+'px'; canvas.style.height=H+'px';
-    const ctx = canvas.getContext('2d');
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-    const pad = {top:16, right:50, bottom:8, left:62};
-    const cW = W-pad.left-pad.right, cH = H-pad.top-pad.bottom;
+    const ctx=canvas.getContext('2d');
+    ctx.scale(devicePixelRatio,devicePixelRatio);
+    const pad={top:16,right:50,bottom:8,left:62};
+    const cW=W-pad.left-pad.right, cH=H-pad.top-pad.bottom;
 
-    // ── Escala ──────────────────────────────────────────────────
-    let maxVal = 0;
-    YEARS.forEach(y=>{ if(!activeYears.has(y))return; for(let m=1;m<=12;m++){const v=getVal(y,m);if(v>maxVal)maxVal=v;} });
-    if(activeYears.has('meta'))   Object.values(METAS_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
+    let maxVal=0;
+    YEARS.forEach(y=>{
+      if(!activeYears.has(y))return;
+      for(let m=1;m<=12;m++){const v=getVal(y,m);if(v&&v>maxVal)maxVal=v;}
+    });
+    if(activeYears.has('meta'))Object.values(METAS_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
     if(activeYears.has('forecast'))Object.values(FORECAST_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
-    if(!maxVal) maxVal=3000000;
-    maxVal *= 1.12;
+    if(!maxVal)maxVal=3000000;
+    maxVal*=1.12;
 
-    const toX = m => pad.left + (m-1)*(cW/11);
-    const toY = v => pad.top + cH - (v/maxVal)*cH;
+    const toX=m=>pad.left+(m-1)*(cW/11);
+    const toY=v=>pad.top+cH-(v/maxVal)*cH;
 
     ctx.clearRect(0,0,W,H);
 
-    // ── Grid + labels Y ─────────────────────────────────────────
-    ctx.strokeStyle='rgba(99,179,237,0.06)'; ctx.lineWidth=1;
-    for(let i=0;i<=4;i++){ const yy=pad.top+(cH/4)*i; ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+cW,yy);ctx.stroke(); }
-    ctx.fillStyle='rgba(90,106,130,0.8)'; ctx.font='9px DM Mono,monospace'; ctx.textAlign='right';
-    for(let i=0;i<=4;i++){ const v=maxVal*(1-i/4),yy=pad.top+(cH/4)*i; ctx.fillText('R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),pad.left-6,yy+3); }
+    // Grid
+    ctx.strokeStyle='rgba(99,179,237,0.06)';ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){const yy=pad.top+(cH/4)*i;ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+cW,yy);ctx.stroke();}
 
-    // ── Meta (linha tracejada branca) ────────────────────────────
+    // Y labels
+    ctx.fillStyle='rgba(90,106,130,0.8)';ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
+    for(let i=0;i<=4;i++){
+      const v=maxVal*(1-i/4),yy=pad.top+(cH/4)*i;
+      ctx.fillText('R$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),pad.left-6,yy+3);
+    }
+
+    // Meta
     if(activeYears.has('meta')){
       ctx.beginPath();
-      for(let m=1;m<=12;m++){ const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0; m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v)); }
-      ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
+      for(let m=1;m<=12;m++){const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));}
+      ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
       for(let m=1;m<=12;m++){
         const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;
-        ctx.beginPath(); ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-        ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fill();
+        ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
+        ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fill();
         _dots.push({x:toX(m),y:toY(v),type:'meta',month:m,val:v});
       }
     }
 
-    // ── Forecast (linha azul) ────────────────────────────────────
+    // Forecast
     if(activeYears.has('forecast')){
-      // Área sombreada — apenas meses futuros (após o último completo)
-      if(LAST_COMPLETE < 12){
+      if(REALIZED_UNTIL < 12){
         ctx.beginPath();
-        const anchorM = LAST_COMPLETE > 0 ? LAST_COMPLETE : 1;
-        ctx.moveTo(toX(anchorM), toY(FORECAST_2026[anchorM]||0));
-        for(let m=anchorM+1;m<=12;m++){ const v=FORECAST_2026[m]; if(v) ctx.lineTo(toX(m),toY(v)); }
-        ctx.lineTo(toX(12),toY(0)); ctx.lineTo(toX(anchorM),toY(0)); ctx.closePath();
+        ctx.moveTo(toX(REALIZED_UNTIL),toY(EXPECTED_2026[REALIZED_UNTIL]||FORECAST_2026[REALIZED_UNTIL]));
+        for(let m=REALIZED_UNTIL+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
+        ctx.lineTo(toX(12),toY(0));ctx.lineTo(toX(REALIZED_UNTIL),toY(0));ctx.closePath();
         const g=ctx.createLinearGradient(0,pad.top,0,pad.top+cH);
-        g.addColorStop(0,'rgba(116,185,255,0.10)'); g.addColorStop(1,'rgba(116,185,255,0.01)');
-        ctx.fillStyle=g; ctx.fill();
+        g.addColorStop(0,'rgba(116,185,255,0.10)');g.addColorStop(1,'rgba(116,185,255,0.01)');
+        ctx.fillStyle=g;ctx.fill();
       }
-
-      // Linha esperada sobre meses já realizados (tracejada fina)
-      if(LAST_COMPLETE > 0){
+      if(REALIZED_UNTIL > 0){
         ctx.beginPath();
-        for(let m=1;m<=LAST_COMPLETE;m++){ const v=EXPECTED_2026[m]; if(!v) continue; m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v)); }
-        ctx.setLineDash([3,3]); ctx.strokeStyle='rgba(116,185,255,0.45)'; ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
+        for(let m=1;m<=REALIZED_UNTIL;m++){
+          const v=EXPECTED_2026[m]; if(!v) continue;
+          m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));
+        }
+        ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(116,185,255,0.45)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
       }
-
-      // Linha de projeção futura (tracejada azul grossa)
-      if(LAST_COMPLETE < 12){
+      if(REALIZED_UNTIL < 12){
         ctx.beginPath();
-        const startM = LAST_COMPLETE > 0 ? LAST_COMPLETE : 1;
-        ctx.moveTo(toX(startM), toY(FORECAST_2026[startM]||0));
-        for(let m=startM+1;m<=12;m++){ const v=FORECAST_2026[m]; if(v) ctx.lineTo(toX(m),toY(v)); }
-        ctx.setLineDash([5,4]); ctx.strokeStyle=FC_COLOR; ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]);
+        const startM = REALIZED_UNTIL > 0 ? REALIZED_UNTIL : 1;
+        ctx.moveTo(toX(startM), toY(EXPECTED_2026[startM]||FORECAST_2026[startM]));
+        for(let m=startM+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
+        ctx.setLineDash([5,4]);ctx.strokeStyle=FC_COLOR;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
       }
 
-      // Dots de forecast:
-      // - Meses completos (≤ LAST_COMPLETE): dot colorido (verde=bateu, vermelho=não bateu)
-      // - Demais (mês atual parcial + futuros): círculo aberto azul
+      // Dots — mês atual tratado como projetado (sem dot colorido)
       for(let m=1;m<=12;m++){
-        if(m <= LAST_COMPLETE){
-          const real = REALIZED_2026[m];
-          const exp  = EXPECTED_2026[m];
-          if(!real || !exp) continue;
+        const isCurrent = (NOW_YEAR===2026 && m===NOW_MONTH);
+        if(m<=REALIZED_UNTIL && !isCurrent){
+          const exp=EXPECTED_2026[m]; if(!exp) continue;
+          const real=REALIZED_2026[m]; if(!real) continue;
           const hit = real >= exp;
           const dotColor = hit ? '#00b894' : '#e17055';
-          // Dot hollow da esperada
-          ctx.beginPath(); ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
-          ctx.strokeStyle='rgba(116,185,255,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
-          // Dot preenchido do realizado
-          ctx.beginPath(); ctx.arc(toX(m),toY(real),5,0,Math.PI*2);
-          ctx.fillStyle=dotColor; ctx.fill();
-          ctx.beginPath(); ctx.arc(toX(m),toY(real),6.5,0,Math.PI*2);
-          ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=1; ctx.stroke();
+          ctx.beginPath();ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
+          ctx.strokeStyle='rgba(116,185,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();
+          ctx.beginPath();ctx.arc(toX(m),toY(real),5,0,Math.PI*2);
+          ctx.fillStyle=dotColor;ctx.fill();
+          ctx.beginPath();ctx.arc(toX(m),toY(real),6.5,0,Math.PI*2);
+          ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();
           _dots.push({x:toX(m),y:toY(real),type:'forecast',month:m,val:real,expected:exp,hit,color:dotColor,projected:false});
         } else {
-          // Mês atual (parcial) ou futuro — círculo aberto azul sobre a linha de forecast
-          const v = FORECAST_2026[m]; if(!v) continue;
-          ctx.beginPath(); ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-          ctx.strokeStyle=FC_COLOR; ctx.lineWidth=1.5; ctx.stroke();
-          ctx.fillStyle='rgba(8,9,15,0.6)'; ctx.fill();
+          const v=FORECAST_2026[m]; if(!v) continue;
+          ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
+          ctx.strokeStyle=FC_COLOR;ctx.lineWidth=1.5;ctx.stroke();
+          ctx.fillStyle='rgba(8,9,15,0.6)';ctx.fill();
           _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,expected:v,color:FC_COLOR,projected:true});
         }
       }
     }
 
-    // ── Linhas históricas (2022–2026) ────────────────────────────
+    // Historical lines (2022–2026)
     YEARS.forEach(y=>{
-      if(!activeYears.has(y)) return;
-      // Para 2026: plota apenas meses com dados completos (exclui mês atual parcial)
-      const pts = [];
+      if(!activeYears.has(y))return;
+      const pts=[];
       for(let m=1;m<=12;m++){
-        if(y===2026 && NOW_YEAR===2026 && m===NOW_MONTH) continue; // exclui mês parcial
-        const v=getVal(y,m); if(v!==null) pts.push({m,v});
+        // Para 2026: exclui o mês atual (dados parciais) da linha
+        if(y===2026 && NOW_YEAR===2026 && m===NOW_MONTH) continue;
+        const v=getVal(y,m);if(v!==null)pts.push({m,v});
       }
-      if(!pts.length) return;
-
-      // Linha
+      if(!pts.length)return;
       ctx.beginPath();
       pts.forEach((p,i)=>{
-        const x=toX(p.m), yy=toY(p.v);
-        if(i===0){ ctx.moveTo(x,yy); return; }
-        const prev=pts[i-1], px=toX(prev.m), py=toY(prev.v), cpx=px+(x-px)*0.5;
+        const x=toX(p.m),yy=toY(p.v);
+        if(i===0){ctx.moveTo(x,yy);return;}
+        const prev=pts[i-1],px=toX(prev.m),py=toY(prev.v),cpx=px+(x-px)*0.5;
         ctx.bezierCurveTo(cpx,py,cpx,yy,x,yy);
       });
       ctx.setLineDash(y===2026?[6,3]:[]);
-      ctx.lineWidth = (y===2025||y===2026) ? 2 : 1.5;
-      ctx.strokeStyle = COLORS[y]; ctx.stroke(); ctx.setLineDash([]);
-
-      // Dots
+      ctx.lineWidth=y===2025||y===2026?2:1.5;
+      ctx.strokeStyle=COLORS[y];ctx.stroke();ctx.setLineDash([]);
       pts.forEach(p=>{
-        const r = (y===2026||y===2025) ? 3 : 2;
-        ctx.beginPath(); ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);
-        ctx.fillStyle=COLORS[y]; ctx.fill();
+        const r=y===2026||y===2025?3:2;
+        ctx.beginPath();ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);ctx.fillStyle=COLORS[y];ctx.fill();
         _dots.push({x:toX(p.m),y:toY(p.v),type:'year',year:y,month:p.m,val:p.v,color:COLORS[y],r});
       });
     });
-
     buildMonthButtons(_dots, _cnt);
   }
 
