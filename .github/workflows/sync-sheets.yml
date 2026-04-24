@@ -1,1 +1,45 @@
+name: Sync Google Sheets → data.json
+
+on:
+  schedule:
+    # A cada 15 minutos (mínimo do GitHub Actions)
+    - cron: "*/15 * * * *"
+  workflow_dispatch:   # permite rodar manualmente pelo GitHub
+
+permissions:
+  contents: write      # necessário para fazer commit no repo
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Executar sync
+        run: python sync_sheets.py
+
+      - name: Commit data.json se houve mudança
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          # Só commita se o arquivo realmente mudou
+          if git diff --staged --quiet; then
+            echo "Sem mudanças em data.json — nada a commitar."
+          else
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+            git commit -m "chore: sync sheets → data.json [${TIMESTAMP}]"
+            git push
+          fi
 
