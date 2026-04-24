@@ -23,9 +23,11 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar dependências
-        run: pip install requests
+        run: pip install requests cryptography
 
       - name: Executar sync
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: python sync_sheets.py
 
       - name: Commit data.json se houve mudança
