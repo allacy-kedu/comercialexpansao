@@ -708,8 +708,8 @@ const TEAM = {
   'Mônica Gomes':      {regional:'R2', cargo:'Closer'},
   'Pedro Barrocas':    {regional:'R2', cargo:'Inside Sales'},
 };
-const METAS_CLOSER = {'2026-01':143000,'2026-02':115000,'2026-03':200000,'2026-04':267000,'2026-05':267000,'2026-06':267000,'2026-07':267000,'2026-08':267000,'2026-09':267000,'2026-10':267000,'2026-11':267000,'2026-12':267000};
-const METAS_IS     = {'2026-01':100000,'2026-02':80000,'2026-03':140000,'2026-04':187000,'2026-05':187000,'2026-06':187000,'2026-07':187000,'2026-08':187000,'2026-09':187000,'2026-10':187000,'2026-11':187000,'2026-12':187000};
+const METAS_CLOSER = {'2026-01':143000,'2026-02':115000,'2026-03':200000,'2026-04':267000,'2026-05':341000,'2026-06':341000,'2026-07':341000,'2026-08':341000,'2026-09':341000,'2026-10':341000,'2026-11':341000,'2026-12':341000};
+const METAS_IS     = {'2026-01':100000,'2026-02':80000,'2026-03':140000,'2026-04':187000,'2026-05':252000,'2026-06':252000,'2026-07':252000,'2026-08':252000,'2026-09':252000,'2026-10':252000,'2026-11':252000,'2026-12':252000};
 function getMetaVendedor(nome, ym){
   const t = TEAM[nome];
   if(!t) return null;
@@ -717,9 +717,9 @@ function getMetaVendedor(nome, ym){
   if(t.cargo==='Inside Sales') return METAS_IS[ym]||null;
   return null;
 }
-const METAS_R1 = {'2026-01':772600,'2026-02':617400,'2026-03':1080000,'2026-04':1440000,'2026-05':1440000,'2026-06':1440000,'2026-07':1440000,'2026-08':1440000,'2026-09':1440000,'2026-10':1440000,'2026-11':1440000,'2026-12':1440000};
-const METAS_R2 = {'2026-01':728400,'2026-02':582700,'2026-03':1020000,'2026-04':1360000,'2026-05':1360000,'2026-06':1360000,'2026-07':1360000,'2026-08':1360000,'2026-09':1360000,'2026-10':1360000,'2026-11':1360000,'2026-12':1360000};
-const METAS_GERAL = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,'2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,'2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
+const METAS_R1 = {'2026-01':772600,'2026-02':617400,'2026-03':1080000,'2026-04':1440000,'2026-05':1616000,'2026-06':1616000,'2026-07':1616000,'2026-08':1616000,'2026-09':1616000,'2026-10':1616000,'2026-11':1616000,'2026-12':1616000};
+const METAS_R2 = {'2026-01':728400,'2026-02':582700,'2026-03':1020000,'2026-04':1360000,'2026-05':1186000,'2026-06':1186000,'2026-07':1186000,'2026-08':1186000,'2026-09':1186000,'2026-10':1186000,'2026-11':1186000,'2026-12':1186000};
+const METAS_GERAL = {'2026-01':1501000,'2026-02':1200100,'2026-03':2100000,'2026-04':2800000,'2026-05':2802000,'2026-06':2802000,'2026-07':2802000,'2026-08':2802000,'2026-09':2802000,'2026-10':2802000,'2026-11':2802000,'2026-12':2802000};
 
 const RAW=[];
 
@@ -1412,9 +1412,7 @@ update();
 
 // ── Trend Chart ──────────────────────────────────────────────
 (function(){
-  const METAS_2026 = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,
-    '2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,
-    '2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
+  const METAS_2026 = {'2026-01':1501000,'2026-02':1200100,'2026-03':2100000,'2026-04':2800000,'2026-05':2802000,'2026-06':2802000,'2026-07':2802000,'2026-08':2802000,'2026-09':2802000,'2026-10':2802000,'2026-11':2802000,'2026-12':2802000};
 
   function buildMonthly(){
     const agg = {}, cnt = {};
@@ -1428,8 +1426,11 @@ update();
   }
 
   function calcForecast(monthly){
-    // Method: 2025 as sole base year * growth factor
-    // Growth factor = sum realized 2026 / same months in 2025
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // 1-12
+    const dayOfMonth = today.getDate();
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
     // Realized 2026 months
     const realized = {};
@@ -1439,17 +1440,24 @@ update();
       if(monthly[k]){realized[m]=monthly[k]; lastRealizedMonth=m;}
     }
 
-    // Growth factor from realized months
+    // For the current month in 2026, extrapolate by daily rate
+    // partialSales ÷ daysElapsed × daysInMonth
+    if(currentYear === 2026 && realized[currentMonth]){
+      const partialSales = realized[currentMonth];
+      const daysElapsed = Math.max(1, dayOfMonth - 1); // days with data
+      const projected = Math.round(partialSales / daysElapsed * daysInMonth);
+      realized[currentMonth] = projected; // replace partial with extrapolated
+    }
+
+    // Growth factor from completed realized months (exclude current month)
     let rNum=0, rDen=0;
     Object.entries(realized).forEach(([m,v])=>{
+      if(parseInt(m) === currentMonth && currentYear === 2026) return; // skip current
       const k2025='2025-'+String(m).padStart(2,'0');
       if(monthly[k2025]){rNum+=v; rDen+=monthly[k2025];}
     });
     const growthFactor = rDen>0 ? rNum/rDen : 1.0;
 
-    // Build forecast for ALL 12 months (including realized ones)
-    // forecast[m] = what was EXPECTED based on 2025 * factor
-    // realized[m] = what actually happened (only for realized months)
     const forecast = {};
     const expected = {};
     for(let m=1;m<=12;m++){
@@ -1457,7 +1465,6 @@ update();
       const base2025 = monthly[k2025] || null;
       const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
       expected[m] = exp;
-      // For future months: forecast = expected; for past: forecast = realized
       forecast[m] = realized[m] !== undefined ? realized[m] : exp;
     }
     return {forecast, expected, realized, lastRealizedMonth, growthFactor};
