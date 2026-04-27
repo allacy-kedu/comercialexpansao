@@ -1612,10 +1612,15 @@ update();
     }
 
     // Historical lines
+    const _nowMonth = new Date().getMonth()+1;
     YEARS.forEach(y=>{
       if(!activeYears.has(y))return;
       const pts=[];
-      for(let m=1;m<=12;m++){const v=getVal(y,m);if(v!==null)pts.push({m,v});}
+      for(let m=1;m<=12;m++){
+        // Para 2026 no mês atual: usa valor extrapolado (igual à linha de forecast)
+        let v = (y===2026 && m===_nowMonth) ? (FORECAST_2026[m]||null) : getVal(y,m);
+        if(v!==null) pts.push({m,v});
+      }
       if(!pts.length)return;
       ctx.beginPath();
       pts.forEach((p,i)=>{
