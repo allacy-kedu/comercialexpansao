@@ -1428,48 +1428,63 @@ update();
   }
 
   function calcForecast(monthly){
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1-12
-    const dayOfMonth = today.getDate();
-    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const today      = new Date();
+    const currentYear  = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // 1–12
 
-    // Realized 2026 months
+    // Dias decorridos e totais do ano corrente
+    const startOfYear  = new Date(currentYear, 0, 1);
+    const endOfYear    = new Date(currentYear, 11, 31);
+    const dayOfYear    = Math.floor((today - startOfYear) / 86400000) + 1;
+    const daysInYear   = Math.floor((endOfYear - startOfYear) / 86400000) + 1;
+
+    // Realizados de 2026 (valores reais, sem modificar)
     const realized = {};
     let lastRealizedMonth = 0;
     for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){realized[m]=monthly[k]; lastRealizedMonth=m;}
+      if(monthly[k]){ realized[m]=monthly[k]; lastRealizedMonth=m; }
     }
 
-    // For the current month in 2026, extrapolate by daily rate
-    // partialSales ÷ daysElapsed × daysInMonth
-    if(currentYear === 2026 && realized[currentMonth]){
-      const partialSales = realized[currentMonth];
-      const daysElapsed = Math.max(1, dayOfMonth - 1); // days with data
-      const projected = Math.round(partialSales / daysElapsed * daysInMonth);
-      realized[currentMonth] = projected; // replace partial with extrapolated
-    }
+    // Projeção anual: soma de tudo realizado até hoje ÷ dias decorridos × dias no ano
+    const totalRealizado = Object.values(realized).reduce((s,v)=>s+v, 0);
+    const projecaoAnual  = currentYear===2026 && dayOfYear>0
+      ? Math.round(totalRealizado / dayOfYear * daysInYear)
+      : totalRealizado;
 
-    // Growth factor from completed realized months (exclude current month)
+    // Fator de crescimento baseado nos meses encerrados (< mês atual)
     let rNum=0, rDen=0;
-    Object.entries(realized).forEach(([m,v])=>{
-      if(parseInt(m) === currentMonth && currentYear === 2026) return; // skip current
+    for(let m=1; m<currentMonth; m++){
+      const r = realized[m];
       const k2025='2025-'+String(m).padStart(2,'0');
-      if(monthly[k2025]){rNum+=v; rDen+=monthly[k2025];}
-    });
+      const p = monthly[k2025];
+      if(r && p){ rNum+=r; rDen+=p; }
+    }
     const growthFactor = rDen>0 ? rNum/rDen : 1.0;
 
-    const forecast = {};
-    const expected = {};
+    // Monta forecast mês a mês:
+    //   encerrados  → valor real
+    //   mês atual   → extrapola pelo ritmo diário (dias decorridos no mês)
+    //   futuros     → projeta com fator de crescimento vs 2025
+    const forecast = {}, expected = {};
     for(let m=1;m<=12;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
       const base2025 = monthly[k2025] || null;
       const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
       expected[m] = exp;
-      forecast[m] = realized[m] !== undefined ? realized[m] : exp;
+
+      if(m < currentMonth && realized[m]){
+        forecast[m] = realized[m]; // mês encerrado: real
+      } else if(m === currentMonth && realized[m]){
+        // mês em andamento: extrapola pelo ritmo diário do mês
+        const daysInMonth  = new Date(currentYear, m, 0).getDate();
+        const daysElapsed  = Math.max(1, today.getDate() - 1);
+        forecast[m] = Math.round(realized[m] / daysElapsed * daysInMonth);
+      } else {
+        forecast[m] = exp; // futuro: projeção
+      }
     }
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor};
+    return {forecast, expected, realized, lastRealizedMonth, growthFactor, projecaoAnual};
   }
 
   const _dots = []; // hit-test registry
@@ -1492,14 +1507,13 @@ update();
 
     const {agg:_agg, cnt:_cnt} = buildMonthly();
     const _monthly = {..._agg};
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, growthFactor:GROWTH_FACTOR} = calcForecast(_monthly);
+    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, growthFactor:GROWTH_FACTOR, projecaoAnual:PROJ_ANUAL} = calcForecast(_monthly);
     _dots.length = 0;
 
     // Update subtitle
     const subEl = document.getElementById('trend-forecast-sub');
     if(subEl){
-      const total = Object.values(FORECAST_2026).reduce((s,v)=>s+(v||0),0);
-      const totalFmt = total>=1000000?(total/1000000).toFixed(1)+'M':(total/1000).toFixed(0)+'K';
+      const totalFmt = PROJ_ANUAL>=1000000?(PROJ_ANUAL/1000000).toFixed(1)+'M':(PROJ_ANUAL/1000).toFixed(0)+'K';
       subEl.textContent = 'Projeção anual 2026: R$ ' + totalFmt;
     }
     const canvas=document.getElementById('trend-chart');
@@ -1587,33 +1601,13 @@ update();
         ctx.setLineDash([5,4]);ctx.strokeStyle=FC_COLOR;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
       }
 
-      // Dots — realized months: green if hit, red if missed; future: open circle
+      // Dots — todos como círculo aberto azul (sem verde/vermelho)
       for(let m=1;m<=12;m++){
-        if(m<=REALIZED_UNTIL){
-          // Draw expected dot (hollow)
-          const exp=EXPECTED_2026[m]; if(!exp) continue;
-          ctx.beginPath();ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
-          ctx.strokeStyle='rgba(116,185,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();
-
-          // Draw realized dot — green if >= expected, red if below
-          const real=REALIZED_2026[m];
-          const hit = real >= exp;
-          const dotColor = hit ? '#00b894' : '#e17055';
-          const dotR = 5;
-          ctx.beginPath();ctx.arc(toX(m),toY(real),dotR,0,Math.PI*2);
-          ctx.fillStyle=dotColor;ctx.fill();
-          // White ring around dot
-          ctx.beginPath();ctx.arc(toX(m),toY(real),dotR+1.5,0,Math.PI*2);
-          ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();
-
-          _dots.push({x:toX(m),y:toY(real),type:'forecast',month:m,val:real,expected:exp,hit,color:dotColor,projected:false});
-        } else {
-          const v=FORECAST_2026[m]; if(!v) continue;
-          ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-          ctx.strokeStyle=FC_COLOR;ctx.lineWidth=1.5;ctx.stroke();
-          ctx.fillStyle='rgba(8,9,15,0.6)';ctx.fill();
-          _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,expected:v,color:FC_COLOR,projected:true});
-        }
+        const v=FORECAST_2026[m]; if(!v) continue;
+        ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
+        ctx.strokeStyle=FC_COLOR;ctx.lineWidth=1.5;ctx.stroke();
+        ctx.fillStyle='rgba(8,9,15,0.6)';ctx.fill();
+        _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,color:FC_COLOR,projected:m>REALIZED_UNTIL});
       }
     }
 
