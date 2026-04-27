@@ -588,6 +588,16 @@ document.addEventListener('click', e=>{
       <div class="kpi-value" id="kpi-margem" style="color:#e17dfa">—</div>
       <div class="kpi-sub" id="kpi-margem-sub">—</div>
     </div>
+    <div class="kpi" style="--kpi-c:#b39ddb">
+      <div class="kpi-label">Margem Garantia Prevista</div>
+      <div class="kpi-value" id="kpi-margem-gp" style="color:#b39ddb">—</div>
+      <div class="kpi-sub" id="kpi-margem-gp-sub">—</div>
+    </div>
+    <div class="kpi" style="--kpi-c:#80cbc4">
+      <div class="kpi-label">Margem Outras Garantias</div>
+      <div class="kpi-value" id="kpi-margem-og" style="color:#80cbc4">—</div>
+      <div class="kpi-sub" id="kpi-margem-og-sub">—</div>
+    </div>
   </div>
 
   <div class="stitle">Operacional</div>
@@ -1029,10 +1039,21 @@ function update(){
   const comSp=data.filter(r=>r.spread!=null&&r.fat_escola!=null);
   const spFatE=comSp.reduce((s,r)=>s+(r.fat_escola||0),0);
   const spM=spFatE>0?comSp.reduce((s,r)=>s+r.spread*(r.fat_escola||0),0)/spFatE:null;
-  // Margem = SOMARPRODUTO(margem * fat_escola) / SOMA(fat_escola)
-  const comMg=data.filter(r=>r.margem!=null&&r.fat_escola!=null);
-  const mgFatE=comMg.reduce((s,r)=>s+(r.fat_escola||0),0);
-  const mgM=mgFatE>0?comMg.reduce((s,r)=>s+r.margem*(r.fat_escola||0),0)/mgFatE:null;
+  // Margem = SOMA(margem_rs) / SOMA(garantido)  [colunas AI/AH]
+  const comMg=data.filter(r=>r.margem_rs!=null&&r.garantido!=null&&r.garantido>0);
+  const somaAH=comMg.reduce((s,r)=>s+(r.garantido||0),0);
+  const somaAI=comMg.reduce((s,r)=>s+(r.margem_rs||0),0);
+  const mgM=somaAH>0?somaAI/somaAH:null;
+  // Margem Garantia Prevista
+  const comMgGP=data.filter(r=>r.margem_rs!=null&&r.garantido!=null&&r.garantido>0&&String(r.modelo||'').trim()==='Garantia Prevista');
+  const somaAH_gp=comMgGP.reduce((s,r)=>s+(r.garantido||0),0);
+  const somaAI_gp=comMgGP.reduce((s,r)=>s+(r.margem_rs||0),0);
+  const mgGP=somaAH_gp>0?somaAI_gp/somaAH_gp:null;
+  // Margem Outras Garantias
+  const comMgOG=data.filter(r=>r.margem_rs!=null&&r.garantido!=null&&r.garantido>0&&String(r.modelo||'').trim()!=='Garantia Prevista');
+  const somaAH_og=comMgOG.reduce((s,r)=>s+(r.garantido||0),0);
+  const somaAI_og=comMgOG.reduce((s,r)=>s+(r.margem_rs||0),0);
+  const mgOG=somaAH_og>0?somaAI_og/somaAH_og:null;
   const ativos=data.filter(r=>r.status==='Ativo').length;
   const churns=data.filter(r=>r.status==='Churn').length;
   const escolas = data.reduce((s,r)=>s+(r.unidades||1),0);
@@ -1167,7 +1188,9 @@ function update(){
   set('kpi-churn',fmtN(churns));set('kpi-churn-sub',pctStr(churns));
   set('kpi-cancelado',fmtN(cCancelado));set('kpi-cancelado-sub',pctStr(cCancelado));
   set('kpi-descredenciamento',fmtN(cDescred));set('kpi-descredenciamento-sub',pctStr(cDescred));
-  set('kpi-margem',mgM!==null?fmtPct(mgM):'—');set('kpi-margem-sub',comMg.length+' contratos c/ margem');
+  set('kpi-margem',mgM!==null?fmtPct(mgM):'—');set('kpi-margem-sub',comMg.length+' contratos');
+  set('kpi-margem-gp',mgGP!==null?fmtPct(mgGP):'—');set('kpi-margem-gp-sub',comMgGP.length+' contratos Garantia Prevista');
+  set('kpi-margem-og',mgOG!==null?fmtPct(mgOG):'—');set('kpi-margem-og-sub',comMgOG.length+' contratos outras garantias');
 
 
   // ── Ranking de Vendas ──────────────────────────────────────
@@ -2098,6 +2121,8 @@ function parseCSVtoRAW(csv){
       spread:       pct(c[13]),
       margem:       pct(c[14]),
       modelo:       d(c[15]),
+      garantido:    n(c[33]),
+      margem_rs:    n(c[34]),
       status:       d(c[17]),
       cidade:       d(c[19]),
       estado:       d(c[20]),
