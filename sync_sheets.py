@@ -109,6 +109,8 @@ def csv_to_raw(text:str)->list:
             "assinatura":  parse_date(col(24)),
             "confessional":1 if str(col(32)).strip().upper()=="TRUE" else 0,
             "unidades":    int(col(6))if str(col(6)).isdigit()else 1,
+            "garantido":   parse_number(col(33)),
+            "margem_rs":   parse_number(col(34)),
         })
     return result
 
