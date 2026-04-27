@@ -547,7 +547,6 @@ document.addEventListener('click', e=>{
         <button class="trend-yr-btn active" data-year="2025" style="--yr-c:#00b894">2025</button>
         <button class="trend-yr-btn active" data-year="2026" style="--yr-c:#fd79a8">2026</button>
         <button class="trend-yr-btn trend-yr-meta active" data-year="meta">Meta</button>
-        <button class="trend-yr-btn active" data-year="forecast" style="--yr-c:#74b9ff">Previsão</button>
       </div>
     </div>
     <div class="trend-canvas-wrap" style="position:relative;">
@@ -1501,7 +1500,7 @@ update();
   const YEARS = [2022,2023,2024,2025,2026];
   const COLORS = {2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
   const FC_COLOR = '#74b9ff';
-  const activeYears = new Set([2022,2023,2024,2025,2026,'meta','forecast']);
+  const activeYears = new Set([2022,2023,2024,2025,2026,'meta']);
 
   function drawChart(){
     // Rebuild all data from current RAW every call
