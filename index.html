@@ -1428,63 +1428,72 @@ update();
   }
 
   function calcForecast(monthly){
-    const today      = new Date();
+    const today        = new Date();
     const currentYear  = today.getFullYear();
     const currentMonth = today.getMonth() + 1; // 1–12
 
-    // Dias decorridos e totais do ano corrente
-    const startOfYear  = new Date(currentYear, 0, 1);
-    const endOfYear    = new Date(currentYear, 11, 31);
-    const dayOfYear    = Math.floor((today - startOfYear) / 86400000) + 1;
-    const daysInYear   = Math.floor((endOfYear - startOfYear) / 86400000) + 1;
+    // Dias decorridos no ano e total do ano
+    const startOfYear = new Date(currentYear, 0, 1);
+    const dayOfYear   = Math.floor((today - startOfYear) / 86400000) + 1;
+    const daysInYear  = (currentYear % 4 === 0) ? 366 : 365;
 
-    // Realizados de 2026 (valores reais, sem modificar)
+    // Realizados de 2026 — valores reais dos meses encerrados (< mês atual)
     const realized = {};
     let lastRealizedMonth = 0;
-    for(let m=1;m<=12;m++){
+    for(let m=1; m<currentMonth; m++){
       const k='2026-'+String(m).padStart(2,'0');
       if(monthly[k]){ realized[m]=monthly[k]; lastRealizedMonth=m; }
     }
 
-    // Projeção anual: soma de tudo realizado até hoje ÷ dias decorridos × dias no ano
+    // Acumulado real até o fim do mês anterior
     const totalRealizado = Object.values(realized).reduce((s,v)=>s+v, 0);
-    const projecaoAnual  = currentYear===2026 && dayOfYear>0
+
+    // Projeção anual: acumulado ÷ dias decorridos × dias no ano
+    const projecaoAnual = dayOfYear > 0
       ? Math.round(totalRealizado / dayOfYear * daysInYear)
       : totalRealizado;
 
-    // Fator de crescimento baseado nos meses encerrados (< mês atual)
-    let rNum=0, rDen=0;
-    for(let m=1; m<currentMonth; m++){
-      const r = realized[m];
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const p = monthly[k2025];
-      if(r && p){ rNum+=r; rDen+=p; }
-    }
-    const growthFactor = rDen>0 ? rNum/rDen : 1.0;
+    // Quanto falta realizar (do mês atual em diante)
+    const restante = projecaoAnual - totalRealizado;
 
-    // Monta forecast mês a mês:
-    //   encerrados  → valor real
-    //   mês atual   → extrapola pelo ritmo diário (dias decorridos no mês)
-    //   futuros     → projeta com fator de crescimento vs 2025
+    // Peso de cada mês futuro baseado no padrão de 2025
+    const pesoFuturo = {};
+    let somaPeso = 0;
+    for(let m=currentMonth; m<=12; m++){
+      const k2025='2025-'+String(m).padStart(2,'0');
+      const v = monthly[k2025] || 0;
+      pesoFuturo[m] = v;
+      somaPeso += v;
+    }
+
+    // Distribui o restante proporcionalmente pelos meses a partir do atual
     const forecast = {}, expected = {};
-    for(let m=1;m<=12;m++){
+    for(let m=1; m<=12; m++){
       const k2025='2025-'+String(m).padStart(2,'0');
       const base2025 = monthly[k2025] || null;
-      const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
-      expected[m] = exp;
+
+      // Expected: projeção simples pelo fator histórico (para referência interna)
+      let rNum=0, rDen=0;
+      for(let mm=1; mm<currentMonth; mm++){
+        const r=realized[mm], p=monthly['2025-'+String(mm).padStart(2,'0')];
+        if(r&&p){rNum+=r;rDen+=p;}
+      }
+      const gf = rDen>0?rNum/rDen:1.0;
+      expected[m] = base2025 ? Math.round(base2025 * gf) : null;
 
       if(m < currentMonth && realized[m]){
-        forecast[m] = realized[m]; // mês encerrado: real
-      } else if(m === currentMonth && realized[m]){
-        // mês em andamento: extrapola pelo ritmo diário do mês
-        const daysInMonth  = new Date(currentYear, m, 0).getDate();
-        const daysElapsed  = Math.max(1, today.getDate());
-        forecast[m] = Math.round(realized[m] / daysElapsed * daysInMonth);
+        // Mês encerrado: valor real
+        forecast[m] = realized[m];
       } else {
-        forecast[m] = exp; // futuro: projeção
+        // Mês atual e futuros: distribui o restante pelo peso do padrão 2025
+        const peso = pesoFuturo[m] || 0;
+        forecast[m] = somaPeso > 0
+          ? Math.round(restante * (peso / somaPeso))
+          : Math.round(restante / (13 - currentMonth));
       }
     }
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor, projecaoAnual};
+
+    return {forecast, expected, realized, lastRealizedMonth, projecaoAnual};
   }
 
   const _dots = []; // hit-test registry
@@ -1507,7 +1516,7 @@ update();
 
     const {agg:_agg, cnt:_cnt} = buildMonthly();
     const _monthly = {..._agg};
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, growthFactor:GROWTH_FACTOR, projecaoAnual:PROJ_ANUAL} = calcForecast(_monthly);
+    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, projecaoAnual:PROJ_ANUAL} = calcForecast(_monthly);
     _dots.length = 0;
 
     // Update subtitle
