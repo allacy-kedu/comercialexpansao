@@ -2479,8 +2479,8 @@ function buildMelhorMes(){
       if(!r.assinatura || !r.fat_kedu) return false;
       const d = new Date(r.assinatura);
       if(!(d.getFullYear()===2026 && (d.getMonth()+1)===m)) return false;
-      // Só Closer e Inside Sales — usa o EXEC_MAP que já tem o cargo de cada executivo
-      const info = EXEC_MAP[r.executivo||''];
+      // Só Closer e Inside Sales — usa o TEAM que tem o cargo de cada executivo
+      const info = TEAM[r.executivo||''];
       if(!info) return false;
       return info.cargo==='Closer' || info.cargo==='Inside Sales';
     });
