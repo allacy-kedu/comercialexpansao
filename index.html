@@ -504,12 +504,14 @@ document.addEventListener('click', e=>{
 
   <div class="ranking-card" id="ranking-card-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div class="ranking-title" style="margin-bottom:0;">Ranking de Vendas &nbsp;<span id="ranking-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <div id="ranking-inner-header" class="ranking-title" style="margin-bottom:0;">Ranking de Vendas &nbsp;<span id="ranking-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
       <div style="display:flex;gap:6px;">
         <button id="ranking-view-cargo" onclick="setRankingView('cargo')" style="background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--accent);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;font-weight:700;letter-spacing:.04em;">Cargo</button>
         <button id="ranking-view-regional" onclick="setRankingView('regional')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Regional</button>
         <button id="ranking-view-geral" onclick="setRankingView('geral')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Geral</button>
         <button id="ranking-view-melhor" onclick="setRankingView('melhor')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Melhor do Mês</button>
+      </div>
       </div>
     </div>
     <div class="ranking-cols" id="ranking-cols">
@@ -1103,6 +1105,8 @@ function setRankingView(view){
   });
   const colsMelhor = document.getElementById('ranking-cols-melhor');
   if(colsMelhor) colsMelhor.style.display = view==='melhor' ? 'block' : 'none';
+  const rankTitle = document.getElementById('ranking-inner-header');
+  if(rankTitle) rankTitle.style.display = view==='melhor' ? 'none' : 'flex';
   if(view==='melhor') buildMelhorMes();
   update();
 }
@@ -1390,7 +1394,9 @@ function rankingAvatar(nome, metaHit){
     if(colsReg)   colsReg.style.display='none';
     if(colsGeral) colsGeral.style.display='none';
 
-    if(rankingView==='regional'){
+    if(rankingView==='melhor'){
+      // Melhor do Mês — não exibe nenhuma coluna de ranking
+    } else if(rankingView==='regional'){
       if(colsReg) colsReg.style.display='grid';
       buildRowsIndividual(r1Members, 'ranking-r1');
       buildRowsIndividual(r2Members, 'ranking-r2');
@@ -2467,7 +2473,11 @@ function buildMelhorMes(){
     const mesData = RAW.filter(r=>{
       if(!r.assinatura || !r.fat_kedu) return false;
       const d = new Date(r.assinatura);
-      return d.getFullYear()===2026 && (d.getMonth()+1)===m;
+      if(!(d.getFullYear()===2026 && (d.getMonth()+1)===m)) return false;
+      // Só Closer e Inside Sales — usa o EXEC_MAP que já tem o cargo de cada executivo
+      const info = EXEC_MAP[r.executivo||''];
+      if(!info) return false;
+      return info.cargo==='Closer' || info.cargo==='Inside Sales';
     });
 
     if(!mesData.length || new Date(2026, m-1, 1) > today){
