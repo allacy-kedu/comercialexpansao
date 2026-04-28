@@ -1107,7 +1107,10 @@ function setRankingView(view){
   if(colsMelhor) colsMelhor.style.display = view==='melhor' ? 'block' : 'none';
   const rankTitle = document.getElementById('ranking-inner-header');
   if(rankTitle) rankTitle.style.display = view==='melhor' ? 'none' : 'flex';
-  if(view==='melhor') buildMelhorMes();
+  if(view==='melhor'){
+    // Pequeno delay para garantir que o DOM e o RAW estejam prontos
+    setTimeout(buildMelhorMes, 50);
+  }
   update();
 }
 
@@ -2434,6 +2437,8 @@ async function autoLoadCSV(showStatus){
     buildEstadoDrop();
     update();
     if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
+    // Atualiza Melhor do Mês se estiver ativo
+    if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
     // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
