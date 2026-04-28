@@ -76,6 +76,16 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-col-title{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
 .ranking-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(78,205,196,0.25);}
+.melhor-avatar-wrap{position:relative;flex-shrink:0;}
+.melhor-avatar-ring{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);padding:2.5px;display:flex;align-items:center;justify-content:center;}
+.melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+.melhor-avatar-fallback{width:100%;height:100%;border-radius:50%;background:#1a1f35;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#FFD700;}
+.melhor-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);font-size:8px;font-weight:800;color:#111320;}
+.melhor-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.melhor-empty{width:56px;height:56px;border-radius:50%;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;}
+.melhor-label{font-size:8px;color:#FFD700;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'DM Mono',monospace;}
+.melhor-name{font-size:9px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;text-align:center;font-family:'DM Mono',monospace;}
+.melhor-val{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
 .ranking-avatar-fallback{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);flex-shrink:0;}
 .ranking-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(99,179,237,0.04);}
 .ranking-pos{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);width:12px;text-align:right;flex-shrink:0;}
@@ -499,6 +509,7 @@ document.addEventListener('click', e=>{
         <button id="ranking-view-cargo" onclick="setRankingView('cargo')" style="background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--accent);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;font-weight:700;letter-spacing:.04em;">Cargo</button>
         <button id="ranking-view-regional" onclick="setRankingView('regional')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Regional</button>
         <button id="ranking-view-geral" onclick="setRankingView('geral')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Geral</button>
+        <button id="ranking-view-melhor" onclick="setRankingView('melhor')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Melhor do Mês</button>
       </div>
     </div>
     <div class="ranking-cols" id="ranking-cols">
@@ -532,6 +543,9 @@ document.addEventListener('click', e=>{
         <div class="ranking-col-title" style="display:flex;align-items:center;justify-content:space-between;">Todos os Executivos <span id="copy-btn-geral" class="ranking-copy-btn" onclick="copyRankingNames('ranking-geral',this)">⎘ copiar</span></div>
         <div id="ranking-geral"></div>
       </div>
+    </div>
+    <div id="ranking-cols-melhor" style="display:none;padding:8px 0 4px;">
+      <div id="melhor-mes-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px 8px;"></div>
     </div>
   </div>
 
@@ -1076,16 +1090,20 @@ function renderQuartil(){
 
 function setRankingView(view){
   rankingView = view;
-  const btnCargo = document.getElementById('ranking-view-cargo');
-  const btnReg   = document.getElementById('ranking-view-regional');
-  const btnGeral = document.getElementById('ranking-view-geral');
-  [['cargo',btnCargo],['regional',btnReg],['geral',btnGeral]].forEach(([v,btn])=>{
+  const btnCargo  = document.getElementById('ranking-view-cargo');
+  const btnReg    = document.getElementById('ranking-view-regional');
+  const btnGeral  = document.getElementById('ranking-view-geral');
+  const btnMelhor = document.getElementById('ranking-view-melhor');
+  [['cargo',btnCargo],['regional',btnReg],['geral',btnGeral],['melhor',btnMelhor]].forEach(([v,btn])=>{
     if(!btn) return;
     const active = view===v;
     btn.style.borderBottom = active ? '2px solid var(--accent)' : '2px solid transparent';
     btn.style.color        = active ? 'var(--accent)' : 'var(--muted)';
     btn.style.fontWeight   = active ? '700' : '400';
   });
+  const colsMelhor = document.getElementById('ranking-cols-melhor');
+  if(colsMelhor) colsMelhor.style.display = view==='melhor' ? 'block' : 'none';
+  if(view==='melhor') buildMelhorMes();
   update();
 }
 
@@ -2430,6 +2448,67 @@ if(document.readyState==='complete'||document.readyState==='interactive'){
 }
 setInterval(()=>autoLoadCSV(false), GS_REFRESH_MS);
 
+
+// ── Melhor do Mês ─────────────────────────────────────────────
+function buildMelhorMes(){
+  const grid = document.getElementById('melhor-mes-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const today  = new Date();
+
+  for(let m=1; m<=12; m++){
+    const label = MONTHS[m-1];
+    const item  = document.createElement('div');
+    item.className = 'melhor-item';
+
+    // Filtra contratos do mês m de 2026 sem aplicar filtros de período
+    // mas respeitando outros filtros ativos (liderança, cargo, etc.)
+    const mesData = RAW.filter(r=>{
+      if(!r.assinatura || !r.fat_kedu) return false;
+      const d = new Date(r.assinatura);
+      return d.getFullYear()===2026 && (d.getMonth()+1)===m;
+    });
+
+    if(!mesData.length || new Date(2026, m-1, 1) > today){
+      // Mês futuro ou sem dados
+      item.innerHTML = `
+        <div class="melhor-empty" style="opacity:${new Date(2026,m-1,1)>today?'.35':'1'}">?</div>
+        <div class="melhor-label" style="color:var(--muted)">${label}</div>
+        <div class="melhor-val">—</div>`;
+    } else {
+      // Agrupa por executivo
+      const byExec = {};
+      mesData.forEach(r=>{
+        const k = r.executivo||'?';
+        byExec[k] = (byExec[k]||0) + (r.fat_kedu||0);
+      });
+      const sorted = Object.entries(byExec).sort((a,b)=>b[1]-a[1]);
+      const [nome, val] = sorted[0];
+      const initials = nome.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+      const fmtVal   = val>=1e6?'R$ '+(val/1e6).toFixed(2)+'M':'R$ '+(val/1000).toFixed(0)+'K';
+      const nomeAbrev= nome.split(' ').slice(0,2).join(' ');
+      const fotoPath = 'fotos/'+nome+'.jpg';
+
+      item.innerHTML = `
+        <div class="melhor-avatar-wrap">
+          <div class="melhor-avatar-ring">
+            <img src="${fotoPath}" alt="${nome}"
+              class="melhor-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="melhor-avatar-fallback" style="display:none">${initials}</div>
+          </div>
+          <div class="melhor-badge">1</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="melhor-label">${label}</div>
+          <div class="melhor-name" title="${nome}">${nomeAbrev}</div>
+          <div class="melhor-val">${fmtVal}</div>
+        </div>`;
+    }
+    grid.appendChild(item);
+  }
+}
 // ── Export Tendência PNG ─────────────────────────────────────
 function exportTrend(){
   const canvas = document.getElementById('trend-chart');
