@@ -1342,6 +1342,10 @@ function rankingAvatar(nome, metaHit){
         const bw = meta>0?Math.min((v/meta)*100,100):0;
         const row = document.createElement('div');
         row.className = 'ranking-row';
+        const gap    = meta - v;
+        const gapTxt = gap > 0
+          ? '<span style="color:#f6ad55;font-size:9px;">faltam R$ '+fmtR(gap)+'</span>'
+          : '<span style="color:#52c77d;font-size:9px;">✓ meta atingida</span>';
         row.innerHTML =
           '<span class="ranking-pos">'+(i+1)+'</span>'+
           rankingAvatar(nome, pct>=100)+
@@ -1349,7 +1353,7 @@ function rankingAvatar(nome, metaHit){
           '<div class="ranking-bar-wrap"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+barColor(pct)+'"></div></div>'+
           '<div class="ranking-vals">'+
             '<div class="ranking-fat" style="color:'+barColor(pct)+'">R$ '+fmtR(v)+'</div>'+
-            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'%</div>'+
+            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'% · '+gapTxt+'</div>'+
           '</div>';
         el.appendChild(row);
       });
@@ -1373,6 +1377,10 @@ function rankingAvatar(nome, metaHit){
         const bw  = metaIndividual>0?Math.min((v/metaIndividual)*100,100):0;
         const row = document.createElement('div');
         row.className = 'ranking-row';
+        const gap    = metaIndividual - v;
+        const gapTxt = gap > 0
+          ? '<span style="color:#f6ad55;font-size:9px;">faltam R$ '+fmtR(gap)+'</span>'
+          : '<span style="color:#52c77d;font-size:9px;">✓ meta atingida</span>';
         row.innerHTML =
           '<span class="ranking-pos">'+(i+1)+'</span>'+
           rankingAvatar(nome, pct>=100)+
@@ -1380,7 +1388,7 @@ function rankingAvatar(nome, metaHit){
           '<div class="ranking-bar-wrap"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+barColor(pct)+'"></div></div>'+
           '<div class="ranking-vals">'+
             '<div class="ranking-fat" style="color:'+barColor(pct)+'">R$ '+fmtR(v)+'</div>'+
-            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'%</div>'+
+            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'% · '+gapTxt+'</div>'+
           '</div>';
         el.appendChild(row);
       });
