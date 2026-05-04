@@ -1564,13 +1564,9 @@ update();
   function getVal(agg,y,m){ return agg[y+'-'+String(m).padStart(2,'0')]||null; }
 
   // ── Forecast ──────────────────────────────────────────────────
-  // Lógica:
-  // Para cada mês M de 2026:
-  //   - Fator = soma dos últimos 12 meses realizados de 2026 (até M-1)
-  //             dividido pelos mesmos 12 meses em 2025
-  //   - Previsão de M = valor de M em 2025 × fator
-  //   - Mês atual (em andamento): extrapola pelo ritmo diário
-  // A previsão existe para todos os 12 meses.
+  // Lógica: previsão de M é calculada com realizados de Jan até M-1
+  // e fixada no último dia de M-1 — não muda durante o mês M.
+  // Isso permite comparar realizado vs previsão de forma justa.
   function calcForecast(monthly, monthly_cnt={}){
     const today        = new Date();
     const currentYear  = today.getFullYear();
@@ -1579,91 +1575,67 @@ update();
     const daysInMonth  = new Date(currentYear,currentMonth,0).getDate();
     const _diaEfetivo  = (_simOverride) ? Math.max(1,_simOverride.dia) : Math.max(1,dayOfMonth);
 
-    // Realizados de 2026 (valores brutos — zero se sem dados)
+    // Realizados de 2026 — apenas meses ENCERRADOS (< currentMonth)
+    // O mês atual só entra no cálculo do próximo mês
     const realized={};
     let lastRealizedMonth=0;
     for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
-      realized[m] = monthly[k]||0;
+      realized[m]=monthly[k]||0;
       if(monthly[k]) lastRealizedMonth=m;
     }
 
-    // Extrapola mês atual pelo ritmo diário
+    // Mês atual: extrapola pelo ritmo diário (para exibir na linha realizada)
     let currentProj=null;
     if(currentYear===2026&&realized[currentMonth]>0){
       currentProj=Math.round(realized[currentMonth]/_diaEfetivo*daysInMonth);
     }
 
-    // Para cada mês M, calcula o fator com base nos últimos 12 meses realizados até M-1
-    function getFatorParaMes(m){
-      // Coleta os meses realizados disponíveis de 2026 antes de M
-      // Usa até 12 meses anteriores (incluindo anos anteriores se necessário)
+    // Fator para mês M = usa apenas meses ENCERRADOS antes de M
+    // (não usa o mês atual — previsão de M é fixada no fim de M-1)
+    function getFator(m){
       let rNum=0, rDen=0;
-      // Meses encerrados de 2026 antes de M
-      for(let mm=1;mm<m;mm++){
-        const r = mm<currentMonth ? realized[mm] : (mm===currentMonth&&currentProj?currentProj:0);
-        const k2025='2025-'+String(mm).padStart(2,'0');
-        const p = monthly[k2025]||0;
-        if(r>0&&p>0){rNum+=r;rDen+=p;}
+      for(let mm=1; mm<m; mm++){
+        // Só usa meses realmente encerrados (mm < currentMonth)
+        if(mm >= currentMonth) break;
+        const r=realized[mm];
+        const p=monthly['2025-'+String(mm).padStart(2,'0')]||0;
+        if(r>0&&p>0){rNum+=r; rDen+=p;}
       }
-      // Se não tem dados de 2026 ainda (ex: estamos em Janeiro → sem meses anteriores)
-      // usa 2025 como base com fator 1
       return rDen>0 ? rNum/rDen : 1.0;
     }
 
+    // Previsão para cada mês
     const forecast={}, expected={};
     for(let m=1;m<=12;m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025=monthly[k2025]||null;
-      const fator=getFatorParaMes(m);
-      const proj=base2025?Math.round(base2025*fator):null;
+      const base2025=monthly['2025-'+String(m).padStart(2,'0')]||null;
+      const fator=getFator(m);
+      const proj=base2025 ? Math.round(base2025*fator) : null;
       expected[m]=proj;
-
-      if(m<currentMonth){
-        // Mês encerrado: usa realizado (pode ser zero)
-        forecast[m]=realized[m];
-      } else if(m===currentMonth){
-        // Mês atual: extrapola se tiver dados, senão usa projeção
-        forecast[m]=currentProj!==null?currentProj:(proj||0);
-      } else {
-        // Mês futuro: projeção com fator dinâmico
-        forecast[m]=proj||null;
-      }
+      forecast[m]=proj; // previsão existe para todos os meses, fixada antes do mês começar
     }
 
-    // Fator geral (para o subtitle) — usando todos os meses encerrados
-    let rNum=0,rDen=0;
-    for(let m=1;m<currentMonth;m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const p=monthly[k2025]||0;
-      if(realized[m]>0&&p>0){rNum+=realized[m];rDen+=p;}
-    }
-    if(currentProj&&monthly['2025-'+String(currentMonth).padStart(2,'0')]){
-      rNum+=currentProj; rDen+=monthly['2025-'+String(currentMonth).padStart(2,'0')];
-    }
-    const growthFactor=rDen>0?rNum/rDen:1.0;
+    // Fator geral para subtitle (meses encerrados até currentMonth-1)
+    const growthFactor=getFator(currentMonth);
 
-    // ── Previsão de contratos (fator separado) ───────────────────
+    // ── Contratos (fator separado) ────────────────────────────────
     const realizedCnt={};
-    let lastRealizedCntMonth=0;
     for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
       realizedCnt[m]=monthly_cnt[k]||0;
-      if(monthly_cnt[k]) lastRealizedCntMonth=m;
     }
 
-    // Extrapola contratos do mês atual
     let currentProjCnt=null;
     if(currentYear===2026&&realizedCnt[currentMonth]>0){
       currentProjCnt=Math.round(realizedCnt[currentMonth]/_diaEfetivo*daysInMonth);
     }
 
-    function getCntFatorParaMes(m){
+    function getCntFator(m){
       let rNum=0,rDen=0;
       for(let mm=1;mm<m;mm++){
-        const r=mm<currentMonth?realizedCnt[mm]:(mm===currentMonth&&currentProjCnt?currentProjCnt:0);
-        const k2025='2025-'+String(mm).padStart(2,'0');
-        const p=monthly_cnt[k2025]||0;
+        if(mm>=currentMonth) break;
+        const r=realizedCnt[mm];
+        const p=monthly_cnt['2025-'+String(mm).padStart(2,'0')]||0;
         if(r>0&&p>0){rNum+=r;rDen+=p;}
       }
       return rDen>0?rNum/rDen:1.0;
@@ -1671,13 +1643,9 @@ update();
 
     const forecastCnt={};
     for(let m=1;m<=12;m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025=monthly_cnt[k2025]||null;
-      const fator=getCntFatorParaMes(m);
-      const proj=base2025?Math.round(base2025*fator):null;
-      if(m<currentMonth) forecastCnt[m]=realizedCnt[m];
-      else if(m===currentMonth) forecastCnt[m]=currentProjCnt!==null?currentProjCnt:(proj||0);
-      else forecastCnt[m]=proj||null;
+      const base=monthly_cnt['2025-'+String(m).padStart(2,'0')]||null;
+      const fator=getCntFator(m);
+      forecastCnt[m]=base?Math.round(base*fator):null;
     }
 
     return {forecast,expected,realized,lastRealizedMonth,growthFactor,currentProj,forecastCnt,realizedCnt};
