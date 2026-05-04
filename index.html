@@ -2586,7 +2586,7 @@ function buildMelhorMes(){
   const R1_NAMES = ['Antônio Cláudio','Bruna Nunes','Larissa Costa','Warly Bernardino'];
   const R2_NAMES = ['Cinthia Marques','Gustavo Dias'];
 
-  function fmtR(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K'; }
+  function fmtR(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':v>=1000?'R$ '+(v/1000).toFixed(0)+'K':'R$ '+Math.round(v).toLocaleString('pt-BR'); }
   function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
