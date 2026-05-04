@@ -689,7 +689,7 @@ document.addEventListener('click', e=>{
       <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
     </div>
     <div id="camp-tab-exec">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
+      <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
       <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
       <div class="camp-grid" id="camp-grid-abril"></div>
 
@@ -2588,11 +2588,11 @@ function buildMelhorMes(){
 
   function fmtR(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':v>=1000?'R$ '+(v/1000).toFixed(0)+'K':'R$ '+Math.round(v).toLocaleString('pt-BR'); }
   function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
-  function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
-  function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+  function barColor(p){  return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
+  function initials(n){  return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
   function getReal(name,meses){ return RAW.filter(r=>r.executivo===name&&r.assinatura&&meses.includes(r.assinatura.slice(0,7))).reduce((s,r)=>s+(r.fat_kedu||0),0); }
   function metaMes(e,m){ return e.cargo==='Closer'?(META_CLOSER_MES[m]||0):(META_IS_MES[m]||0); }
-  function metaTrim(e){ return ['2026-04','2026-05','2026-06'].reduce((s,m)=>s+metaMes(e,m),0); }
+  function metaTrim(e){  return ['2026-04','2026-05','2026-06'].reduce((s,m)=>s+metaMes(e,m),0); }
 
   function avatar(name,cor){
     return `<div class="camp-av-ring" style="background:linear-gradient(135deg,${cor}88,${cor}44);">
@@ -2608,48 +2608,43 @@ function buildMelhorMes(){
     return `<div class="camp-tier ${cls}"><span class="camp-tier-icon">${icon}</span><span class="camp-tier-desc">${d}</span><span class="camp-tier-val">${val}</span></div>`;
   }
 
+  function triTiersHtml(realTrim, mT){
+    const tri130ok = realTrim >= mT*1.3;
+    const tri150ok = realTrim >= mT*1.5;
+    if(!tri130ok){
+      return tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim))
+           + tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0);
+    } else if(!tri150ok){
+      return tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)
+           + tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim));
+    } else {
+      return tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)
+           + tierHtml(true,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0);
+    }
+  }
+
   function regionalHeader(label){
     return `<div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;grid-column:1/-1;">${label}</div>`;
   }
 
-  // Card unificado: campanha de abril + tiers trimestrais pendentes
+  // ── Card Abril ────────────────────────────────────────────────
   function cardAbril(e){
     const MESES_ABR  = ['2026-04'];
     const MESES_TRIM = ['2026-04','2026-05','2026-06'];
-    const realAbr   = getReal(e.name, MESES_ABR);
-    const realTrim  = getReal(e.name, MESES_TRIM);
-    const mA = metaMes(e,'2026-04'), mM = metaMes(e,'2026-05'), mJ = metaMes(e,'2026-06');
-    const mT = metaTrim(e);
+    const realAbr  = getReal(e.name, MESES_ABR);
+    const realTrim = getReal(e.name, MESES_TRIM);
+    const mA=metaMes(e,'2026-04'), mM=metaMes(e,'2026-05'), mJ=metaMes(e,'2026-06');
+    const mT=metaTrim(e);
 
-    // Tiers de abril
     const t1ok = realAbr  >= mA;
     const t2ok = realTrim >= mA+mM;
     const t3ok = realTrim >= mA+mM+mJ;
-
-    // Tiers trimestrais
     const tri130ok = realTrim >= mT*1.3;
     const tri150ok = realTrim >= mT*1.5;
 
-    const pct = mA>0 ? Math.round(realAbr/mA*100) : 0;
-    const bw  = Math.min(100, pct);
-
-    // Premiação total visível em abril
-    const totalAbr  = (t1ok?500:0)+(t2ok?500:0)+(t3ok?1000:0);
-    const totalTri  = (tri130ok?1000:0)+(tri150ok?2000:0);
-    const totalGeral = totalAbr + totalTri;
-
-    // Tiers trimestrais pendentes — mostra apenas o que ainda não foi conquistado
-    const triTiers = [];
-    if(!tri130ok){
-      triTiers.push(tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim)));
-      triTiers.push(tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
-    } else if(!tri150ok){
-      triTiers.push(tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0));
-      triTiers.push(tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim)));
-    } else {
-      triTiers.push(tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0));
-      triTiers.push(tierHtml(true,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
-    }
+    const pct = mA>0?Math.round(realAbr/mA*100):0;
+    const totalAbr = (t1ok?500:0)+(t2ok?500:0)+(t3ok?1000:0);
+    const totalTri = (tri130ok?1000:0)+(tri150ok?2000:0);
 
     return `<div class="camp-card">
       <div class="camp-card-head">
@@ -2660,28 +2655,108 @@ function buildMelhorMes(){
         </div>
         <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
       </div>
-      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${bw}%;background:${barColor(pct)};"></div></div>
+      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pct)}%;background:${barColor(pct)};"></div></div>
       <div class="camp-tiers">
         <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Abril</div>
         ${tierHtml(t1ok,!t1ok,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))}
         ${tierHtml(t2ok,t1ok&&!t2ok,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM-realTrim))}
         ${tierHtml(t3ok,t2ok&&!t3ok,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM+mJ-realTrim))}
         <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 0 4px;border-top:1px solid var(--border);margin-top:4px;">Campanha Trimestral</div>
-        ${triTiers.join('')}
+        ${triTiersHtml(realTrim,mT)}
       </div>
       <div class="camp-total">
         <span class="camp-total-label">Premiação total acumulada</span>
-        <span class="camp-total-val" style="color:${totalGeral>0?'#00b894':'var(--muted)'}">${totalGeral>0?fmtR(totalGeral)+' ✓':'R$ 0'}</span>
+        <span class="camp-total-val" style="color:${totalAbr+totalTri>0?'#00b894':'var(--muted)'}">${totalAbr+totalTri>0?fmtR(totalAbr+totalTri)+' ✓':'R$ 0'}</span>
       </div>
     </div>`;
   }
 
+  // ── Card Maio ─────────────────────────────────────────────────
+  function cardMaio(e){
+    const MESES_ABR  = ['2026-04'];
+    const MESES_MAI  = ['2026-05'];
+    const MESES_TRIM = ['2026-04','2026-05','2026-06'];
+    const realAbr  = getReal(e.name, MESES_ABR);
+    const realMai  = getReal(e.name, MESES_MAI);
+    const realTrim = getReal(e.name, MESES_TRIM);
+    const mA=metaMes(e,'2026-04'), mM=metaMes(e,'2026-05'), mJ=metaMes(e,'2026-06');
+    const mT=metaTrim(e);
+
+    const naoAtingindoAbr = realAbr < mA; // só mostra gap se não bateu abril
+
+    // Tiers de maio
+    const tmeta   = realMai >= mM;
+    const tgap    = naoAtingindoAbr && (realAbr+realMai) >= mA; // recuperou gap
+    const tmaijun = realTrim >= mM+mJ;             // bateu mai+jun até 31/05
+    const tabrmaijun = realTrim >= mA+mM+mJ;       // bateu abr+mai+jun até 31/05
+
+    // Tiers trimestrais pendentes
+    const tri130ok = realTrim >= mT*1.3;
+    const tri150ok = realTrim >= mT*1.5;
+
+    const pct = mM>0?Math.round(realMai/mM*100):0;
+    const totalMaio = (tmeta?1000:0)+(tgap?500:0)+(tmaijun?750:0)+(tabrmaijun?750:0);
+    const totalTri  = (tri130ok?1000:0)+(tri150ok?2000:0);
+
+    // Premiação já recebida em abril (não soma de novo)
+    const totalAbr = (realAbr>=mA?500:0)+((realAbr+realMai)>=mA+mM?500:0)+((realAbr+realMai)>=mA+mM+mJ?1000:0);
+
+    return `<div class="camp-card">
+      <div class="camp-card-head">
+        ${avatar(e.name,e.cor)}
+        <div class="camp-card-info">
+          <div class="camp-card-name">${e.name}</div>
+          <div class="camp-card-cargo">${e.cargo} · Meta Mai: ${fmtR(mM)}</div>
+        </div>
+        <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
+      </div>
+      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pct)}%;background:${barColor(pct)};"></div></div>
+      <div class="camp-tiers">
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Maio</div>
+        ${tierHtml(tmeta,!tmeta,'100% meta maio','R$ 1.000',Math.max(0,mM-realMai))}
+        ${naoAtingindoAbr ? tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,mA-(realAbr+realMai))) : ''}
+        ${tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05','+R$ 750',Math.max(0,mM+mJ-realTrim))}
+        ${tierHtml(tabrmaijun,tmaijun&&!tabrmaijun,'100% meta abr+mai+jun até 31/05','+R$ 750',Math.max(0,mA+mM+mJ-realTrim))}
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 0 4px;border-top:1px solid var(--border);margin-top:4px;">Campanha Trimestral</div>
+        ${triTiersHtml(realTrim,mT)}
+      </div>
+      <div class="camp-total">
+        <span class="camp-total-label">Premiação total acumulada</span>
+        <span class="camp-total-val" style="color:${totalAbr+totalMaio+totalTri>0?'#00b894':'var(--muted)'}">${totalAbr+totalMaio+totalTri>0?fmtR(totalAbr+totalMaio+totalTri)+' ✓':'R$ 0'}</span>
+      </div>
+    </div>`;
+  }
+
+  // ── Build ──────────────────────────────────────────────────────
+  function getActiveCard(){
+    // Determina qual mês de campanha exibir com base na data atual
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth()+1;
+    if(y===2026 && m===5) return 'maio';
+    return 'abril'; // padrão: abril (ou mês anterior ao atual)
+  }
+
   function buildAbril(){
     const el = document.getElementById('camp-grid-abril'); if(!el) return;
+    const mes = getActiveCard();
+    const cardFn = mes==='maio' ? cardMaio : cardAbril;
     const r1 = CAMP_R1.filter(e=>TEAM[e.name]);
     const r2 = CAMP_R2.filter(e=>TEAM[e.name]);
-    el.innerHTML = regionalHeader('Regional 1') + r1.map(cardAbril).join('')
-                 + regionalHeader('Regional 2') + r2.map(cardAbril).join('');
+    el.innerHTML = regionalHeader('Regional 1') + r1.map(cardFn).join('')
+                 + regionalHeader('Regional 2') + r2.map(cardFn).join('');
+
+    // Atualiza título e badge
+    const tit = document.getElementById('camp-mes-titulo');
+    const badge = document.getElementById('camp-days-abr');
+    if(mes==='maio'){
+      if(tit) tit.textContent = 'Campanha de Maio · metas mensais';
+      const daysLeft = Math.max(0,Math.ceil((new Date('2026-05-31')-new Date())/(1000*60*60*24)));
+      if(badge) badge.textContent = '▸ encerra 31/05 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
+    } else {
+      if(tit) tit.textContent = 'Campanha de Abril · metas antecipadas';
+      const daysLeft = Math.max(0,Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24)));
+      if(badge) badge.textContent = '▸ encerra 30/04 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
+    }
   }
 
   function buildCoord(){
@@ -2695,11 +2770,11 @@ function buildMelhorMes(){
       const realTrim = c.members.reduce((s,n)=>s+getReal(n,MESES),0);
       const pct = c.meta>0?Math.round(realTrim/c.meta*100):0;
       const bw  = Math.min(100,pct);
-      const t1ok = realTrim>=c.meta, t2ok=realTrim>=c.meta*1.3, t3ok=realTrim>=c.meta*1.5;
-      const total = (t1ok?2000:0)+(t2ok?1000:0)+(t3ok?1000:0);
-      const execMeta = name=>{ const e=CAMP_R1.concat(CAMP_R2).find(x=>x.name===name); return e?metaTrim(e):0; };
-      const bonusExec = c.members.filter(n=>getReal(n,MESES)>=execMeta(n)).length*300;
-      const pills = c.members.map(n=>{
+      const t1ok=realTrim>=c.meta, t2ok=realTrim>=c.meta*1.3, t3ok=realTrim>=c.meta*1.5;
+      const total=(t1ok?2000:0)+(t2ok?1000:0)+(t3ok?1000:0);
+      const execMeta=name=>{ const e=CAMP_R1.concat(CAMP_R2).find(x=>x.name===name); return e?metaTrim(e):0; };
+      const bonusExec=c.members.filter(n=>getReal(n,MESES)>=execMeta(n)).length*300;
+      const pills=c.members.map(n=>{
         const mI=execMeta(n), rI=getReal(n,MESES), p=mI>0?Math.round(rI/mI*100):0, ok=rI>=mI;
         return `<span class="camp-pill${ok?' done':''}">${n.split(' ').slice(0,2).join(' ')} · ${p}%</span>`;
       }).join('');
@@ -2733,9 +2808,6 @@ function buildMelhorMes(){
   window.buildCampanhas = function(){
     buildAbril();
     buildCoord();
-    const daysLeft = Math.max(0,Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24)));
-    const el = document.getElementById('camp-days-abr');
-    if(el) el.textContent = '▸ encerra 30/04 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
   };
 
   window.campShowTab = function(tab,btn){
