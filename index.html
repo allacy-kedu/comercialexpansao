@@ -1591,14 +1591,20 @@ update();
       currentProj=Math.round(realized[currentMonth]/_diaEfetivo*daysInMonth);
     }
 
-    // Fator para mês M = usa apenas meses ENCERRADOS antes de M
-    // (não usa o mês atual — previsão de M é fixada no fim de M-1)
+    // Fator para mês M = usa meses encerrados antes de M
+    // No modo simulador, o mês atual é tratado como encerrado com o valor simulado extrapolado
+    const simMode = !!_simOverride;
     function getFator(m){
       let rNum=0, rDen=0;
       for(let mm=1; mm<m; mm++){
-        // Só usa meses realmente encerrados (mm < currentMonth)
-        if(mm >= currentMonth) break;
-        const r=realized[mm];
+        let r=0;
+        if(mm < currentMonth){
+          r=realized[mm]; // mês realmente encerrado
+        } else if(mm===currentMonth && simMode && currentProj){
+          r=currentProj; // mês atual tratado como encerrado no simulador
+        } else {
+          break;
+        }
         const p=monthly['2025-'+String(mm).padStart(2,'0')]||0;
         if(r>0&&p>0){rNum+=r; rDen+=p;}
       }
@@ -1612,11 +1618,11 @@ update();
       const fator=getFator(m);
       const proj=base2025 ? Math.round(base2025*fator) : null;
       expected[m]=proj;
-      forecast[m]=proj; // previsão existe para todos os meses, fixada antes do mês começar
+      forecast[m]=proj;
     }
 
-    // Fator geral para subtitle (meses encerrados até currentMonth-1)
-    const growthFactor=getFator(currentMonth);
+    // Fator geral para subtitle
+    const growthFactor = simMode ? getFator(currentMonth+1) : getFator(currentMonth);
 
     // ── Contratos (fator separado) ────────────────────────────────
     const realizedCnt={};
@@ -1633,8 +1639,10 @@ update();
     function getCntFator(m){
       let rNum=0,rDen=0;
       for(let mm=1;mm<m;mm++){
-        if(mm>=currentMonth) break;
-        const r=realizedCnt[mm];
+        let r=0;
+        if(mm<currentMonth) r=realizedCnt[mm];
+        else if(mm===currentMonth&&simMode&&currentProjCnt) r=currentProjCnt;
+        else break;
         const p=monthly_cnt['2025-'+String(mm).padStart(2,'0')]||0;
         if(r>0&&p>0){rNum+=r;rDen+=p;}
       }
