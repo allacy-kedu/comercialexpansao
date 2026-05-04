@@ -81,6 +81,45 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
 .melhor-avatar-fallback{width:100%;height:100%;border-radius:50%;background:#1a1f35;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#FFD700;}
 .melhor-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);font-size:8px;font-weight:800;color:#111320;}
+.camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
+.camp-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
+.camp-tab.active{border-color:var(--accent);color:var(--accent);}
+.camp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.camp-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.camp-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.camp-av-ring{width:44px;height:44px;border-radius:50%;padding:2px;flex-shrink:0;}
+.camp-av-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;}
+.camp-av-fallback{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;}
+.camp-card-info{flex:1;min-width:0;}
+.camp-card-name{font-size:11px;font-weight:700;color:var(--text);}
+.camp-card-cargo{font-size:9px;color:var(--muted);margin-top:1px;}
+.camp-card-pct{font-size:15px;font-weight:700;margin-left:auto;flex-shrink:0;}
+.camp-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;}
+.camp-bar-fill{height:100%;border-radius:2px;}
+.camp-tiers{display:flex;flex-direction:column;gap:5px;}
+.camp-tier{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;border:1px solid transparent;}
+.camp-tier.done{background:rgba(0,184,148,0.08);border-color:rgba(0,184,148,0.2);}
+.camp-tier.next{background:rgba(116,185,255,0.06);border-color:rgba(116,185,255,0.2);}
+.camp-tier.locked{opacity:.35;}
+.camp-tier-icon{font-size:10px;width:14px;color:var(--muted);}
+.camp-tier.done .camp-tier-icon{color:#00b894;}
+.camp-tier.next .camp-tier-icon{color:#74b9ff;}
+.camp-tier-desc{flex:1;font-size:9px;color:var(--muted2);}
+.camp-tier.done .camp-tier-desc{color:#00b894;}
+.camp-tier.next .camp-tier-desc{color:#74b9ff;}
+.camp-tier-val{font-size:9px;font-weight:700;color:var(--text);}
+.camp-tier.done .camp-tier-val{color:#00b894;}
+.camp-tier.next .camp-tier-val{color:#74b9ff;}
+.camp-total{display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.camp-total-label{font-size:9px;color:var(--muted);}
+.camp-total-val{font-size:11px;font-weight:700;}
+.camp-divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.camp-days{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);background:rgba(99,179,237,0.06);padding:2px 8px;border-radius:10px;margin-bottom:12px;}
+.camp-exec-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.camp-pill{font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);}
+.camp-pill.done{border-color:rgba(0,184,148,0.3);color:#00b894;background:rgba(0,184,148,0.06);}
+@media(max-width:600px){.camp-grid{grid-template-columns:1fr;}}
 .melhor-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .melhor-empty{width:56px;height:56px;border-radius:50%;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;}
 .melhor-label{font-size:8px;color:#FFD700;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'DM Mono',monospace;}
@@ -636,6 +675,32 @@ document.addEventListener('click', e=>{
         </div>
       </div>
       <div id="sim-factor-line" style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.6);text-align:center;margin-top:10px;">—</div>
+    </div>
+  </div>
+
+  <!-- Campanhas -->
+  <div class="camp-section-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
+      <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
+    </div>
+    <div class="camp-tabs">
+      <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
+      <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
+    </div>
+    <div id="camp-tab-exec">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
+      <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
+      <div class="camp-grid" id="camp-grid-abril"></div>
+      <div class="camp-divider"></div>
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Abr–Jun</div>
+      <div class="camp-days">▸ encerra 30/06 · 61 dias restantes</div>
+      <div class="camp-grid" id="camp-grid-trim"></div>
+    </div>
+    <div id="camp-tab-coord" style="display:none;">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
+      <div class="camp-days">▸ encerra 30/06 · 61 dias restantes</div>
+      <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
     </div>
   </div>
 
@@ -2414,6 +2479,7 @@ async function autoLoadCSV(showStatus){
     if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
     // Atualiza Melhor do Mês se estiver ativo
     if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
+    if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
     // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
@@ -2499,6 +2565,225 @@ function buildMelhorMes(){
     grid.appendChild(item);
   }
 }
+
+// ── Campanhas ─────────────────────────────────────────────────
+(function(){
+  // Config das campanhas
+  const META_CLOSER_MES = {'2026-04':267000,'2026-05':341000,'2026-06':341000};
+  const META_IS_MES     = {'2026-04':187000,'2026-05':252000,'2026-06':252000};
+  const META_R1_TRIM    = 4848000; // Abr+Mai+Jun R1
+  const META_R2_TRIM    = 3558000; // Abr+Mai+Jun R2
+
+  const CLOSER_NAMES = ['Cinthia Marques','Larissa Costa','Gustavo Dias','Antônio Cláudio','Warly Bernardino','Bruna Nunes','Mônica Gomes'];
+  const IS_NAMES     = ['Alexandre Gomes','Emanuel Sobral','Edivania Nascimento','Tennyson Costa'];
+  const R1_NAMES     = ['Gustavo Dias','Antônio Cláudio','Warly Bernardino'];
+  const R2_NAMES     = ['Larissa Costa','Cinthia Marques','Bruna Nunes'];
+
+  function fmtR(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K'; }
+  function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
+  function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
+  function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+  function getReal(name, meses){
+    return RAW.filter(r=>r.executivo===name&&r.assinatura&&meses.includes(r.assinatura.slice(0,7))).reduce((s,r)=>s+(r.fat_kedu||0),0);
+  }
+
+  function avatar(name, cor){
+    const foto = 'fotos/'+name+'.jpg';
+    return `<div class="camp-av-ring" style="background:linear-gradient(135deg,${cor}88,${cor}44);">
+      <img src="${foto}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="camp-av-fallback" style="display:none;background:#1a1f35;color:${cor};">${initials(name)}</div>
+    </div>`;
+  }
+
+  function tierHtml(ok, isNext, desc, val, falta){
+    const cls = ok?'done':isNext?'next':'locked';
+    const icon = ok?'✓':isNext?'→':'·';
+    const d = (isNext&&falta>0) ? desc+' · faltam '+fmtR(falta) : desc;
+    return `<div class="camp-tier ${cls}"><span class="camp-tier-icon">${icon}</span><span class="camp-tier-desc">${d}</span><span class="camp-tier-val">${val}</span></div>`;
+  }
+
+  function buildAbril(){
+    const MESES_TRIM = ['2026-04','2026-05','2026-06'];
+    const MESES_ABR  = ['2026-04'];
+    const MESES_MAI  = ['2026-05'];
+    const MESES_JUN  = ['2026-06'];
+    const EXEC = [
+      ...CLOSER_NAMES.filter(n=>TEAM[n]&&TEAM[n].cargo==='Closer').map(n=>({name:n,cargo:'Closer',cor:'#fd79a8',meta:META_CLOSER_MES['2026-04']})),
+      ...IS_NAMES.filter(n=>TEAM[n]&&TEAM[n].cargo==='Inside Sales').map(n=>({name:n,cargo:'Inside Sales',cor:'#74b9ff',meta:META_IS_MES['2026-04']})),
+    ].filter(e=>TEAM[e.name]&&(!TEAM[e.name].removedFrom||TEAM[e.name].removedFrom>'2026-04'));
+
+    const el = document.getElementById('camp-grid-abril');
+    if(!el) return;
+    el.innerHTML = EXEC.map(e=>{
+      const realAbr = getReal(e.name, MESES_ABR);
+      const realMai = getReal(e.name, MESES_MAI);
+      const realJun = getReal(e.name, MESES_JUN);
+      const realTotal = realAbr+realMai+realJun;
+      const metaAbr = e.cargo==='Closer'?META_CLOSER_MES['2026-04']:META_IS_MES['2026-04'];
+      const metaMai = e.cargo==='Closer'?META_CLOSER_MES['2026-05']:META_IS_MES['2026-05'];
+      const metaJun = e.cargo==='Closer'?META_CLOSER_MES['2026-06']:META_IS_MES['2026-06'];
+      const t1ok = realAbr >= metaAbr;
+      const t2ok = realTotal >= metaAbr+metaMai;
+      const t3ok = realTotal >= metaAbr+metaMai+metaJun;
+      const pct = metaAbr>0?Math.round(realAbr/metaAbr*100):0;
+      const bw = Math.min(100,pct);
+      const total = (t1ok?500:0)+(t2ok?500:0)+(t3ok?1000:0);
+      return `<div class="camp-card">
+        <div class="camp-card-head">
+          ${avatar(e.name,e.cor)}
+          <div class="camp-card-info">
+            <div class="camp-card-name">${e.name}</div>
+            <div class="camp-card-cargo">${e.cargo} · Meta: ${fmtR(metaAbr)}</div>
+          </div>
+          <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
+        </div>
+        <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${bw}%;background:${barColor(pct)};"></div></div>
+        <div class="camp-tiers">
+          ${tierHtml(t1ok,!t1ok,'100% meta abril','R$ 500',Math.max(0,metaAbr-realAbr))}
+          ${tierHtml(t2ok,t1ok&&!t2ok,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,metaAbr+metaMai-realTotal))}
+          ${tierHtml(t3ok,t2ok&&!t3ok,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,metaAbr+metaMai+metaJun-realTotal))}
+        </div>
+        <div class="camp-total">
+          <span class="camp-total-label">Premiação campanha abril</span>
+          <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildTrim(){
+    const MESES_TRIM = ['2026-04','2026-05','2026-06'];
+    const EXEC = [
+      ...CLOSER_NAMES.filter(n=>TEAM[n]&&TEAM[n].cargo==='Closer').map(n=>({name:n,cargo:'Closer',cor:'#fd79a8'})),
+      ...IS_NAMES.filter(n=>TEAM[n]&&TEAM[n].cargo==='Inside Sales').map(n=>({name:n,cargo:'Inside Sales',cor:'#74b9ff'})),
+    ].filter(e=>TEAM[e.name]&&(!TEAM[e.name].removedFrom||TEAM[e.name].removedFrom>'2026-04'));
+
+    const el = document.getElementById('camp-grid-trim');
+    if(!el) return;
+    el.innerHTML = EXEC.map(e=>{
+      const metaTrim = (()=>{
+        let t=0;
+        ['2026-04','2026-05','2026-06'].forEach(m=>{
+          t+=(e.cargo==='Closer'?META_CLOSER_MES[m]:META_IS_MES[m])||0;
+        });
+        return t;
+      })();
+      const realTrim = getReal(e.name, MESES_TRIM);
+      const pct = metaTrim>0?Math.round(realTrim/metaTrim*100):0;
+      const bw  = Math.min(100, pct/1.5);
+      const t1ok = realTrim >= metaTrim*1.3;
+      const t2ok = realTrim >= metaTrim*1.5;
+      const total = (t1ok?1000:0)+(t2ok?2000:0);
+      return `<div class="camp-card">
+        <div class="camp-card-head">
+          ${avatar(e.name,e.cor)}
+          <div class="camp-card-info">
+            <div class="camp-card-name">${e.name}</div>
+            <div class="camp-card-cargo">${e.cargo} · Meta trim: ${fmtR(metaTrim)}</div>
+          </div>
+          <div class="camp-card-pct" style="color:#74b9ff">${pct}%</div>
+        </div>
+        <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${bw}%;background:#74b9ff;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-bottom:8px;">
+          <span>0%</span><span style="color:#74b9ff">${pct}% atual</span><span>130%</span><span>150%</span>
+        </div>
+        <div class="camp-tiers">
+          ${tierHtml(t1ok,!t1ok,'130% meta trimestral','+R$ 1.000',Math.max(0,metaTrim*1.3-realTrim))}
+          ${tierHtml(t2ok,t1ok&&!t2ok,'150% meta trimestral','+R$ 2.000',Math.max(0,metaTrim*1.5-realTrim))}
+        </div>
+        <div class="camp-total">
+          <span class="camp-total-label">Premiação trimestral</span>
+          <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildCoord(){
+    const MESES_TRIM = ['2026-04','2026-05','2026-06'];
+    const COORDS = [
+      {regional:'Regional 1', meta:META_R1_TRIM, members:R1_NAMES},
+      {regional:'Regional 2', meta:META_R2_TRIM, members:R2_NAMES},
+    ];
+    const el = document.getElementById('camp-grid-coord');
+    if(!el) return;
+    el.innerHTML = COORDS.map(c=>{
+      const realTrim = c.members.reduce((s,n)=>s+getReal(n,MESES_TRIM),0);
+      const pct = c.meta>0?Math.round(realTrim/c.meta*100):0;
+      const bw  = Math.min(100,pct);
+      const t1ok = realTrim>=c.meta;
+      const t2ok = realTrim>=c.meta*1.3;
+      const t3ok = realTrim>=c.meta*1.5;
+      const total = (t1ok?2000:0)+(t2ok?1000:0)+(t3ok?1000:0);
+      // Meta individual trimestral por executivo
+      const execMeta = (name)=>{
+        let t=0;
+        MESES_TRIM.forEach(m=>{
+          const cargo = TEAM[name]?TEAM[name].cargo:'';
+          t+=(cargo==='Closer'?META_CLOSER_MES[m]:META_IS_MES[m])||0;
+        });
+        return t;
+      };
+      const bonusExec = c.members.filter(n=>getReal(n,MESES_TRIM)>=execMeta(n)).length*300;
+      const pills = c.members.map(n=>{
+        const metaI=execMeta(n);
+        const realI=getReal(n,MESES_TRIM);
+        const p=metaI>0?Math.round(realI/metaI*100):0;
+        const ok=realI>=metaI;
+        return `<span class="camp-pill${ok?' done':''}">${n.split(' ').slice(0,2).join(' ')} · ${p}%</span>`;
+      }).join('');
+      return `<div class="camp-card">
+        <div class="camp-card-head" style="align-items:flex-start;">
+          <div class="camp-card-info">
+            <div class="camp-card-name">${c.regional}</div>
+            <div class="camp-card-cargo">Meta trimestre: ${fmtR(c.meta)} · Realizado: ${fmtR(realTrim)}</div>
+          </div>
+          <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
+        </div>
+        <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${bw}%;background:${barColor(pct)};"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-bottom:8px;">
+          <span>0%</span><span>100%·${fmtR(c.meta)}</span><span>130%·${fmtR(c.meta*1.3)}</span><span>150%·${fmtR(c.meta*1.5)}</span>
+        </div>
+        <div class="camp-tiers">
+          ${tierHtml(t1ok,!t1ok,'100% meta trimestre',fmtR(2000),Math.max(0,c.meta-realTrim))}
+          ${tierHtml(t2ok,t1ok&&!t2ok,'130% meta trimestre','+R$ 1.000',Math.max(0,c.meta*1.3-realTrim))}
+          ${tierHtml(t3ok,t2ok&&!t3ok,'150% meta trimestre','+R$ 1.000',Math.max(0,c.meta*1.5-realTrim))}
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(99,179,237,0.04);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:9px;color:var(--muted);margin-bottom:6px;">+R$ 300 por executivo que atingir 100% da meta trimestral</div>
+          <div class="camp-exec-pills">${pills}</div>
+          ${bonusExec>0?`<div style="font-size:9px;color:#00b894;margin-top:6px;">Bônus executivos: +${fmtR(bonusExec)}</div>`:''}
+        </div>
+        <div class="camp-total">
+          <span class="camp-total-label">Premiação total (campanha + bônus)</span>
+          <span class="camp-total-val" style="color:${total+bonusExec>0?'#00b894':'var(--muted)'}">${total+bonusExec>0?fmtR(total+bonusExec)+' ✓':'R$ 0 · próx: '+fmtR(2000)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.buildCampanhas = function(){
+    buildAbril();
+    buildTrim();
+    buildCoord();
+    // Dias restantes até 30/04
+    const daysLeft = Math.max(0, Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24)));
+    const el = document.getElementById('camp-days-abr');
+    if(el) el.textContent = '▸ encerra 30/04 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
+  };
+
+  window.campShowTab = function(tab, btn){
+    document.getElementById('camp-tab-exec').style.display = tab==='exec'?'block':'none';
+    document.getElementById('camp-tab-coord').style.display = tab==='coord'?'block':'none';
+    document.querySelectorAll('.camp-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  // Inicializa após dados carregados
+  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(window.buildCampanhas,300);
+  else document.addEventListener('DOMContentLoaded',()=>setTimeout(window.buildCampanhas,300));
+})();
 // ── Export Tendência PNG ─────────────────────────────────────
 function exportTrend(){
   const canvas = document.getElementById('trend-chart');
