@@ -1619,8 +1619,11 @@ update();
       if(!activeYears.has(y)) return;
       const data=[];
       for(let m=1;m<=12;m++){
-        if(y===2026&&nowYear===2026&&m===nowMonth){
-          data.push(forecast[m]||null);
+        if(y===2026&&nowYear===2026){
+          // 2026: mostra real até mês anterior, extrapolado no mês atual, null nos futuros
+          if(m < nowMonth) data.push(getVal(agg,y,m));
+          else if(m === nowMonth) data.push(forecast[m]||getVal(agg,y,m)||null);
+          else data.push(null); // meses futuros: não plota na linha rosa
         } else {
           data.push(getVal(agg,y,m));
         }
@@ -1732,37 +1735,12 @@ update();
         interaction:{ mode:'index', intersect:false },
         plugins:{
           legend:{ display:false },
-          tooltip:{
-            backgroundColor:'#161929',
-            borderColor:'rgba(99,179,237,0.25)',
-            borderWidth:1,
-            titleColor:'#e8edf5',
-            titleFont:{family:'DM Mono,monospace',size:11},
-            bodyColor:'#8394aa',
-            bodyFont:{family:'DM Mono,monospace',size:10},
-            padding:10,
-            callbacks:{
-              title: items => MONTHS_LONG[items[0].dataIndex],
-              label: ctx=>{
-                const v=ctx.raw;
-                if(v==null) return null;
-                const lbl=ctx.dataset.label;
-                const name = lbl==='meta'?'Meta 2026':lbl==='forecast'?'Previsão':lbl;
-                const ym=lbl==='2026'||lbl==='forecast'||lbl==='meta'
-                  ? '2026-'+String(ctx.dataIndex+1).padStart(2,'0')
-                  : lbl+'-'+String(ctx.dataIndex+1).padStart(2,'0');
-                const c=cnt[ym]?` · ${cnt[ym]} ctr`:'';
-                return name+': '+fmtV(v)+c;
-              },
-              labelColor: ctx=>({
-                borderColor:'transparent',
-                backgroundColor: ctx.dataset.label==='meta'?'rgba(255,255,255,0.4)':
-                  ctx.dataset.label==='forecast'?FC_COLOR:
-                  COLORS[parseInt(ctx.dataset.label)]||FC_COLOR,
-                borderRadius:2,
-              }),
-            }
-          }
+          tooltip:{ enabled:false },
+        },
+        onClick:(evt,elements)=>{
+          if(!elements.length) return;
+          const m = elements[0].index; // 0-based
+          showMonthPopup(m, cnt, forecast, evt.native);
         },
         scales:{
           x:{
@@ -1872,6 +1850,76 @@ update();
     link.href=tmp.toDataURL('image/png');
     link.click();
   };
+
+  // ── Popup manual (estilo original) ───────────────────────────
+  function showMonthPopup(mIdx, cnt, forecast, nativeEvt){
+    const existing = document.getElementById('trend-popup');
+    if(existing && existing.dataset.month === String(mIdx)){
+      existing.remove(); return;
+    }
+    if(existing) existing.remove();
+
+    const m = mIdx + 1; // 1-based
+    const popup = document.createElement('div');
+    popup.id = 'trend-popup';
+    popup.dataset.month = String(mIdx);
+    popup.style.cssText = 'position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:210px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
+    title.innerHTML = MONTHS_LONG[mIdx] + '<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
+    popup.appendChild(title);
+
+    const fmtV = v => v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+
+    // Anos históricos
+    [...activeYears].filter(y=>typeof y==='number').sort().forEach(y=>{
+      const {agg} = buildMonthly();
+      const v = getVal(agg, y, m);
+      if(!v) return;
+      const ym = y+'-'+String(m).padStart(2,'0');
+      const ctrTxt = cnt[ym] ? '<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>' : '';
+      const yLabel = (y===2026&&m===new Date().getMonth()+1) ? '2026 (proj.)' : String(y);
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
+      row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+COLORS[y]+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+yLabel+'</span></span><span style="font-weight:700;color:'+COLORS[y]+';text-align:right;">'+fmtV(v)+ctrTxt+'</span>';
+      popup.appendChild(row);
+    });
+
+    // Previsão
+    if(activeYears.has('forecast') && forecast[m]){
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
+      const ym = '2026-'+String(m).padStart(2,'0');
+      const ctrTxt = cnt[ym] ? '<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>' : '';
+      row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+FC_COLOR+';background:rgba(8,9,15,0.7);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">PREVISÃO</span></span><span style="font-weight:700;color:'+FC_COLOR+';text-align:right;">'+fmtV(forecast[m])+ctrTxt+'</span>';
+      popup.appendChild(row);
+    }
+
+    // Meta
+    if(activeYears.has('meta')){
+      const mv = METAS_GERAL['2026-'+String(m).padStart(2,'0')];
+      if(mv){
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:4px;';
+        row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">'+fmtV(mv)+'</span>';
+        popup.appendChild(row);
+      }
+    }
+
+    document.body.appendChild(popup);
+    const pw = popup.offsetWidth||220, ph = popup.offsetHeight||160;
+    let px = (nativeEvt?.clientX||400) - pw/2;
+    let py = (nativeEvt?.clientY||300) - ph - 12;
+    if(px+pw > window.innerWidth-8) px = window.innerWidth-pw-8;
+    if(px < 8) px = 8;
+    if(py < 8) py = (nativeEvt?.clientY||300) + 12;
+    popup.style.left = px+'px';
+    popup.style.top  = py+'px';
+
+    document.getElementById('popup-close').addEventListener('click', e=>{ e.stopPropagation(); popup.remove(); });
+    setTimeout(()=>{ document.addEventListener('click', function h(e){ if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',h);} }); }, 0);
+  }
 
   // ── Init ──────────────────────────────────────────────────────
   function init(){
