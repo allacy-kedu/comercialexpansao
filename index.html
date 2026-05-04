@@ -81,10 +81,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
 .melhor-avatar-fallback{width:100%;height:100%;border-radius:50%;background:#1a1f35;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#FFD700;}
 .melhor-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);font-size:8px;font-weight:800;color:#111320;}
-.kedu-popup .leaflet-popup-content-wrapper{background:#161929!important;border:1px solid rgba(99,179,237,0.25)!important;border-radius:10px!important;box-shadow:0 8px 24px rgba(0,0,0,0.5)!important;}
-.kedu-popup .leaflet-popup-tip{background:#161929!important;}
-.kedu-popup .leaflet-popup-content{margin:10px 14px!important;}
-.kedu-popup .leaflet-popup-close-button{color:#5a6a82!important;font-size:16px!important;}
 .camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
 .camp-tabs{display:flex;gap:6px;margin-bottom:16px;}
 .camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
@@ -193,8 +189,6 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
 @media(max-width:1200px){.kpi-grid,.kpi-grid-2{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:768px){.kpi-grid,.kpi-grid-2{grid-template-columns:1fr 1fr;}}
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
@@ -797,42 +791,6 @@ document.addEventListener('click', e=>{
       <div class="kpi-label">Descredenciamento</div>
       <div class="kpi-value" id="kpi-descredenciamento" style="color:#b2bec3">—</div>
       <div class="kpi-sub" id="kpi-descredenciamento-sub">—</div>
-    </div>
-  </div>
-
-  <!-- Mapa de Escolas -->
-  <div class="card" style="margin-bottom:20px;padding:18px 22px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Mapa de Escolas</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="map-subtitle">Distribuição geográfica dos contratos</div>
-      </div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#52c77d;"></div>Ativo
-        </div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#fdcb6e;"></div>Implantando
-        </div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#e17055;"></div>Outros
-        </div>
-      </div>
-    </div>
-    <div style="position:relative;width:100%;height:480px;border-radius:10px;overflow:hidden;" id="kedu-map"></div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;">
-      <div class="kpi" style="--kpi-c:#4ECDC4;padding:10px;">
-        <div class="kpi-label">Escolas no mapa</div>
-        <div class="kpi-value" id="map-kpi-escolas" style="color:#4ECDC4;">—</div>
-      </div>
-      <div class="kpi" style="--kpi-c:#74b9ff;padding:10px;">
-        <div class="kpi-label">Estados</div>
-        <div class="kpi-value" id="map-kpi-estados" style="color:#74b9ff;">—</div>
-      </div>
-      <div class="kpi" style="--kpi-c:#a29bfe;padding:10px;">
-        <div class="kpi-label">Cidades</div>
-        <div class="kpi-value" id="map-kpi-cidades" style="color:#a29bfe;">—</div>
-      </div>
     </div>
   </div>
 
@@ -2524,7 +2482,6 @@ async function autoLoadCSV(showStatus){
     // Atualiza Melhor do Mês se estiver ativo
     if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
     if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
-    if(typeof window._rebuildMap === 'function') window._rebuildMap();
     // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
@@ -2836,217 +2793,52 @@ function buildMelhorMes(){
   else document.addEventListener('DOMContentLoaded',()=>setTimeout(window.buildCampanhas,300));
 })();
 
+// ── Export Tendência PNG ─────────────────────────────────────
+function exportTrend(){
+  const canvas = document.getElementById('trend-chart');
+  if(!canvas) return;
 
-// ── Mapa de Escolas ───────────────────────────────────────────
+  // Cria canvas temporário com fundo sólido
+  const tmp = document.createElement('canvas');
+  tmp.width  = canvas.width;
+  tmp.height = canvas.height;
+  const tctx = tmp.getContext('2d');
+
+  // Fundo conforme o tema atual
+  const isLight = document.documentElement.getAttribute('data-theme')==='light';
+  tctx.fillStyle = isLight ? '#ffffff' : '#0f1120';
+  tctx.fillRect(0, 0, tmp.width, tmp.height);
+  tctx.drawImage(canvas, 0, 0);
+
+  // Download
+  const link = document.createElement('a');
+  const now  = new Date();
+  const ts   = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  link.download = 'tendencia-vendas-'+ts+'.png';
+  link.href = tmp.toDataURL('image/png');
+  link.click();
+}
+
+// ── Tema claro/escuro ─────────────────────────────────────────
+function toggleTheme(){
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isLight ? '☀' : '☾';
+  try{ localStorage.setItem('kedu-theme', isLight ? 'dark' : 'light'); }catch(e){}
+  // Redesenha gráficos para atualizar cores de canvas
+  if(typeof window._redrawTrendChart==='function') setTimeout(window._redrawTrendChart, 50);
+}
+// Restaura preferência salva
 (function(){
-  const GEO = {
-    'Acopiara-CE':[-6.089,-39.452],'Alfenas-MG':[-21.429,-45.947],'Amontada-CE':[-3.358,-39.829],
-    'Ananindeua-PA':[-1.365,-48.372],'Aparecida de Goiânia-GO':[-16.823,-49.244],'Apucarana-PR':[-23.551,-51.461],
-    'Aquiraz-CE':[-3.897,-38.391],'Aracaju-SE':[-10.911,-37.071],'Aracruz-ES':[-19.819,-40.274],
-    'Araguaína-TO':[-7.193,-48.207],'Arapiraca-AL':[-9.752,-36.661],'Areia Branca-RN':[-4.952,-37.114],
-    'Atalaia-AL':[-9.509,-36.022],'Açailândia-MA':[-4.948,-47.501],'Balneário Camboriú-SC':[-26.990,-48.635],
-    'Bananeiras-PB':[-6.752,-35.627],'Barra do Ribeiro-RS':[-30.293,-51.302],'Barras-PI':[-4.248,-42.296],
-    'Barreira-CE':[-4.286,-38.644],'Barreiros-PE':[-8.817,-35.185],'Bayeux-PB':[-7.125,-34.938],
-    'Bela Cruz-CE':[-3.044,-40.171],'Belford Roxo-RJ':[-22.764,-43.400],'Belo Horizonte-MG':[-19.917,-43.934],
-    'Belém-PA':[-1.455,-48.502],'Betim-MG':[-19.967,-44.198],'Boa Vista-RR':[2.820,-60.672],
-    'Bom Conselho-PE':[-9.171,-36.681],'Brasília-DF':[-15.780,-47.929],'Cabo de Santo Agostinho-PE':[-8.283,-35.034],
-    'Cachoeira-BA':[-12.610,-38.959],'Caicó-RN':[-6.457,-37.097],'Cajamar-SP':[-23.357,-46.877],
-    'Camaçari-BA':[-12.699,-38.324],'Campina Grande-PB':[-7.230,-35.881],'Campina Grande do Sul-PR':[-25.303,-49.055],
-    'Campinas-SP':[-22.906,-47.063],'Campo Maior-PI':[-4.825,-42.168],'Campos Sales-CE':[-7.069,-40.371],
-    'Canarana-MT':[-13.549,-52.270],'Candeias-BA':[-12.676,-38.545],'Canguaretama-RN':[-6.373,-35.124],
-    'Capela-SE':[-10.506,-37.057],'Caruaru-PE':[-8.276,-35.976],'Castanhal-PA':[-1.294,-47.920],
-    'Catalão-GO':[-18.166,-47.947],'Caucaia-CE':[-3.741,-38.653],'Ceará-Mirim-RN':[-5.638,-35.426],
-    'Conceição do Almeida-BA':[-12.794,-39.177],'Conselheiro Lafaiete-MG':[-20.660,-43.788],'Crato-CE':[-7.232,-39.409],
-    'Cuiabá-MT':[-15.601,-56.097],'Curitiba-PR':[-25.430,-49.271],'Currais Novos-RN':[-6.260,-36.515],
-    "Dias D'Ávila-BA":[-12.613,-38.298],'Duque de Caxias-RJ':[-22.786,-43.311],'Espírito Santo-RN':[-5.308,-35.356],
-    'Eunápolis-BA':[-16.377,-39.581],'Fazenda Rio Grande-PR':[-25.666,-49.308],'Feira de Santana-BA':[-12.252,-38.966],
-    'Fortaleza-CE':[-3.717,-38.543],'Garanhuns-PE':[-8.888,-36.496],'Garça-SP':[-22.213,-49.654],
-    'Goiana-PE':[-7.560,-35.003],'Goianira-GO':[-16.498,-49.425],'Goiânia-GO':[-16.686,-49.264],
-    'Governador Mangabeira-BA':[-12.605,-39.038],'Guaiúba-CE':[-4.043,-38.645],'Guamaré-RN':[-5.104,-36.322],
-    'Guapó-GO':[-16.831,-49.530],'Guarulhos-SP':[-23.462,-46.533],'Horizonte-CE':[-4.100,-38.491],
-    'Hortolândia-SP':[-22.852,-47.220],'Icó-CE':[-6.401,-38.861],'Igaci-AL':[-9.534,-36.635],
-    'Igarapé-Açu-PA':[-1.122,-47.622],'Igarassu-PE':[-7.834,-34.906],'Iguatu-CE':[-6.360,-39.299],
-    'Ilhota-SC':[-26.900,-48.828],'Ilhéus-BA':[-14.789,-39.048],'Ipatinga-MG':[-19.468,-42.537],
-    'Ipojuca-PE':[-8.400,-35.068],'Itabaiana-SE':[-10.684,-37.426],'Itaberaba-BA':[-12.528,-40.307],
-    'Itabuna-BA':[-14.786,-39.279],'Itaitinga-CE':[-3.970,-38.524],'Itamaraju-BA':[-17.036,-39.532],
-    'Itapema-SC':[-27.086,-48.614],'Itapipoca-CE':[-3.492,-39.578],'Jaboatão dos Guararapes-PE':[-8.113,-35.015],
-    'Jequié-BA':[-13.852,-40.084],'João Pessoa-PB':[-7.119,-34.845],'Juazeiro do Norte-CE':[-7.213,-39.315],
-    'Lagoa da Confusão-TO':[-10.797,-49.624],'Lauro de Freitas-BA':[-12.898,-38.329],'Macapá-AP':[0.034,-51.066],
-    'Macaé-RJ':[-22.370,-41.787],'Macaíba-RN':[-5.857,-35.355],'Maceió-AL':[-9.666,-35.735],
-    'Manaus-AM':[-3.119,-60.022],'Marabá-PA':[-5.368,-49.118],'Maracanaú-CE':[-3.878,-38.627],
-    'Mata de São João-BA':[-12.529,-38.298],'Mesquita-RJ':[-22.802,-43.438],'Muritiba-BA':[-12.614,-39.039],
-    'Natal-RN':[-5.795,-35.209],'Niterói-RJ':[-22.883,-43.104],'Nossa Senhora do Socorro-SE':[-10.856,-37.128],
-    'Nova Friburgo-RJ':[-22.281,-42.531],'Nova Iguaçu-RJ':[-22.759,-43.451],'Olinda-PE':[-8.009,-34.855],
-    'Ouricuri-PE':[-7.879,-40.081],'Pacajus-CE':[-4.172,-38.460],'Pacatuba-CE':[-3.978,-38.618],
-    'Pacoti-CE':[-4.225,-38.918],'Parauapebas-PA':[-6.068,-49.902],'Parnaíba-PI':[-2.905,-41.776],
-    'Passo Fundo-RS':[-28.262,-52.406],'Patos-PB':[-7.024,-37.281],'Paulista-PE':[-7.940,-34.872],
-    'Paço do Lumiar-MA':[-2.556,-44.101],'Pedro Velho-RN':[-6.430,-35.223],'Pesqueira-PE':[-8.359,-36.697],
-    'Petrolina-PE':[-9.389,-40.502],'Quixadá-CE':[-4.969,-39.016],'Quixeramobim-CE':[-5.199,-39.290],
-    'Quixeré-CE':[-5.073,-37.981],'Recife-PE':[-8.054,-34.881],'Ribeirão Preto-SP':[-21.170,-47.810],
-    'Rio Branco-AC':[-9.975,-67.824],'Rio de Janeiro-RJ':[-22.906,-43.173],'Salinópolis-PA':[-0.614,-47.356],
-    'Salvador-BA':[-12.972,-38.501],'Santa Cruz do Capibaribe-PE':[-7.956,-36.205],'Santa Inês-MA':[-3.664,-45.382],
-    'Santa Rita-PB':[-7.118,-34.978],'Santarém-PA':[-2.444,-54.708],'Santo André-SP':[-23.664,-46.530],
-    'Santo Antônio de Jesus-BA':[-12.965,-39.261],'Senhor do Bonfim-BA':[-10.461,-40.189],'Serrinha-BA':[-11.664,-38.987],
-    'Simões Filho-BA':[-12.784,-38.401],'Suzano-SP':[-23.543,-46.311],'São Antônio de Jesus-BA':[-12.965,-39.261],
-    'São Cristóvão-SE':[-11.014,-37.206],'São Gonçalo-RJ':[-22.827,-43.054],'São Gonçalo do Amarante-RN':[-5.793,-35.328],
-    'São Gonçalo do Piauí-PI':[-6.058,-42.720],'São Gonçalo dos Campos-BA':[-12.434,-38.963],'São José-SC':[-27.592,-48.640],
-    'São José da Coroa Grande-PE':[-8.898,-35.147],'São José de Ribamar-MA':[-2.557,-44.058],'São João de Meriti-RJ':[-22.800,-43.370],
-    'São Lourenço da Mata-PE':[-8.005,-35.024],'São Luís-MA':[-2.530,-44.303],'São Miguel dos Campos-AL':[-9.782,-36.096],
-    'São Paulo-SP':[-23.550,-46.633],'Teixeira de Freitas-BA':[-17.532,-39.742],'Teotônio Vilela-AL':[-9.913,-36.342],
-    'Teresina-PI':[-5.091,-42.803],'Tianguá-CE':[-3.733,-40.991],'Timon-MA':[-5.094,-42.836],
-    'Uberlândia-MG':[-18.918,-48.277],'Umbaúba-SE':[-11.370,-37.671],'Vitória da Conquista-BA':[-14.866,-40.844],
-    'Volta Redonda-RJ':[-22.523,-44.104],'Várzea Grande-MT':[-15.646,-56.133],'Várzea Paulista-SP':[-23.211,-46.828],
-  };
-
-  const ESTADO_SIGLAS = {
-    'Acre':'AC','Alagoas':'AL','Amapá':'AP','Amazonas':'AM','Bahia':'BA','Ceará':'CE',
-    'Distrito Federal':'DF','Espírito Santo':'ES','Goiás':'GO','Maranhão':'MA','Mato Grosso':'MT',
-    'Mato Grosso do Sul':'MS','Minas Gerais':'MG','Pará':'PA','Paraíba':'PB','Paraná':'PR',
-    'Pernambuco':'PE','Piauí':'PI','Rio de Janeiro':'RJ','Rio Grande do Norte':'RN',
-    'Rio Grande do Sul':'RS','Rondônia':'RO','Roraima':'RR','Santa Catarina':'SC',
-    'São Paulo':'SP','Sergipe':'SE','Tocantins':'TO',
-  };
-
-  const STATUS_COLOR = {
-    'Ativo':'#52c77d','Implantando':'#fdcb6e',
-    'Cancelado':'#e17055','Descredenciamento':'#e17055','Churn':'#e17055'
-  };
-
-  function fmtFat(v){ if(!v) return '—'; return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K'; }
-
-  let _leafletMap = null;
-  let _stateLayer = null;
-
-  function buildMap(){
-    if(typeof L === 'undefined') return setTimeout(buildMap, 300);
-    const el = document.getElementById('kedu-map');
-    if(!el) return;
-
-    // Agrupa por estado
-    const estados = {};
-    RAW.forEach(r=>{
-      if(!r.cidade || !r.estado) return;
-      const sigla = r.estado.length===2 ? r.estado : (ESTADO_SIGLAS[r.estado]||r.estado);
-      const key = r.cidade+'-'+sigla;
-      if(!GEO[key]) return;
-      if(!estados[sigla]) estados[sigla]={sigla, escolas:[], lat:0, lng:0, count:0};
-      estados[sigla].escolas.push({
-        nome:r.escola||r.cidade, status:r.status||'Ativo',
-        fat:r.fat_kedu||0, alunos:r.alunos||0,
-        lat:GEO[key][0], lng:GEO[key][1],
-      });
-      estados[sigla].count++;
-    });
-
-    // Centroide por estado (média das cidades)
-    Object.values(estados).forEach(e=>{
-      const lats=e.escolas.map(x=>x.lat), lngs=e.escolas.map(x=>x.lng);
-      e.lat=lats.reduce((s,v)=>s+v,0)/lats.length;
-      e.lng=lngs.reduce((s,v)=>s+v,0)/lngs.length;
-    });
-
-    const totalEsc = Object.values(estados).reduce((s,e)=>s+e.count,0);
-    const totalEst = Object.keys(estados).length;
-    const totalCid = new Set(RAW.filter(r=>r.cidade&&r.estado).map(r=>r.cidade+(r.estado.length===2?r.estado:(ESTADO_SIGLAS[r.estado]||r.estado)))).size;
-
-    document.getElementById('map-kpi-escolas').textContent = totalEsc;
-    document.getElementById('map-kpi-estados').textContent = totalEst;
-    document.getElementById('map-kpi-cidades').textContent = totalCid;
-    document.getElementById('map-subtitle').textContent = totalEsc+' escola'+(totalEsc!==1?'s':'')+' em '+totalCid+' cidade'+(totalCid!==1?'s':'')+' · '+totalEst+' estado'+(totalEst!==1?'s':'');
-
-    if(_leafletMap){ _leafletMap.remove(); _leafletMap=null; }
-
-    _leafletMap = L.map(el,{
-      center:[-14.0,-52.0], zoom:4,
-      zoomControl:true,
-      scrollWheelZoom:true,  // zoom com scroll ativado
-      attributionControl:false,
-    });
-
-    // Tiles azulados combinando com o tema do dash
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-      maxZoom:18,
-      subdomains:'abcd',
-    }).addTo(_leafletMap);
-
-    // Camada GeoJSON dos estados para hover highlight
-    fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson')
-      .then(r=>r.json())
-      .then(geojson=>{
-        _stateLayer = L.geoJSON(geojson,{
-          style: feat=>{
-            const sigla = feat.properties.sigla||feat.properties.UF_05||'';
-            const temDados = !!estados[sigla];
-            return {
-              fillColor: temDados ? 'rgba(78,205,196,0.12)' : 'transparent',
-              fillOpacity:1,
-              color: temDados ? 'rgba(78,205,196,0.35)' : 'rgba(99,179,237,0.1)',
-              weight: temDados ? 1.5 : 0.5,
-            };
-          },
-          onEachFeature:(feat,layer)=>{
-            const sigla = feat.properties.sigla||feat.properties.UF_05||'';
-            if(!estados[sigla]) return;
-            layer.on({
-              mouseover: e=>{
-                e.target.setStyle({fillColor:'rgba(78,205,196,0.28)',color:'rgba(78,205,196,0.7)',weight:2});
-                e.target.bringToFront();
-              },
-              mouseout: e=>{
-                e.target.setStyle({fillColor:'rgba(78,205,196,0.12)',color:'rgba(78,205,196,0.35)',weight:1.5});
-              },
-            });
-          }
-        }).addTo(_leafletMap);
-      }).catch(()=>{});
-
-    // Marcadores por estado
-    Object.values(estados).forEach(e=>{
-      const n = e.count;
-      const statusCount={};
-      e.escolas.forEach(x=>{ statusCount[x.status]=(statusCount[x.status]||0)+1; });
-      const dominant=Object.entries(statusCount).sort((a,b)=>b[1]-a[1])[0][0];
-      const cor=STATUS_COLOR[dominant]||'#74b9ff';
-      const r=Math.min(7+n*1.8,26);
-
-      const icon=L.divIcon({
-        className:'',
-        html:`<div style="width:${r*2}px;height:${r*2}px;border-radius:50%;background:${cor};border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:${n>9?9:10}px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">${n>1?n:''}</div>`,
-        iconSize:[r*2,r*2], iconAnchor:[r,r],
-      });
-
-      const fatTotal=e.escolas.reduce((s,x)=>s+x.fat,0);
-      const alunosTotal=e.escolas.reduce((s,x)=>s+x.alunos,0);
-
-      const rows=e.escolas.map(x=>`
-        <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(99,179,237,0.08);">
-          <div style="width:7px;height:7px;border-radius:50%;background:${STATUS_COLOR[x.status]||'#74b9ff'};flex-shrink:0;margin-top:3px;"></div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:10px;color:#e8edf5;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${x.nome||'—'}</div>
-            <div style="display:flex;gap:8px;margin-top:2px;">
-              ${x.fat>0?`<span style="font-size:9px;color:#4ECDC4;">${fmtFat(x.fat)}</span>`:''}
-              ${x.alunos>0?`<span style="font-size:9px;color:#8394aa;">${Math.round(x.alunos)} alunos</span>`:''}
-            </div>
-          </div>
-        </div>`).join('');
-
-      const marker=L.marker([e.lat,e.lng],{icon}).addTo(_leafletMap);
-      marker.bindPopup(`
-        <div style="font-family:'DM Mono',monospace;min-width:220px;max-height:280px;overflow-y:auto;">
-          <div style="font-size:12px;font-weight:700;color:#e8edf5;margin-bottom:4px;">${e.sigla}</div>
-          <div style="display:flex;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(99,179,237,0.15);">
-            <span style="font-size:9px;color:#5a6a82;">${n} escola${n!==1?'s':''}</span>
-            ${fatTotal>0?`<span style="font-size:9px;color:#4ECDC4;">${fmtFat(fatTotal)}</span>`:''}
-            ${alunosTotal>0?`<span style="font-size:9px;color:#8394aa;">${Math.round(alunosTotal)} alunos</span>`:''}
-          </div>
-          ${rows}
-        </div>`,{className:'kedu-popup',maxWidth:280,maxHeight:320});
-    });
-  }
-
-  window._rebuildMap=buildMap;
-
-  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(buildMap,500);
-  else document.addEventListener('DOMContentLoaded',()=>setTimeout(buildMap,500));
+  try{
+    const saved = localStorage.getItem('kedu-theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme','light');
+      const icon = document.getElementById('theme-icon');
+      if(icon) icon.textContent = '☾';
+    }
+  }catch(e){}
 })();
->
+
+</script>
