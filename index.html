@@ -692,10 +692,7 @@ document.addEventListener('click', e=>{
       <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
       <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
       <div class="camp-grid" id="camp-grid-abril"></div>
-      <div class="camp-divider"></div>
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Abr–Jun</div>
-      <div class="camp-days">▸ encerra 30/06 · 61 dias restantes</div>
-      <div class="camp-grid" id="camp-grid-trim"></div>
+
     </div>
     <div id="camp-tab-coord" style="display:none;">
       <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
@@ -2570,10 +2567,9 @@ function buildMelhorMes(){
 (function(){
   const META_CLOSER_MES = {'2026-04':267000,'2026-05':341000,'2026-06':341000};
   const META_IS_MES     = {'2026-04':187000,'2026-05':252000,'2026-06':252000};
-  const META_R1_TRIM    = 4672000;  // 1.440K+1.616K+1.616K
-  const META_R2_TRIM    = 3732000;  // 1.360K+1.186K+1.186K
+  const META_R1_TRIM    = 4672000;
+  const META_R2_TRIM    = 3732000;
 
-  // Por regional, ordem alfabética
   const CAMP_R1 = [
     {name:'Antônio Cláudio',     cargo:'Closer',       cor:'#fd79a8'},
     {name:'Bruna Nunes',         cargo:'Closer',       cor:'#fd79a8'},
@@ -2605,103 +2601,105 @@ function buildMelhorMes(){
     </div>`;
   }
 
-  function tierHtml(ok,isNext,desc,val,falta){
-    const cls=ok?'done':isNext?'next':'locked';
-    const icon=ok?'✓':isNext?'→':'·';
-    const d=(isNext&&falta>0)?desc+' · faltam '+fmtR(falta):desc;
+  function tierHtml(ok, isNext, desc, val, falta){
+    const cls  = ok?'done':isNext?'next':'locked';
+    const icon = ok?'✓':isNext?'→':'·';
+    const d    = (isNext&&falta>0) ? desc+' · faltam '+fmtR(falta) : desc;
     return `<div class="camp-tier ${cls}"><span class="camp-tier-icon">${icon}</span><span class="camp-tier-desc">${d}</span><span class="camp-tier-val">${val}</span></div>`;
   }
 
-  function regionalHeader(label){ return `<div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;grid-column:1/-1;">${label}</div>`; }
-
-  function cardAbril(e){
-    const MESES=['2026-04'];
-    const MESES_TRIM=['2026-04','2026-05','2026-06'];
-    const realAbr=getReal(e.name,MESES);
-    const realTotal=getReal(e.name,MESES_TRIM);
-    const mA=metaMes(e,'2026-04'), mM=metaMes(e,'2026-05'), mJ=metaMes(e,'2026-06');
-    const t1ok=realAbr>=mA, t2ok=realTotal>=mA+mM, t3ok=realTotal>=mA+mM+mJ;
-    const pct=mA>0?Math.round(realAbr/mA*100):0;
-    const total=(t1ok?500:0)+(t2ok?500:0)+(t3ok?1000:0);
-    return `<div class="camp-card">
-      <div class="camp-card-head">
-        ${avatar(e.name,e.cor)}
-        <div class="camp-card-info"><div class="camp-card-name">${e.name}</div><div class="camp-card-cargo">${e.cargo} · Meta: ${fmtR(mA)}</div></div>
-        <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
-      </div>
-      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pct)}%;background:${barColor(pct)};"></div></div>
-      <div class="camp-tiers">
-        ${tierHtml(t1ok,!t1ok,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))}
-        ${tierHtml(t2ok,t1ok&&!t2ok,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM-realTotal))}
-        ${tierHtml(t3ok,t2ok&&!t3ok,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM+mJ-realTotal))}
-      </div>
-      <div class="camp-total">
-        <span class="camp-total-label">Premiação campanha abril</span>
-        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0'}</span>
-      </div>
-    </div>`;
+  function regionalHeader(label){
+    return `<div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;grid-column:1/-1;">${label}</div>`;
   }
 
-  function cardTrim(e){
-    const MESES=['2026-04','2026-05','2026-06'];
-    const realTrim=getReal(e.name,MESES);
-    const mT=metaTrim(e);
-    const pct=mT>0?Math.round(realTrim/mT*100):0;
-    const t1ok=realTrim>=mT*1.3, t2ok=realTrim>=mT*1.5;
-    const total=(t1ok?1000:0)+(t2ok?2000:0);
+  // Card unificado: campanha de abril + tiers trimestrais pendentes
+  function cardAbril(e){
+    const MESES_ABR  = ['2026-04'];
+    const MESES_TRIM = ['2026-04','2026-05','2026-06'];
+    const realAbr   = getReal(e.name, MESES_ABR);
+    const realTrim  = getReal(e.name, MESES_TRIM);
+    const mA = metaMes(e,'2026-04'), mM = metaMes(e,'2026-05'), mJ = metaMes(e,'2026-06');
+    const mT = metaTrim(e);
+
+    // Tiers de abril
+    const t1ok = realAbr  >= mA;
+    const t2ok = realTrim >= mA+mM;
+    const t3ok = realTrim >= mA+mM+mJ;
+
+    // Tiers trimestrais
+    const tri130ok = realTrim >= mT*1.3;
+    const tri150ok = realTrim >= mT*1.5;
+
+    const pct = mA>0 ? Math.round(realAbr/mA*100) : 0;
+    const bw  = Math.min(100, pct);
+
+    // Premiação total visível em abril
+    const totalAbr  = (t1ok?500:0)+(t2ok?500:0)+(t3ok?1000:0);
+    const totalTri  = (tri130ok?1000:0)+(tri150ok?2000:0);
+    const totalGeral = totalAbr + totalTri;
+
+    // Tiers trimestrais pendentes — mostra apenas o que ainda não foi conquistado
+    const triTiers = [];
+    if(!tri130ok){
+      triTiers.push(tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim)));
+      triTiers.push(tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
+    } else if(!tri150ok){
+      triTiers.push(tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0));
+      triTiers.push(tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim)));
+    } else {
+      triTiers.push(tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0));
+      triTiers.push(tierHtml(true,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
+    }
+
     return `<div class="camp-card">
       <div class="camp-card-head">
         ${avatar(e.name,e.cor)}
-        <div class="camp-card-info"><div class="camp-card-name">${e.name}</div><div class="camp-card-cargo">${e.cargo} · Meta trim: ${fmtR(mT)}</div></div>
-        <div class="camp-card-pct" style="color:#74b9ff">${pct}%</div>
+        <div class="camp-card-info">
+          <div class="camp-card-name">${e.name}</div>
+          <div class="camp-card-cargo">${e.cargo} · Meta Abr: ${fmtR(mA)}</div>
+        </div>
+        <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
       </div>
-      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pct/1.5)}%;background:#74b9ff;"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-bottom:8px;">
-        <span>0%</span><span style="color:#74b9ff">${pct}%</span><span>130%</span><span>150%</span>
-      </div>
+      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${bw}%;background:${barColor(pct)};"></div></div>
       <div class="camp-tiers">
-        ${tierHtml(t1ok,!t1ok,'130% meta trimestral','+R$ 1.000',Math.max(0,mT*1.3-realTrim))}
-        ${tierHtml(t2ok,t1ok&&!t2ok,'150% meta trimestral','+R$ 2.000',Math.max(0,mT*1.5-realTrim))}
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Abril</div>
+        ${tierHtml(t1ok,!t1ok,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))}
+        ${tierHtml(t2ok,t1ok&&!t2ok,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM-realTrim))}
+        ${tierHtml(t3ok,t2ok&&!t3ok,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM+mJ-realTrim))}
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 0 4px;border-top:1px solid var(--border);margin-top:4px;">Campanha Trimestral</div>
+        ${triTiers.join('')}
       </div>
       <div class="camp-total">
-        <span class="camp-total-label">Premiação trimestral</span>
-        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
+        <span class="camp-total-label">Premiação total acumulada</span>
+        <span class="camp-total-val" style="color:${totalGeral>0?'#00b894':'var(--muted)'}">${totalGeral>0?fmtR(totalGeral)+' ✓':'R$ 0'}</span>
       </div>
     </div>`;
   }
 
   function buildAbril(){
-    const el=document.getElementById('camp-grid-abril'); if(!el) return;
-    const r1=CAMP_R1.filter(e=>TEAM[e.name]);
-    const r2=CAMP_R2.filter(e=>TEAM[e.name]);
+    const el = document.getElementById('camp-grid-abril'); if(!el) return;
+    const r1 = CAMP_R1.filter(e=>TEAM[e.name]);
+    const r2 = CAMP_R2.filter(e=>TEAM[e.name]);
     el.innerHTML = regionalHeader('Regional 1') + r1.map(cardAbril).join('')
                  + regionalHeader('Regional 2') + r2.map(cardAbril).join('');
   }
 
-  function buildTrim(){
-    const el=document.getElementById('camp-grid-trim'); if(!el) return;
-    const r1=CAMP_R1.filter(e=>TEAM[e.name]);
-    const r2=CAMP_R2.filter(e=>TEAM[e.name]);
-    el.innerHTML = regionalHeader('Regional 1') + r1.map(cardTrim).join('')
-                 + regionalHeader('Regional 2') + r2.map(cardTrim).join('');
-  }
-
   function buildCoord(){
-    const MESES=['2026-04','2026-05','2026-06'];
-    const COORDS=[
+    const MESES = ['2026-04','2026-05','2026-06'];
+    const COORDS = [
       {regional:'Regional 1', meta:META_R1_TRIM, members:R1_NAMES},
       {regional:'Regional 2', meta:META_R2_TRIM, members:R2_NAMES},
     ];
-    const el=document.getElementById('camp-grid-coord'); if(!el) return;
-    el.innerHTML=COORDS.map(c=>{
-      const realTrim=c.members.reduce((s,n)=>s+getReal(n,MESES),0);
-      const pct=c.meta>0?Math.round(realTrim/c.meta*100):0;
-      const bw=Math.min(100,pct);
-      const t1ok=realTrim>=c.meta, t2ok=realTrim>=c.meta*1.3, t3ok=realTrim>=c.meta*1.5;
-      const total=(t1ok?2000:0)+(t2ok?1000:0)+(t3ok?1000:0);
-      const execMeta=name=>{ const e=CAMP_R1.concat(CAMP_R2).find(x=>x.name===name); return e?metaTrim(e):0; };
-      const bonusExec=c.members.filter(n=>getReal(n,MESES)>=execMeta(n)).length*300;
-      const pills=c.members.map(n=>{
+    const el = document.getElementById('camp-grid-coord'); if(!el) return;
+    el.innerHTML = COORDS.map(c=>{
+      const realTrim = c.members.reduce((s,n)=>s+getReal(n,MESES),0);
+      const pct = c.meta>0?Math.round(realTrim/c.meta*100):0;
+      const bw  = Math.min(100,pct);
+      const t1ok = realTrim>=c.meta, t2ok=realTrim>=c.meta*1.3, t3ok=realTrim>=c.meta*1.5;
+      const total = (t1ok?2000:0)+(t2ok?1000:0)+(t3ok?1000:0);
+      const execMeta = name=>{ const e=CAMP_R1.concat(CAMP_R2).find(x=>x.name===name); return e?metaTrim(e):0; };
+      const bonusExec = c.members.filter(n=>getReal(n,MESES)>=execMeta(n)).length*300;
+      const pills = c.members.map(n=>{
         const mI=execMeta(n), rI=getReal(n,MESES), p=mI>0?Math.round(rI/mI*100):0, ok=rI>=mI;
         return `<span class="camp-pill${ok?' done':''}">${n.split(' ').slice(0,2).join(' ')} · ${p}%</span>`;
       }).join('');
@@ -2732,16 +2730,17 @@ function buildMelhorMes(){
     }).join('');
   }
 
-  window.buildCampanhas=function(){
-    buildAbril(); buildTrim(); buildCoord();
-    const daysLeft=Math.max(0,Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24)));
-    const el=document.getElementById('camp-days-abr');
-    if(el) el.textContent='▸ encerra 30/04 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
+  window.buildCampanhas = function(){
+    buildAbril();
+    buildCoord();
+    const daysLeft = Math.max(0,Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24)));
+    const el = document.getElementById('camp-days-abr');
+    if(el) el.textContent = '▸ encerra 30/04 · '+daysLeft+' dia'+(daysLeft!==1?'s':'')+' restante'+(daysLeft!==1?'s':'');
   };
 
-  window.campShowTab=function(tab,btn){
-    document.getElementById('camp-tab-exec').style.display=tab==='exec'?'block':'none';
-    document.getElementById('camp-tab-coord').style.display=tab==='coord'?'block':'none';
+  window.campShowTab = function(tab,btn){
+    document.getElementById('camp-tab-exec').style.display  = tab==='exec'?'block':'none';
+    document.getElementById('camp-tab-coord').style.display = tab==='coord'?'block':'none';
     document.querySelectorAll('.camp-tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   };
