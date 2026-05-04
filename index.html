@@ -152,6 +152,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
 @media(max-width:1200px){.kpi-grid,.kpi-grid-2{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:768px){.kpi-grid,.kpi-grid-2{grid-template-columns:1fr 1fr;}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
 // ── Export Meta PNG ───────────────────────────────────────────
@@ -587,9 +588,8 @@ document.addEventListener('click', e=>{
       </div>
     </div>
     <div class="trend-canvas-wrap" style="position:relative;">
-      <canvas id="trend-chart"></canvas>
+      <canvas id="trend-chart" style="height:220px;"></canvas>
     </div>
-    <div id="trend-month-btns" style="display:flex;justify-content:space-around;padding:10px 62px 0 62px;margin-top:4px;"></div>
 
     <!-- Simulador de Previsão -->
     <div id="sim-toggle" onclick="toggleSim()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;margin-top:12px;border-top:1px solid rgba(99,179,237,0.08);user-select:none;">
@@ -1535,489 +1535,356 @@ function resetFilters(){filters={dateFrom:'',dateTo:'',lideranca:'',executivo:''
 
 update();
 
-// ── Trend Chart ──────────────────────────────────────────────
+// ── Trend Chart (Chart.js) ───────────────────────────────────
 (function(){
-  const METAS_2026 = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,
-    '2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,
-    '2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
+  const COLORS = {2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
+  const FC_COLOR   = '#74b9ff';
+  const META_COLOR = 'rgba(255,255,255,0.22)';
+  const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const MONTHS_LONG  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const YEARS = [2022,2023,2024,2025,2026];
+  const activeYears = new Set([2022,2023,2024,2025,2026,'meta','forecast']);
 
+  let _chart = null;
+  let _simActive = false;
+  let _simOverride = null;
+
+  // ── Dados ─────────────────────────────────────────────────────
   function buildMonthly(){
-    const agg = {}, cnt = {};
-    RAW.forEach(r => {
-      if(!r.assinatura || !r.fat_kedu) return;
-      const ym = r.assinatura.slice(0,7);
-      agg[ym] = (agg[ym]||0) + r.fat_kedu;
-      cnt[ym] = (cnt[ym]||0) + 1;
+    const agg={}, cnt={};
+    RAW.forEach(r=>{
+      if(!r.assinatura||!r.fat_kedu) return;
+      const ym=r.assinatura.slice(0,7);
+      agg[ym]=(agg[ym]||0)+r.fat_kedu;
+      cnt[ym]=(cnt[ym]||0)+1;
     });
-    return {agg, cnt};
+    return {agg,cnt};
   }
 
+  function getVal(agg,y,m){ return agg[y+'-'+String(m).padStart(2,'0')]||null; }
+
+  // ── Forecast ──────────────────────────────────────────────────
   function calcForecast(monthly){
     const today        = new Date();
     const currentYear  = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1–12
+    const currentMonth = today.getMonth()+1;
     const dayOfMonth   = today.getDate();
-    const daysInMonth  = new Date(currentYear, currentMonth, 0).getDate();
+    const daysInMonth  = new Date(currentYear,currentMonth,0).getDate();
 
-    // 1. Coleta realizados de 2026 (valores reais de cada mês)
-    const realized = {};
-    let lastRealizedMonth = 0;
-    for(let m=1; m<=12; m++){
+    const realized={};
+    let lastRealizedMonth=0;
+    for(let m=1;m<=12;m++){
       const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){ realized[m]=monthly[k]; lastRealizedMonth=m; }
+      if(monthly[k]){realized[m]=monthly[k];lastRealizedMonth=m;}
     }
 
-    // 2. Extrapola o mês atual pelo ritmo diário (real ÷ dia_atual × dias_no_mês)
-    // Se simulador ativo, usa o dia do slider
-    const _diaEfetivo = (typeof _simOverride !== 'undefined' && _simOverride)
-      ? Math.max(1, _simOverride.dia) : Math.max(1, dayOfMonth);
-    let currentProj = null;
-    if(currentYear===2026 && realized[currentMonth]){
-      currentProj = Math.round(realized[currentMonth] / _diaEfetivo * daysInMonth);
+    const _diaEfetivo = (_simOverride) ? Math.max(1,_simOverride.dia) : Math.max(1,dayOfMonth);
+    let currentProj=null;
+    if(currentYear===2026&&realized[currentMonth]){
+      currentProj=Math.round(realized[currentMonth]/_diaEfetivo*daysInMonth);
     }
 
-    // 3. Fator de crescimento: inclui meses encerrados + mês atual extrapolado
-    //    Assim, quanto mais vende no mês atual → fator maior → meses futuros sobem
-    let rNum=0, rDen=0;
-    for(let m=1; m<=12; m++){
+    let rNum=0,rDen=0;
+    for(let m=1;m<=12;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025 = monthly[k2025];
+      const base2025=monthly[k2025];
       if(!base2025) continue;
-      if(m < currentMonth && realized[m]){
-        rNum += realized[m]; rDen += base2025; // mês encerrado: usa real
-      } else if(m === currentMonth && currentProj){
-        rNum += currentProj; rDen += base2025; // mês atual: usa extrapolado
-      }
+      if(m<currentMonth&&realized[m]){rNum+=realized[m];rDen+=base2025;}
+      else if(m===currentMonth&&currentProj){rNum+=currentProj;rDen+=base2025;}
     }
-    const growthFactor = rDen>0 ? rNum/rDen : 1.0;
+    const growthFactor=rDen>0?rNum/rDen:1.0;
 
-    // 4. Monta forecast mês a mês
-    const forecast = {}, expected = {};
-    for(let m=1; m<=12; m++){
+    const forecast={},expected={};
+    for(let m=1;m<=12;m++){
       const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025 = monthly[k2025] || null;
-      const exp = base2025 ? Math.round(base2025 * growthFactor) : null;
-      expected[m] = exp;
-
-      if(m < currentMonth && realized[m]){
-        forecast[m] = realized[m];       // encerrado: real
-      } else if(m === currentMonth && currentProj){
-        forecast[m] = currentProj;       // atual: extrapolado
-      } else {
-        forecast[m] = exp;               // futuro: fator × 2025 (dinâmico)
-      }
+      const base2025=monthly[k2025]||null;
+      const exp=base2025?Math.round(base2025*growthFactor):null;
+      expected[m]=exp;
+      if(m<currentMonth&&realized[m]) forecast[m]=realized[m];
+      else if(m===currentMonth&&currentProj) forecast[m]=currentProj;
+      else forecast[m]=exp;
     }
-
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor, currentProj};
+    return {forecast,expected,realized,lastRealizedMonth,growthFactor,currentProj};
   }
 
-  const _dots = []; // hit-test registry
+  // ── Monta datasets ────────────────────────────────────────────
+  function buildDatasets(agg,forecast,expected,realized,lastRealizedMonth){
+    const today=new Date();
+    const nowMonth=today.getMonth()+1;
+    const nowYear=today.getFullYear();
+    const datasets=[];
 
-  const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const YEARS = [2022,2023,2024,2025,2026];
-  const COLORS = {2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
-  const FC_COLOR = '#74b9ff';
-  const activeYears = new Set([2022,2023,2024,2025,2026,'meta','forecast']);
-
-  function drawChart(){
-    // Rebuild all data from current RAW every call
-    const MONTHLY_RAW = {};
-    RAW.forEach(r => {
-      if(!r.assinatura || !r.fat_kedu) return;
-      const ym = r.assinatura.slice(0,7);
-      MONTHLY_RAW[ym] = (MONTHLY_RAW[ym]||0) + r.fat_kedu;
-    });
-    function getVal(y,m){ return MONTHLY_RAW[y+'-'+String(m).padStart(2,'0')]||null; }
-
-    const {agg:_agg, cnt:_cnt} = buildMonthly();
-    const _monthly = {..._agg};
-    // Se simulador estiver ativo, substitui o valor do mês atual
-    if(typeof _simOverride !== 'undefined' && _simOverride){
-      const _todaySim = new Date();
-      const _ymSim = _todaySim.getFullYear()+'-'+String(_todaySim.getMonth()+1).padStart(2,'0');
-      _monthly[_ymSim] = _simOverride.fat;
-    }
-    const {forecast:FORECAST_2026, expected:EXPECTED_2026, realized:REALIZED_2026, lastRealizedMonth:REALIZED_UNTIL, growthFactor:GROWTH_FACTOR, currentProj:CURRENT_PROJ} = calcForecast(_monthly);
-    _dots.length = 0;
-
-    // Update subtitle — projeção anual = realizados + mês atual extrapolado + futuros
-    const subEl = document.getElementById('trend-forecast-sub');
-    if(subEl){
-      const total = Object.values(FORECAST_2026).reduce((s,v)=>s+(v||0),0);
-      const totalFmt = total>=1000000?(total/1000000).toFixed(1)+'M':(total/1000).toFixed(0)+'K';
-      const factorPct = ((GROWTH_FACTOR-1)*100).toFixed(1);
-      subEl.textContent = 'Projeção anual 2026: R$ '+totalFmt+' · Crescimento vs 2025: '+(GROWTH_FACTOR>=1?'+':'')+factorPct+'%';
-    }
-    const canvas=document.getElementById('trend-chart');
-    if(!canvas)return;
-    const wrap=canvas.parentElement;
-    const W=wrap.offsetWidth||800, H=220;
-    canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
-    canvas.style.width=W+'px'; canvas.style.height=H+'px';
-    const ctx=canvas.getContext('2d');
-    ctx.scale(devicePixelRatio,devicePixelRatio);
-    const pad={top:16,right:50,bottom:8,left:62};
-    const cW=W-pad.left-pad.right, cH=H-pad.top-pad.bottom;
-
-    let maxVal=0;
+    // Linhas históricas
     YEARS.forEach(y=>{
-      if(!activeYears.has(y))return;
-      for(let m=1;m<=12;m++){const v=getVal(y,m);if(v&&v>maxVal)maxVal=v;}
+      if(!activeYears.has(y)) return;
+      const data=[];
+      for(let m=1;m<=12;m++){
+        if(y===2026&&nowYear===2026&&m===nowMonth){
+          data.push(forecast[m]||null);
+        } else {
+          data.push(getVal(agg,y,m));
+        }
+      }
+      datasets.push({
+        label: String(y),
+        data,
+        borderColor: COLORS[y],
+        borderWidth: (y===2025||y===2026)?2:1.5,
+        borderDash: y===2026?[6,3]:[],
+        pointBackgroundColor: COLORS[y],
+        pointRadius: (y===2025||y===2026)?4:3,
+        pointHoverRadius:6,
+        tension:0.4,
+        fill:false,
+        spanGaps:false,
+      });
     });
-    if(activeYears.has('meta'))Object.values(METAS_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
-    if(activeYears.has('forecast'))Object.values(FORECAST_2026).forEach(v=>{if(v>maxVal)maxVal=v;});
-    if(!maxVal)maxVal=3000000;
-    maxVal*=1.12;
-
-    const toX=m=>pad.left+(m-1)*(cW/11);
-    const toY=v=>pad.top+cH-(v/maxVal)*cH;
-
-    ctx.clearRect(0,0,W,H);
-
-    // Grid
-    ctx.strokeStyle='rgba(99,179,237,0.06)';ctx.lineWidth=1;
-    for(let i=0;i<=4;i++){const yy=pad.top+(cH/4)*i;ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+cW,yy);ctx.stroke();}
-
-    // Y labels
-    ctx.fillStyle='rgba(90,106,130,0.8)';ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
-    for(let i=0;i<=4;i++){
-      const v=maxVal*(1-i/4),yy=pad.top+(cH/4)*i;
-      ctx.fillText('R$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),pad.left-6,yy+3);
-    }
-    // X labels handled by month buttons below chart
 
     // Meta
     if(activeYears.has('meta')){
-      ctx.beginPath();
-      for(let m=1;m<=12;m++){const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));}
-      ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
-      // Meta dots
-      for(let m=1;m<=12;m++){
-        const v=METAS_2026['2026-'+String(m).padStart(2,'0')]||0;
-        ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-        ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fill();
-        _dots.push({x:toX(m),y:toY(v),type:'meta',month:m,val:v});
-      }
+      datasets.push({
+        label:'meta',
+        data: Array.from({length:12},(_,i)=>METAS_GERAL['2026-'+String(i+1).padStart(2,'0')]||null),
+        borderColor: META_COLOR,
+        borderWidth:1.5,
+        borderDash:[4,4],
+        pointBackgroundColor:'rgba(255,255,255,0.08)',
+        pointBorderColor:'rgba(255,255,255,0.35)',
+        pointBorderWidth:1.5,
+        pointRadius:3,
+        pointHoverRadius:5,
+        tension:0,
+        fill:false,
+      });
     }
 
     // Forecast
     if(activeYears.has('forecast')){
-      // Shaded area (projected portion only)
-      if(REALIZED_UNTIL < 12){
-        ctx.beginPath();
-        ctx.moveTo(toX(REALIZED_UNTIL),toY(EXPECTED_2026[REALIZED_UNTIL]||FORECAST_2026[REALIZED_UNTIL]));
-        for(let m=REALIZED_UNTIL+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
-        ctx.lineTo(toX(12),toY(0));ctx.lineTo(toX(REALIZED_UNTIL),toY(0));ctx.closePath();
-        const g=ctx.createLinearGradient(0,pad.top,0,pad.top+cH);
-        g.addColorStop(0,'rgba(116,185,255,0.10)');g.addColorStop(1,'rgba(116,185,255,0.01)');
-        ctx.fillStyle=g;ctx.fill();
-      }
-
-      // Expected line for realized months (what was forecast before year started)
-      if(REALIZED_UNTIL > 0){
-        ctx.beginPath();
-        for(let m=1;m<=REALIZED_UNTIL;m++){
-          const v=EXPECTED_2026[m]; if(!v) continue;
-          m===1?ctx.moveTo(toX(m),toY(v)):ctx.lineTo(toX(m),toY(v));
-        }
-        ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(116,185,255,0.45)';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
-      }
-
-      // Dashed line (projected future months)
-      if(REALIZED_UNTIL < 12){
-        ctx.beginPath();
-        const startM = REALIZED_UNTIL > 0 ? REALIZED_UNTIL : 1;
-        ctx.moveTo(toX(startM), toY(EXPECTED_2026[startM]||FORECAST_2026[startM]));
-        for(let m=startM+1;m<=12;m++){const v=FORECAST_2026[m];if(v)ctx.lineTo(toX(m),toY(v));}
-        ctx.setLineDash([5,4]);ctx.strokeStyle=FC_COLOR;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
-      }
-
-      // Dots — realized months: green if hit, red if missed; future: open circle
-      for(let m=1;m<=12;m++){
-        if(m<=REALIZED_UNTIL){
-          // Draw expected dot (hollow)
-          const exp=EXPECTED_2026[m]; if(!exp) continue;
-          ctx.beginPath();ctx.arc(toX(m),toY(exp),3,0,Math.PI*2);
-          ctx.strokeStyle='rgba(116,185,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();
-
-          // Draw realized dot — green if >= expected, red if below
-          const real=REALIZED_2026[m];
-          const hit = real >= exp;
-          const dotColor = hit ? '#00b894' : '#e17055';
-          const dotR = 5;
-          ctx.beginPath();ctx.arc(toX(m),toY(real),dotR,0,Math.PI*2);
-          ctx.fillStyle=dotColor;ctx.fill();
-          // White ring around dot
-          ctx.beginPath();ctx.arc(toX(m),toY(real),dotR+1.5,0,Math.PI*2);
-          ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();
-
-          _dots.push({x:toX(m),y:toY(real),type:'forecast',month:m,val:real,expected:exp,hit,color:dotColor,projected:false});
-        } else {
-          const v=FORECAST_2026[m]; if(!v) continue;
-          ctx.beginPath();ctx.arc(toX(m),toY(v),3,0,Math.PI*2);
-          ctx.strokeStyle=FC_COLOR;ctx.lineWidth=1.5;ctx.stroke();
-          ctx.fillStyle='rgba(8,9,15,0.6)';ctx.fill();
-          _dots.push({x:toX(m),y:toY(v),type:'forecast',month:m,val:v,expected:v,color:FC_COLOR,projected:true});
-        }
-      }
+      datasets.push({
+        label:'forecast',
+        data: Array.from({length:12},(_,i)=>forecast[i+1]||null),
+        borderColor: FC_COLOR,
+        borderWidth:2,
+        borderDash:[5,4],
+        pointBackgroundColor:'rgba(8,9,15,0.7)',
+        pointBorderColor: FC_COLOR,
+        pointBorderWidth:1.5,
+        pointRadius:4,
+        pointHoverRadius:6,
+        tension:0,
+        fill:false,
+      });
     }
 
-    // Historical lines
-    YEARS.forEach(y=>{
-      if(!activeYears.has(y))return;
-      const pts=[];
-      for(let m=1;m<=12;m++){const v=getVal(y,m);if(v!==null)pts.push({m,v});}
-      if(!pts.length)return;
-      ctx.beginPath();
-      pts.forEach((p,i)=>{
-        const x=toX(p.m),yy=toY(p.v);
-        if(i===0){ctx.moveTo(x,yy);return;}
-        const prev=pts[i-1],px=toX(prev.m),py=toY(prev.v),cpx=px+(x-px)*0.5;
-        ctx.bezierCurveTo(cpx,py,cpx,yy,x,yy);
-      });
-      ctx.setLineDash(y===2026?[6,3]:[]);
-      ctx.lineWidth=y===2025||y===2026?2:1.5;
-      ctx.strokeStyle=COLORS[y];ctx.stroke();ctx.setLineDash([]);
-      pts.forEach(p=>{
-        const r=y===2026||y===2025?3:2;
-        ctx.beginPath();ctx.arc(toX(p.m),toY(p.v),r,0,Math.PI*2);ctx.fillStyle=COLORS[y];ctx.fill();
-        _dots.push({x:toX(p.m),y:toY(p.v),type:'year',year:y,month:p.m,val:p.v,color:COLORS[y],r});
-      });
-    });
-    buildMonthButtons(_dots, _cnt);
+    return datasets;
   }
 
+  // ── Subtitle ─────────────────────────────────────────────────
+  function updateSubtitle(forecast,growthFactor){
+    const subEl=document.getElementById('trend-forecast-sub');
+    if(!subEl) return;
+    const total=Object.values(forecast).reduce((s,v)=>s+(v||0),0);
+    const totalFmt=total>=1e6?(total/1e6).toFixed(1)+'M':(total/1000).toFixed(0)+'K';
+    const factorPct=((growthFactor-1)*100).toFixed(1);
+    subEl.textContent='Projeção anual 2026: R$ '+totalFmt+' · Crescimento vs 2025: '+(growthFactor>=1?'+':'')+factorPct+'%';
+  }
+
+  // ── Render principal ──────────────────────────────────────────
+  function drawChart(){
+    const canvas=document.getElementById('trend-chart');
+    if(!canvas) return;
+
+    // Garante que Chart.js está carregado
+    if(typeof Chart==='undefined') return setTimeout(drawChart,100);
+
+    const {agg,cnt}=buildMonthly();
+    if(_simOverride){
+      const today=new Date();
+      const ym=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
+      agg[ym]=_simOverride.fat;
+    }
+    const monthly={...agg};
+    const {forecast,expected,realized,lastRealizedMonth,growthFactor,currentProj}=calcForecast(monthly);
+
+    updateSubtitle(forecast,growthFactor);
+
+    const datasets=buildDatasets(agg,forecast,expected,realized,lastRealizedMonth);
+
+    const fmtV=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+
+    if(_chart){
+      _chart.data.datasets=datasets;
+      _chart.update('none');
+      return;
+    }
+
+    // Ajusta altura do canvas
+    const W=canvas.parentElement.offsetWidth||800;
+    canvas.style.height='220px';
+
+    _chart=new Chart(canvas,{
+      type:'line',
+      data:{ labels: MONTHS_SHORT, datasets },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        animation:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{ display:false },
+          tooltip:{
+            backgroundColor:'#161929',
+            borderColor:'rgba(99,179,237,0.25)',
+            borderWidth:1,
+            titleColor:'#e8edf5',
+            titleFont:{family:'DM Mono,monospace',size:11},
+            bodyColor:'#8394aa',
+            bodyFont:{family:'DM Mono,monospace',size:10},
+            padding:10,
+            callbacks:{
+              title: items => MONTHS_LONG[items[0].dataIndex],
+              label: ctx=>{
+                const v=ctx.raw;
+                if(v==null) return null;
+                const lbl=ctx.dataset.label;
+                const name = lbl==='meta'?'Meta 2026':lbl==='forecast'?'Previsão':lbl;
+                const ym=lbl==='2026'||lbl==='forecast'||lbl==='meta'
+                  ? '2026-'+String(ctx.dataIndex+1).padStart(2,'0')
+                  : lbl+'-'+String(ctx.dataIndex+1).padStart(2,'0');
+                const c=cnt[ym]?` · ${cnt[ym]} ctr`:'';
+                return name+': '+fmtV(v)+c;
+              },
+              labelColor: ctx=>({
+                borderColor:'transparent',
+                backgroundColor: ctx.dataset.label==='meta'?'rgba(255,255,255,0.4)':
+                  ctx.dataset.label==='forecast'?FC_COLOR:
+                  COLORS[parseInt(ctx.dataset.label)]||FC_COLOR,
+                borderRadius:2,
+              }),
+            }
+          }
+        },
+        scales:{
+          x:{
+            grid:{ color:'rgba(99,179,237,0.06)', drawBorder:false },
+            ticks:{
+              color:'rgba(90,106,130,0.8)',
+              font:{family:'DM Mono,monospace',size:9},
+              maxRotation:0,
+              autoSkip:false,
+            },
+            border:{ display:false },
+          },
+          y:{
+            grid:{ color:'rgba(99,179,237,0.06)', drawBorder:false },
+            ticks:{
+              color:'rgba(90,106,130,0.8)',
+              font:{family:'DM Mono,monospace',size:9},
+              maxTicksLimit:5,
+              callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),
+            },
+            border:{ display:false },
+          }
+        }
+      }
+    });
+  }
+
+  // ── Botões de ano ─────────────────────────────────────────────
   function initButtons(){
-    // ── Year toggle buttons ──────────────────────────────────
     document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const yr=btn.dataset.year==='meta'?'meta':btn.dataset.year==='forecast'?'forecast':parseInt(btn.dataset.year);
         if(activeYears.has(yr)){activeYears.delete(yr);btn.classList.remove('active');}
         else{activeYears.add(yr);btn.classList.add('active');}
+        if(_chart){ _chart.destroy(); _chart=null; }
         drawChart();
       });
     });
   }
 
-
-  function buildMonthButtons(dots, cnt){
-    const wrap = document.getElementById('trend-month-btns');
-    if(!wrap) return;
-    wrap.innerHTML = '';
-
-    const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const fmtM = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-    const YEAR_LABELS = {2022:'2022',2023:'2023',2024:'2024',2025:'2025',2026:'2026 (real.)'};
-
-    function removePopup(){ const o=document.getElementById('trend-popup'); if(o) o.remove(); }
-    document.addEventListener('click', e=>{
-      const p=document.getElementById('trend-popup');
-      if(p && !p.contains(e.target) && !e.target.closest('#trend-month-btns')) removePopup();
-    });
-
-    for(let m=1; m<=12; m++){
-      const btn = document.createElement('button');
-      btn.textContent = MONTHS_SHORT[m-1];
-      btn.style.cssText = 'background:transparent;border:none;border-bottom:1px solid rgba(99,179,237,0.15);color:rgba(90,106,130,0.8);font-size:9px;font-family:DM Mono,monospace;cursor:pointer;padding:2px 4px;transition:.15s;flex:1;text-align:center;';
-      btn.onmouseenter = ()=>{ btn.style.color='var(--accent)'; btn.style.borderBottomColor='var(--accent)'; };
-      btn.onmouseleave = ()=>{ btn.style.color='rgba(90,106,130,0.8)'; btn.style.borderBottomColor='rgba(99,179,237,0.15)'; };
-
-      btn.addEventListener('click', function(e){
-        e.stopPropagation();
-        // Toggle — close if same month already open
-        const existing = document.getElementById('trend-popup');
-        const wasThisMonth = existing && existing.dataset.month === String(m);
-        removePopup();
-        if(wasThisMonth) return;
-
-        const hits = dots.filter(d=>d.month===m);
-        if(!hits.length) return;
-
-        const popup = document.createElement('div');
-        popup.id = 'trend-popup';
-        popup.dataset.month = String(m);
-        popup.style.cssText = 'position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:200px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
-
-        const title = document.createElement('div');
-        title.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
-        title.innerHTML = MONTHS_PT[m-1]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
-        popup.appendChild(title);
-
-        const order={year:0,forecast:1,meta:2};
-        hits.sort((a,b)=>{ const oa=order[a.type]||0,ob=order[b.type]||0; if(oa!==ob)return oa-ob; return(a.year||0)-(b.year||0); });
-
-        hits.forEach(d=>{
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
-          if(d.type==='meta'){
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dfe6e9;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">R$ '+fmtM(d.val)+'</span>';
-          } else if(d.type==='forecast'){
-            const valColor=(!d.projected&&d.expected)?(d.hit?'#00b894':'#e17055'):'#74b9ff';
-            const displayVal=(!d.projected&&d.expected)?d.expected:d.val;
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#74b9ff;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">PREVISÃO</span></span><span style="font-weight:700;color:'+valColor+';">R$ '+fmtM(displayVal)+'</span>';
-          } else {
-            const ym = d.year+'-'+String(m).padStart(2,'0');
-            const ctr = cnt[ym]?'<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
-            row.innerHTML = '<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+d.color+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+(YEAR_LABELS[d.year]||d.year)+'</span></span><span style="font-weight:700;color:'+d.color+';text-align:right;">R$ '+fmtM(d.val)+ctr+'</span>';
-          }
-          popup.appendChild(row);
-        });
-
-        document.body.appendChild(popup);
-        const pw=popup.offsetWidth||220, ph=popup.offsetHeight||160;
-        const br=btn.getBoundingClientRect();
-        let px=br.left+br.width/2-pw/2;
-        let py=br.top-ph-8;
-        if(px+pw>window.innerWidth-8) px=window.innerWidth-pw-8;
-        if(px<8) px=8;
-        if(py<8) py=br.bottom+8;
-        popup.style.left=px+'px'; popup.style.top=py+'px';
-        document.getElementById('popup-close').addEventListener('click', e=>{ e.stopPropagation(); removePopup(); });
-      });
-      wrap.appendChild(btn);
-    }
-  }
-
-  if(document.readyState==='complete'||document.readyState==='interactive'){
-    setTimeout(()=>{drawChart();initButtons();},100);
-  } else {
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{drawChart();initButtons();},100));
-  }
-  window.addEventListener('resize',drawChart);
-  // Expose globally so CSV import can trigger redraw
-  window._redrawTrendChart = drawChart;
-
-  // ── Simulador de Previsão ─────────────────────────────────────
-  let _simActive = false; // false = usa dados reais, true = usa dados do simulador
-  let _simOverride = null; // {fat, dia} quando simulador está ativo
-
-  window.toggleSim = function toggleSim(){
-    const panel = document.getElementById('sim-panel');
-    const arrow = document.getElementById('sim-arrow');
-    const isOpen = panel.style.display !== 'none';
-    panel.style.display = isOpen ? 'none' : 'block';
-    arrow.textContent = isOpen ? '▼' : '▲';
+  // ── Simulador ─────────────────────────────────────────────────
+  window.toggleSim = function(){
+    const panel=document.getElementById('sim-panel');
+    const arrow=document.getElementById('sim-arrow');
+    const isOpen=panel.style.display!=='none';
+    panel.style.display=isOpen?'none':'block';
+    arrow.textContent=isOpen?'▼':'▲';
     if(!isOpen){
-      // Ao abrir: inicializa slider com o valor real atual do mês
-      const {agg} = buildMonthly();
-      const today = new Date();
-      const ym = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
-      const realAtual = agg[ym] || 0;
-      document.getElementById('sim-fat').value = realAtual;
-      document.getElementById('sim-dia').value = today.getDate();
+      const {agg}=buildMonthly();
+      const today=new Date();
+      const ym=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
+      const realAtual=agg[ym]||0;
+      document.getElementById('sim-fat').value=realAtual;
+      document.getElementById('sim-dia').value=today.getDate();
       onSimChange();
     } else {
-      // Ao fechar: restaura gráfico com dados reais
-      _simActive = false;
-      _simOverride = null;
+      _simActive=false; _simOverride=null;
+      if(_chart){_chart.destroy();_chart=null;}
       drawChart();
     }
-  }
+  };
 
-  window.onSimChange = function onSimChange(){
-    const dia = parseInt(document.getElementById('sim-dia').value);
-    const fat = parseInt(document.getElementById('sim-fat').value);
-    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
-
-    // Labels dos sliders
-    document.getElementById('sim-dia-val').textContent = 'Dia '+dia;
-    document.getElementById('sim-fat-val').textContent = fat>=1e6?'R$ '+(fat/1e6).toFixed(2)+'M':'R$ '+(fat/1000).toFixed(0)+'K';
-
-    // Ativa o override e redesenha
-    _simActive = true;
-    _simOverride = {fat, dia};
+  window.onSimChange = function(){
+    const dia=parseInt(document.getElementById('sim-dia').value);
+    const fat=parseInt(document.getElementById('sim-fat').value);
+    const daysInMonth=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
+    document.getElementById('sim-dia-val').textContent='Dia '+dia;
+    document.getElementById('sim-fat-val').textContent=fat>=1e6?'R$ '+(fat/1e6).toFixed(2)+'M':'R$ '+(fat/1000).toFixed(0)+'K';
+    _simActive=true; _simOverride={fat,dia};
+    if(_chart){_chart.destroy();_chart=null;}
     drawChart();
 
-    // Pega os valores calculados pelo drawChart via calcForecast
-    const {agg} = buildMonthly();
-    const monthly = {...agg};
-    const today = new Date();
-    const currentMonth = today.getMonth()+1;
-    const currentYear  = today.getFullYear();
-
-    // Recalcula o forecast com os valores do simulador
-    const ym = currentYear+'-'+String(currentMonth).padStart(2,'0');
-    const origVal = monthly[ym];
-    monthly[ym] = fat; // substitui pelo valor do simulador
-    const fc = calcForecastSim(monthly, fat, dia, daysInMonth);
-
-    const fmtV = v => v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
-
-    // Encerrados (meses < atual)
-    let encerrado = 0;
-    for(let m=1; m<currentMonth; m++){
-      const k = currentYear+'-'+String(m).padStart(2,'0');
-      encerrado += monthly[k]||0;
-    }
-
-    const futuro = Object.entries(fc.forecast)
-      .filter(([m])=>parseInt(m)>currentMonth)
-      .reduce((s,[,v])=>s+(v||0),0);
-
-    document.getElementById('sim-r-encerrado').textContent = fmtV(encerrado);
-    document.getElementById('sim-r-atual').textContent     = fmtV(fc.currentProj||fat);
-    document.getElementById('sim-r-futuro').textContent    = fmtV(futuro);
-    document.getElementById('sim-r-total').textContent     = fmtV(encerrado+(fc.currentProj||fat)+futuro);
-    document.getElementById('sim-factor-line').textContent =
+    const {agg}=buildMonthly();
+    const monthly={...agg};
+    const today=new Date();
+    const currentMonth=today.getMonth()+1;
+    const ym=today.getFullYear()+'-'+String(currentMonth).padStart(2,'0');
+    monthly[ym]=fat;
+    const fc=calcForecast(monthly);
+    const fmtV=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+    let encerrado=0;
+    for(let m=1;m<currentMonth;m++) encerrado+=(fc.realized[m]||0);
+    const futuro=Object.entries(fc.forecast).filter(([m])=>parseInt(m)>currentMonth).reduce((s,[,v])=>s+(v||0),0);
+    document.getElementById('sim-r-encerrado').textContent=fmtV(encerrado);
+    document.getElementById('sim-r-atual').textContent=fmtV(fc.currentProj||fat);
+    document.getElementById('sim-r-futuro').textContent=fmtV(futuro);
+    document.getElementById('sim-r-total').textContent=fmtV(encerrado+(fc.currentProj||fat)+futuro);
+    document.getElementById('sim-factor-line').textContent=
       'Fator de crescimento vs 2025: '+(fc.growthFactor>=1?'+':'')+((fc.growthFactor-1)*100).toFixed(1)+'%  ·  '
       +'Projeção do mês: '+fmtV(fc.currentProj||fat)+' ('+dia+'/'+daysInMonth+' dias)';
-  }
-
-  // Versão do calcForecast que aceita fat/dia externos (para o simulador)
-  function calcForecastSim(monthly, fatOverride, diaOverride, daysInMonth){
-    const today        = new Date();
-    const currentYear  = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-
-    const realized = {};
-    let lastRealizedMonth = 0;
-    for(let m=1; m<=12; m++){
-      const k='2026-'+String(m).padStart(2,'0');
-      if(monthly[k]){ realized[m]=monthly[k]; lastRealizedMonth=m; }
-    }
-
-    const daysElapsed = Math.max(1, diaOverride);
-    const currentProj = fatOverride>0 ? Math.round(fatOverride / daysElapsed * daysInMonth) : null;
-
-    let rNum=0, rDen=0;
-    for(let m=1; m<=12; m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025 = monthly[k2025];
-      if(!base2025) continue;
-      if(m < currentMonth && realized[m]){ rNum+=realized[m]; rDen+=base2025; }
-      else if(m===currentMonth && currentProj){ rNum+=currentProj; rDen+=base2025; }
-    }
-    const growthFactor = rDen>0 ? rNum/rDen : 1.0;
-
-    const forecast={}, expected={};
-    for(let m=1; m<=12; m++){
-      const k2025='2025-'+String(m).padStart(2,'0');
-      const base2025 = monthly[k2025]||null;
-      const exp = base2025 ? Math.round(base2025*growthFactor) : null;
-      expected[m]=exp;
-      if(m<currentMonth && realized[m]) forecast[m]=realized[m];
-      else if(m===currentMonth && currentProj) forecast[m]=currentProj;
-      else forecast[m]=exp;
-    }
-    return {forecast, expected, realized, lastRealizedMonth, growthFactor, currentProj};
-  }
-
-  // Patch no drawChart para usar override do simulador quando ativo
-  const _origDrawChart = drawChart;
-  window._redrawTrendChart = function(){
-    if(_simActive && _simOverride){
-      const {agg} = buildMonthly();
-      const monthly = {...agg};
-      const today = new Date();
-      const ym = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
-      monthly[ym] = _simOverride.fat;
-      // Força rebuild com override — drawChart já usa buildMonthly internamente
-      // então precisamos do override no RAW temporariamente
-    }
-    drawChart();
   };
+
+  // ── Export PNG ────────────────────────────────────────────────
+  window.exportTrend = function(){
+    if(!_chart) return;
+    const isLight=document.documentElement.getAttribute('data-theme')==='light';
+    const bg=isLight?'#ffffff':'#0f1120';
+    const canvas=_chart.canvas;
+    const tmp=document.createElement('canvas');
+    tmp.width=canvas.width; tmp.height=canvas.height;
+    const tctx=tmp.getContext('2d');
+    tctx.fillStyle=bg; tctx.fillRect(0,0,tmp.width,tmp.height);
+    tctx.drawImage(canvas,0,0);
+    const link=document.createElement('a');
+    const now=new Date();
+    link.download='tendencia-vendas-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'.png';
+    link.href=tmp.toDataURL('image/png');
+    link.click();
+  };
+
+  // ── Init ──────────────────────────────────────────────────────
+  function init(){
+    if(typeof Chart==='undefined') return setTimeout(init,100);
+    drawChart();
+    initButtons();
+  }
+
+  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(init,100);
+  else document.addEventListener('DOMContentLoaded',()=>setTimeout(init,100));
+  window.addEventListener('resize',()=>{ if(_chart){_chart.destroy();_chart=null;} drawChart(); });
+  window._redrawTrendChart = ()=>{ if(_chart){_chart.destroy();_chart=null;} drawChart(); };
+  window._getMelhorMesMonthly = buildMonthly;
 })();
 
 // Init estado dropdown after DOM is ready
