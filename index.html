@@ -31,6 +31,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .hmark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent4));display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:800;font-size:14px;color:#08090f;}
 .htitle{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.04em;}
 .hsub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px;}
+.header-nav-btn{height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;}
+.header-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.header-nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,0.08);}
 .hbadge{background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;}
 .filterbar{background:rgba(13,15,26,0.75);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 28px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;position:sticky;top:65px;z-index:190;}
 .filter-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace;}
@@ -402,26 +405,10 @@ document.addEventListener('click', e=>{
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <button onclick="toggleFichas()" id="btn-fichas"
-      style="height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;"
-      onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-      onmouseout="if(!_fichasOpen){this.style.borderColor='rgba(99,179,237,0.18)';this.style.color='var(--muted)'}">
+
+    <button onclick="toggleFichas()" id="btn-fichas" class="header-nav-btn">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Fichas
-    </button>
-    <button onclick="toggleCampanhas()" id="btn-campanhas"
-      style="height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;"
-      onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-      onmouseout="if(!_campOpen){this.style.borderColor='rgba(99,179,237,0.18)';this.style.color='var(--muted)'}">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Campanhas
-    </button>
-    <button onclick="toggleContratos()" id="btn-contratos"
-      style="height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;"
-      onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-      onmouseout="if(!_contratosOpen){this.style.borderColor='rgba(99,179,237,0.18)';this.style.color='var(--muted)'}">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Contratos
     </button>
     <div class="hbadge" id="hcount">— contratos</div>
     <button id="theme-btn" onclick="toggleTheme()" title="Alternar tema"
@@ -700,6 +687,35 @@ document.addEventListener('click', e=>{
   </div>
 
 
+  <!-- Campanhas -->
+  <div class="camp-section-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
+      <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div class="camp-tabs" style="margin-bottom:0;">
+        <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
+        <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
+      </div>
+      <div class="camp-tabs" style="margin-bottom:0;" id="camp-mes-nav">
+        <button class="camp-tab" onclick="campSetMes('abril',this)">Abril</button>
+        <button class="camp-tab" onclick="campSetMes('maio',this)">Maio</button>
+        <button class="camp-tab" onclick="campSetMes('junho',this)">Junho</button>
+      </div>
+    </div>
+    <div id="camp-tab-exec">
+      <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">—</div>
+      <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
+      <div class="camp-grid" id="camp-grid-abril"></div>
+    </div>
+    <div id="camp-tab-coord" style="display:none;">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
+      <div class="camp-days">▸ encerra 30/06</div>
+      <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
+    </div>
+  </div>
+
   <div class="stitle">Financeiro</div>
   <div class="kpi-grid">
     <div class="kpi" style="--kpi-c:#4ECDC4">
@@ -789,6 +805,39 @@ document.addEventListener('click', e=>{
   </div>
 
 
+
+
+  <div class="stitle">Contratos</div>
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <div class="table-title">Listagem de Contratos</div>
+        <div class="table-sub" id="tbl-sub">—</div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th data-f="num">#</th>
+          <th data-f="escola">Escola</th>
+          <th data-f="executivo">Executivo</th>
+          <th data-f="lideranca">Liderança</th>
+          <th data-f="status">Status</th>
+          <th data-f="modelo">Modelo</th>
+          <th data-f="fat_escola">Fat. Escola</th>
+          <th data-f="fat_kedu">Fat. Kedu</th>
+          <th data-f="taxa">Taxa</th>
+          <th data-f="alunos">Alunos</th>
+          <th data-f="ticket_medio">Ticket Méd.</th>
+          <th data-f="spread">Spread</th>
+          <th data-f="margem">Margem</th>
+          <th data-f="assinatura">Assinatura</th>
+          <th data-f="estado">Estado</th>
+        </tr></thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
 
@@ -1473,12 +1522,12 @@ function rankingAvatar(nome, metaHit){
   document.getElementById('hcount').textContent=uniqueContratos(data)+' contratos';
   sortedData=[...data];
   renderTable();
-  const tblSub=document.getElementById('tbl-sub'); if(tblSub) tblSub.textContent=uniqueContratos(data)+' contratos filtrados';
+  set('tbl-sub', uniqueContratos(data)+' contratos filtrados');
 }
 
 function renderTable(){
   const tbody=document.getElementById('tbl-body');
-  if(!tbody) return; // painel fechado
+  if(!tbody) return;
   sortedData.sort((a,b)=>{
     const av=a[sortField],bv=b[sortField];
     if(av==null)return 1;if(bv==null)return -1;
@@ -2520,31 +2569,16 @@ function toggleTheme(){
 let _campOpen = false;
 function toggleCampanhas(){
   _campOpen = !_campOpen;
-  const panel = document.getElementById('campanhas-panel');
-  const btn   = document.getElementById('btn-campanhas');
-  panel.style.display = _campOpen ? 'block' : 'none';
-  if(_campOpen){
-    btn.style.borderColor='var(--accent)'; btn.style.color='var(--accent)'; btn.style.background='rgba(78,205,196,0.08)';
-    if(typeof window.buildCampanhas==='function') window.buildCampanhas();
-  } else {
-    btn.style.borderColor='rgba(99,179,237,0.18)'; btn.style.color='var(--muted)'; btn.style.background='transparent';
-  }
+  document.getElementById('campanhas-panel').style.display = _campOpen ? 'block' : 'none';
+  if(_campOpen && typeof window.buildCampanhas==='function') window.buildCampanhas();
 }
 
 // ── Toggle Contratos ──────────────────────────────────────────
 let _contratosOpen = false;
 function toggleContratos(){
   _contratosOpen = !_contratosOpen;
-  const panel = document.getElementById('contratos-panel');
-  const btn   = document.getElementById('btn-contratos');
-  panel.style.display = _contratosOpen ? 'block' : 'none';
-  if(_contratosOpen){
-    btn.style.borderColor='var(--accent)'; btn.style.color='var(--accent)'; btn.style.background='rgba(78,205,196,0.08)';
-    // Renderiza a tabela agora que o tbody está visível no DOM
-    setTimeout(()=>{ renderTable(); const s=document.getElementById('tbl-sub'); if(s) s.textContent=uniqueContratos(applyFilters())+' contratos filtrados'; }, 50);
-  } else {
-    btn.style.borderColor='rgba(99,179,237,0.18)'; btn.style.color='var(--muted)'; btn.style.background='transparent';
-  }
+  document.getElementById('contratos-panel').style.display = _contratosOpen ? 'block' : 'none';
+  if(_contratosOpen) setTimeout(()=>{ renderTable(); const s=document.getElementById('tbl-sub'); if(s) s.textContent=uniqueContratos(applyFilters())+' contratos filtrados'; }, 50);
 }
 
 // ── Fichas de Escolas ─────────────────────────────────────────
@@ -2552,20 +2586,9 @@ let _fichasOpen = false;
 
 function toggleFichas(){
   _fichasOpen = !_fichasOpen;
-  const panel = document.getElementById('fichas-panel');
-  const btn   = document.getElementById('btn-fichas');
-  panel.style.display = _fichasOpen ? 'block' : 'none';
-  if(_fichasOpen){
-    btn.style.borderColor='var(--accent)';
-    btn.style.color='var(--accent)';
-    btn.style.background='rgba(78,205,196,0.08)';
-    populateFichasFilters();
-    renderFichas();
-  } else {
-    btn.style.borderColor='rgba(99,179,237,0.18)';
-    btn.style.color='var(--muted)';
-    btn.style.background='transparent';
-  }
+  document.getElementById('fichas-panel').style.display = _fichasOpen ? 'block' : 'none';
+  document.getElementById('btn-fichas').classList.toggle('active', _fichasOpen);
+  if(_fichasOpen){ populateFichasFilters(); renderFichas(); }
 }
 
 function populateFichasFilters(){
@@ -2684,98 +2707,6 @@ function renderFichas(){
 window._rebuildFichas = ()=>{ if(_fichasOpen){ populateFichasFilters(); renderFichas(); } };
 
 </script>
-
-<!-- Painel Campanhas -->
-<div id="campanhas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
-  <div style="max-width:1400px;margin:0 auto;">
-    <!-- Header Campanhas -->
-    <div style="position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 28px 0;backdrop-filter:blur(8px);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Campanhas</div>
-            <div id="camp-mes-titulo" style="font-size:10px;color:var(--muted);margin-top:1px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;">—</div>
-          </div>
-          <div class="camp-days" id="camp-days-abr" style="margin-bottom:0;">▸ encerra 30/04</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <!-- Tabs mês -->
-          <div style="display:flex;gap:4px;" id="camp-mes-nav">
-            <button class="camp-tab" onclick="campSetMes('abril',this)" style="padding:3px 12px;">Abril</button>
-            <button class="camp-tab" onclick="campSetMes('maio',this)" style="padding:3px 12px;">Maio</button>
-            <button class="camp-tab" onclick="campSetMes('junho',this)" style="padding:3px 12px;">Junho</button>
-          </div>
-          <div style="width:1px;height:20px;background:var(--border);"></div>
-          <!-- Tabs seção -->
-          <div style="display:flex;gap:4px;">
-            <button class="camp-tab active" onclick="campShowTab('exec',this)" style="padding:3px 12px;">Executivos</button>
-            <button class="camp-tab" onclick="campShowTab('coord',this)" style="padding:3px 12px;">Coordenadores</button>
-          </div>
-          <div style="width:1px;height:20px;background:var(--border);"></div>
-          <button onclick="toggleCampanhas()" style="height:30px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:5px;">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Fechar
-          </button>
-        </div>
-      </div>
-    </div>
-    <div style="margin-top:80px;">
-      <div>
-      <div id="camp-tab-exec">
-        <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
-        <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
-        <div class="camp-grid" id="camp-grid-abril"></div>
-      </div>
-      <div id="camp-tab-coord" style="display:none;">
-        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
-        <div class="camp-days">▸ encerra 30/06</div>
-        <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Painel Contratos -->
-<div id="contratos-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
-  <div style="max-width:1800px;margin:0 auto;">
-    <div style="position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 28px;backdrop-filter:blur(8px);">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Listagem de Contratos</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;" id="tbl-sub">—</div>
-        </div>
-        <button onclick="toggleContratos()" style="height:30px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:5px;">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Fechar
-        </button>
-      </div>
-    </div>
-    <div class="table-card" style="margin-top:70px;">
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr>
-            <th data-f="num">#</th>
-            <th data-f="escola">Escola</th>
-            <th data-f="executivo">Executivo</th>
-            <th data-f="lideranca">Liderança</th>
-            <th data-f="status">Status</th>
-            <th data-f="modelo">Modelo</th>
-            <th data-f="fat_escola">Fat. Escola</th>
-            <th data-f="fat_kedu">Fat. Kedu</th>
-            <th data-f="taxa">Taxa</th>
-            <th data-f="alunos">Alunos</th>
-            <th data-f="ticket_medio">Ticket Méd.</th>
-            <th data-f="spread">Spread</th>
-            <th data-f="margem">Margem</th>
-            <th data-f="assinatura">Assinatura</th>
-            <th data-f="estado">Estado</th>
-          </tr></thead>
-          <tbody id="tbl-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Painel Fichas de Escolas -->
 <div id="fichas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
