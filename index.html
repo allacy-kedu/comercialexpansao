@@ -2673,32 +2673,39 @@ function toggleTheme(){
 <!-- Painel Campanhas -->
 <div id="campanhas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1400px;margin:0 auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:10;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--text);font-family:'DM Mono',monospace;">kedu · Campanhas</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">Abr · Mai · Jun 2026</div>
+    <!-- Header Campanhas -->
+    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Campanhas</div>
+            <div id="camp-mes-titulo" style="font-size:10px;color:var(--muted);margin-top:1px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;">—</div>
+          </div>
+          <div class="camp-days" id="camp-days-abr" style="margin-bottom:0;">▸ encerra 30/04</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <!-- Tabs mês -->
+          <div style="display:flex;gap:4px;" id="camp-mes-nav">
+            <button class="camp-tab" onclick="campSetMes('abril',this)" style="padding:3px 12px;">Abril</button>
+            <button class="camp-tab" onclick="campSetMes('maio',this)" style="padding:3px 12px;">Maio</button>
+            <button class="camp-tab" onclick="campSetMes('junho',this)" style="padding:3px 12px;">Junho</button>
+          </div>
+          <div style="width:1px;height:20px;background:var(--border);"></div>
+          <!-- Tabs seção -->
+          <div style="display:flex;gap:4px;">
+            <button class="camp-tab active" onclick="campShowTab('exec',this)" style="padding:3px 12px;">Executivos</button>
+            <button class="camp-tab" onclick="campShowTab('coord',this)" style="padding:3px 12px;">Coordenadores</button>
+          </div>
+          <div style="width:1px;height:20px;background:var(--border);"></div>
+          <button onclick="toggleCampanhas()" style="height:30px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:5px;">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Fechar
+          </button>
+        </div>
       </div>
-      <button onclick="toggleCampanhas()" style="height:32px;padding:0 14px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Fechar
-      </button>
     </div>
-    <div class="camp-section-wrap" style="margin-bottom:0;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
-        <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-        <div class="camp-tabs" style="margin-bottom:0;">
-          <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
-          <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
-        </div>
-        <div class="camp-tabs" style="margin-bottom:0;" id="camp-mes-nav">
-          <button class="camp-tab" onclick="campSetMes('abril',this)">Abril</button>
-          <button class="camp-tab" onclick="campSetMes('maio',this)">Maio</button>
-          <button class="camp-tab" onclick="campSetMes('junho',this)">Junho</button>
-        </div>
-      </div>
+    <div style="margin-top:16px;">
+      <div>
       <div id="camp-tab-exec">
         <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
         <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
@@ -2716,15 +2723,17 @@ function toggleTheme(){
 <!-- Painel Contratos -->
 <div id="contratos-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1800px;margin:0 auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:10;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--text);font-family:'DM Mono',monospace;">kedu · Listagem de Contratos</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;" id="tbl-sub">—</div>
+    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Listagem de Contratos</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;" id="tbl-sub">—</div>
+        </div>
+        <button onclick="toggleContratos()" style="height:30px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Fechar
+        </button>
       </div>
-      <button onclick="toggleContratos()" style="height:32px;padding:0 14px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Fechar
-      </button>
     </div>
     <div class="table-card">
       <div class="tbl-wrap">
@@ -2756,19 +2765,20 @@ function toggleTheme(){
 <!-- Painel Fichas de Escolas -->
 <div id="fichas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1600px;margin:0 auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:10;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--text);font-family:'DM Mono',monospace;">kedu · Fichas de Escolas</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;" id="fichas-sub">—</div>
+    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Fichas de Escolas</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;" id="fichas-sub">—</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;background:var(--card);border:1px solid var(--border);padding:2px 10px;border-radius:10px;" id="fichas-count">—</span>
+          <button onclick="toggleFichas()" style="height:30px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:5px;">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Fechar
+          </button>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;" id="fichas-count">—</span>
-        <button onclick="toggleFichas()" style="height:32px;padding:0 14px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Fechar
-        </button>
-      </div>
-    </div>
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:16px;">
       <div style="position:relative;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a6a82" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
