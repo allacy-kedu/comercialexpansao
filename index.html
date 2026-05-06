@@ -2457,29 +2457,64 @@ function buildMelhorMes(){
   }
 
   window.buildCampanhas=function(){
+    // Ativa mês correto
     document.querySelectorAll('#camp-mes-nav .camp-tab').forEach(btn=>{
-      const m=btn.textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const m=btn.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
       btn.classList.toggle('active',m===campMesAtivo);
     });
+    // Garante que Executivos começa ativo na seção
+    document.querySelectorAll('[onclick^="campShowTab"]').forEach(btn=>{
+      const isExec = btn.getAttribute('onclick').includes("'exec'");
+      btn.classList.toggle('active', isExec);
+    });
+    document.getElementById('camp-tab-exec').style.display='block';
+    document.getElementById('camp-tab-coord').style.display='none';
     buildExec(); buildCoord();
   };
 
   window.campSetMes=function(mes,btn){
     campMesAtivo=mes;
+    // Só remove active dos botões de mês dentro de #camp-mes-nav
     document.querySelectorAll('#camp-mes-nav .camp-tab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); buildExec();
+    btn.classList.add('active');
+    buildExec();
   };
 
   window.campShowTab=function(tab,btn){
     document.getElementById('camp-tab-exec').style.display=tab==='exec'?'block':'none';
     document.getElementById('camp-tab-coord').style.display=tab==='coord'?'block':'none';
-    document.querySelectorAll('.camp-tabs .camp-tab').forEach(b=>b.classList.remove('active'));
+    // Só remove active dos botões de seção (exec/coord), não dos de mês
+    ['exec','coord'].forEach(t=>{
+      const b=document.querySelector('[onclick*="campShowTab(\''+t+'\'"]');
+      if(b) b.classList.remove('active');
+    });
     btn.classList.add('active');
   };
 
   if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(window.buildCampanhas,300);
   else document.addEventListener('DOMContentLoaded',()=>setTimeout(window.buildCampanhas,300));
 })();
+
+// ── Tema claro/escuro ─────────────────────────────────────────
+function toggleTheme(){
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isLight ? '☀' : '☾';
+  try{ localStorage.setItem('kedu-theme', isLight ? 'dark' : 'light'); }catch(e){}
+  if(typeof window._redrawTrendChart==='function') setTimeout(window._redrawTrendChart, 50);
+}
+(function(){
+  try{
+    const saved = localStorage.getItem('kedu-theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme','light');
+      const icon = document.getElementById('theme-icon');
+      if(icon) icon.textContent = '☾';
+    }
+  }catch(e){}
+})();
+
 
 // ── Toggle Campanhas ─────────────────────────────────────────
 let _campOpen = false;
@@ -2648,33 +2683,13 @@ function renderFichas(){
 
 window._rebuildFichas = ()=>{ if(_fichasOpen){ populateFichasFilters(); renderFichas(); } };
 
-// ── Tema claro/escuro ─────────────────────────────────────────
-function toggleTheme(){
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  document.getElementById('theme-icon').textContent = isLight ? '☀' : '☾';
-  try{ localStorage.setItem('kedu-theme', isLight ? 'dark' : 'light'); }catch(e){}
-  if(typeof window._redrawTrendChart==='function') setTimeout(window._redrawTrendChart, 50);
-}
-(function(){
-  try{
-    const saved = localStorage.getItem('kedu-theme');
-    if(saved === 'light'){
-      document.documentElement.setAttribute('data-theme','light');
-      const icon = document.getElementById('theme-icon');
-      if(icon) icon.textContent = '☾';
-    }
-  }catch(e){}
-})();
-
 </script>
 
 <!-- Painel Campanhas -->
 <div id="campanhas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1400px;margin:0 auto;">
     <!-- Header Campanhas -->
-    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0 0;">
+    <div style="position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 28px 0;backdrop-filter:blur(8px);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:16px;">
           <div>
@@ -2704,7 +2719,7 @@ function toggleTheme(){
         </div>
       </div>
     </div>
-    <div style="margin-top:16px;">
+    <div style="margin-top:80px;">
       <div>
       <div id="camp-tab-exec">
         <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha de Abril · metas antecipadas</div>
@@ -2723,7 +2738,7 @@ function toggleTheme(){
 <!-- Painel Contratos -->
 <div id="contratos-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1800px;margin:0 auto;">
-    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0;margin-bottom:16px;">
+    <div style="position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 28px;backdrop-filter:blur(8px);">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Listagem de Contratos</div>
@@ -2735,7 +2750,7 @@ function toggleTheme(){
         </button>
       </div>
     </div>
-    <div class="table-card">
+    <div class="table-card" style="margin-top:70px;">
       <div class="tbl-wrap">
         <table>
           <thead><tr>
@@ -2765,7 +2780,7 @@ function toggleTheme(){
 <!-- Painel Fichas de Escolas -->
 <div id="fichas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:22px 28px;">
   <div style="max-width:1600px;margin:0 auto;">
-    <div style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 0;margin-bottom:16px;">
+    <div style="position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);padding:14px 28px;backdrop-filter:blur(8px);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.04em;">Fichas de Escolas</div>
@@ -2779,7 +2794,7 @@ function toggleTheme(){
           </button>
         </div>
       </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+    <div style="margin-top:80px;"><div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:16px;">
       <div style="position:relative;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a6a82" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" id="fichas-search" placeholder="Buscar por nome de escola..."
@@ -2795,6 +2810,6 @@ function toggleTheme(){
         <option value="">Estado (todos)</option>
       </select>
     </div>
-    <div id="fichas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+    </div><div id="fichas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
   </div>
 </div>
