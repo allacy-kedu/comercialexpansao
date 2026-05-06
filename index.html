@@ -2436,6 +2436,7 @@ function buildMelhorMes(){
   function buildCoord(){
     const MESES=['2026-04','2026-05','2026-06'];
     const el=document.getElementById('camp-grid-coord'); if(!el) return;
+    el.innerHTML = ''; // limpa antes de rebuildar
     [{regional:'Regional 1',meta:META_R1_TRIM,members:R1_NAMES},{regional:'Regional 2',meta:META_R2_TRIM,members:R2_NAMES}].forEach(c=>{
       const realTrim=c.members.reduce((s,n)=>s+getReal(n,MESES),0);
       const pct=c.meta>0?Math.round(realTrim/c.meta*100):0;
