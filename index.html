@@ -2586,7 +2586,7 @@ let _fichasOpen = false;
 
 function toggleFichas(){
   _fichasOpen = !_fichasOpen;
-  document.getElementById('fichas-panel').style.display = _fichasOpen ? 'block' : 'none';
+  document.getElementById('fichas-panel').style.display = _fichasOpen ? 'flex' : 'none';
   document.getElementById('btn-fichas').classList.toggle('active', _fichasOpen);
   if(_fichasOpen){ populateFichasFilters(); renderFichas(); }
 }
@@ -2709,7 +2709,7 @@ window._rebuildFichas = ()=>{ if(_fichasOpen){ populateFichasFilters(); renderFi
 </script>
 
 <!-- Painel Fichas de Escolas -->
-<div id="fichas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;">
+<div id="fichas-panel" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);flex-direction:column;">
   <div style="max-width:1600px;margin:0 auto;">
     <div style="flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 28px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
