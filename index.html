@@ -2362,17 +2362,10 @@ function parseCSVtoRAW(csv){
   return result;
 }
 
-function applyNewRAW(newRaw, filename){
+function applyNewRAWFromCSV(newRaw, filename){
   if(!newRaw||!newRaw.length){ setGsStatus('⚠ Nenhum dado encontrado','#e17055'); return; }
-  RAW.length=0;
-  newRaw.forEach(r=>RAW.push(r));
-  initEcYearColors();
-  populateSelects();
-  buildEstadoDrop();
-  update();
-  // Redraw trend chart since it's inside an IIFE with its own data snapshot
-  if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
   const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  applyNewRAW(newRaw, now);
   setGsStatus('✓ '+newRaw.length+' contratos · '+now,'#52c77d');
   const sub=document.getElementById('dash-sub')||document.querySelector('.hsub');
   if(sub) sub.textContent=(filename||'CSV importado')+' · '+now;
@@ -2389,7 +2382,7 @@ async function handleCSVUpload(event){
   if(name.endsWith('.csv')){
     const text=await file.text();
     const rows=parseCSVtoRAW(text);
-    applyNewRAW(rows, file.name);
+    applyNewRAWFromCSV(rows, file.name);
   } else if(name.endsWith('.xlsx')||name.endsWith('.xls')){
     // Use SheetJS (already available in browser via CDN if needed)
     setGsStatus('Use o formato CSV para importar','#e17055');
@@ -2410,38 +2403,42 @@ function setLoadingBar(active){
   if(bar){ bar.className = active ? 'loading-bar active' : 'loading-bar'; bar.style.width = active ? '' : '0'; }
 }
 
+function applyNewRAW(rows, syncedAt){
+  if(!rows||!rows.length) return false;
+  RAW.length = 0;
+  rows.forEach(r => RAW.push(r));
+  invalidateCache();
+  if(typeof _monthlyRawLen !== 'undefined') _monthlyRawLen = -1;
+  initEcYearColors();
+  populateSelects();
+  buildEstadoDrop();
+  update();
+  if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
+  if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
+  if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
+  if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
+  const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
+  if(sub){ sub.textContent = 'atualizado às ' + syncedAt; sub.style.color = ''; }
+  return true;
+}
+
 async function autoLoadCSV(showStatus){
+  const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
   try {
-    // GitHub Pages — lê o data.json gerado pela GitHub Action
     const resp = await fetch('./data.json?t=' + Date.now());
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const json = await resp.json();
     const rows = json.records || [];
-    if(!rows.length) throw new Error('Sem dados');
-    RAW.length = 0;
-    rows.forEach(r => RAW.push(r));
-    invalidateCache();
-    if(typeof _monthlyRawLen !== 'undefined') _monthlyRawLen = -1;
-    initEcYearColors();
-    populateSelects();
-    buildEstadoDrop();
-    update();
-    if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
-    if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
-    if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
-    if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
-    // Exibe horário da última sincronização do data.json
+    if(!rows.length) throw new Error('Sem dados no data.json');
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
       : new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
-    if(sub) sub.textContent = 'atualizado às ' + syncedAt;
+    applyNewRAW(rows, syncedAt);
   } catch(e){
-    console.warn('data.json load error:', e.message);
-    // Avisa o usuário se primeira carga falhar
-    if(showStatus && !RAW.length){
-      const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
-      if(sub){ sub.textContent = '⚠ Erro ao carregar dados'; sub.style.color = 'var(--red)'; }
+    console.error('data.json load error:', e.message);
+    if(showStatus && sub){
+      sub.textContent = '⚠ Sem conexão com o servidor';
+      sub.style.color = 'var(--red)';
     }
   }
 }
