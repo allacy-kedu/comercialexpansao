@@ -2411,7 +2411,6 @@ function setLoadingBar(active){
 }
 
 async function autoLoadCSV(showStatus){
-  setLoadingBar(true);
   try {
     // GitHub Pages — lê o data.json gerado pela GitHub Action
     const resp = await fetch('./data.json?t=' + Date.now());
@@ -2437,10 +2436,8 @@ async function autoLoadCSV(showStatus){
       : new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
     if(sub) sub.textContent = 'atualizado às ' + syncedAt;
-    setLoadingBar(false);
   } catch(e){
     console.warn('data.json load error:', e.message);
-    setLoadingBar(false);
     // Avisa o usuário se primeira carga falhar
     if(showStatus && !RAW.length){
       const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
@@ -2451,9 +2448,9 @@ async function autoLoadCSV(showStatus){
 
 // Load on start + auto-refresh every 5 min
 if(document.readyState==='complete'||document.readyState==='interactive'){
-  autoLoadCSV(true);
+  setTimeout(()=>autoLoadCSV(true), 400);
 } else {
-  document.addEventListener('DOMContentLoaded', ()=>autoLoadCSV(true));
+  document.addEventListener('DOMContentLoaded', ()=>setTimeout(()=>autoLoadCSV(true), 400));
 }
 setInterval(()=>autoLoadCSV(false), GS_REFRESH_MS);
 
