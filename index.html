@@ -1649,16 +1649,26 @@ function renderBadges(){
     const wrap = document.getElementById('fb-months');
     if(!wrap) return;
     wrap.innerHTML = '';
+    
+    // Captura o mês numérico atual (1 a 12)
+    const currentMonth = new Date().getMonth() + 1;
+
     MONTHS.forEach((m,i)=>{
       const n = i+1;
       const btn = document.createElement('button');
       btn.className = 'fb-m-btn';
       btn.textContent = m;
       btn.type = 'button';
+      
       const isFrom = n===fbFrom, isTo = fbTo && n===fbTo;
       const inRange = fbFrom && fbTo && n>fbFrom && n<fbTo;
-      if(isFrom||isTo) btn.classList.add('sel');
+      
+      // Nova regra: se nenhum mês foi selecionado, acende o mês atual por padrão
+      const isDefault = !fbFrom && !fbTo && n === currentMonth;
+
+      if(isFrom || isTo || isDefault) btn.classList.add('sel');
       else if(inRange) btn.classList.add('in-range');
+      
       btn.onclick = ()=>{
         if(fbPicking==='from' || !fbFrom || n<fbFrom){
           fbFrom=n; fbTo=null; fbPicking='to';
