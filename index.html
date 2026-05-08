@@ -776,14 +776,12 @@ function buildEstadoDrop(){
   // Opção "Selecionar Todos / Limpar"
   const allItem = document.createElement('div');
   allItem.className = 'multisel-item' + (isAllSelected ? ' checked' : '');
-  allItem.innerHTML = '<input type="checkbox" id="est-all"' + (isAllSelected ? ' checked' : '') + '> <label for="est-all" style="cursor:pointer;color:var(--text);font-weight:700;">Selecionar Todos</label>';
+  allItem.innerHTML = '<input type="checkbox" id="est-all"' + (isAllSelected ? ' checked' : '') + ' style="accent-color:var(--accent);width:12px;height:12px;cursor:pointer;"> <label for="est-all" style="cursor:pointer;color:var(--text);font-weight:700;">Selecionar Todos</label>';
   
   allItem.querySelector('input').addEventListener('change', (e)=>{
     if(e.target.checked){
-      // Se marcou, joga todos os estados para a lista de selecionados
       selectedEstados = [...allArr];
     } else {
-      // Se desmarcou, esvazia a lista
       selectedEstados = [];
     }
     filters.estados = [...selectedEstados];
@@ -811,44 +809,81 @@ function buildEstadoDrop(){
       filters.estados = [...selectedEstados];
       item.classList.toggle('checked', e.target.checked);
       
-      // Sincroniza dinamicamente a caixa "Selecionar Todos" caso os itens individuais mudem
+      // Sincroniza dinamicamente a caixa "Selecionar Todos" e "Regionais"
       const allCb = document.getElementById('est-all');
       if(allCb){
          const nowAll = selectedEstados.length === all.size;
          allCb.checked = nowAll;
          allCb.parentElement.classList.toggle('checked', nowAll);
       }
-
+      buildEstadoDrop(); // Reconstrói para manter os checks regionais certos
       updateEstadoLabel();
       update();
     });
     drop.appendChild(item);
   }
 
-  // Renderiza separadores por região
+  // Renderiza separadores por região com Checkbox da Região
   Object.entries(REGIOES).forEach(([regiao, states])=>{
-    const hasAny = states.some(s=>all.has(s));
-    if(!hasAny) return;
+    const validStates = states.filter(s=>all.has(s));
+    if(!validStates.length) return;
+    
+    // Verifica se todos os estados DESSA região estão selecionados
+    const isRegionSelected = validStates.every(s => selectedEstados.includes(s));
+    
     const hdr = document.createElement('div');
-    hdr.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 6px 3px;';
+    hdr.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 8px 4px;';
+    const id = 'reg-'+regiao.replace(/ /g,'_');
+    
     hdr.innerHTML =
-      '<div style="flex:1;height:1px;background:var(--border);"></div>'+
-      '<span style="font-size:8px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;">'+regiao+'</span>'+
-      '<div style="flex:1;height:1px;background:var(--border);"></div>';
+      '<input type="checkbox" id="'+id+'" '+(isRegionSelected?'checked':'')+' style="accent-color:var(--accent);width:12px;height:12px;cursor:pointer;">'+
+      '<label for="'+id+'" style="font-size:9px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;cursor:pointer;">'+regiao+'</label>'+
+      '<div style="flex:1;height:1px;background:var(--border);pointer-events:none;"></div>';
+    
+    hdr.querySelector('input').addEventListener('change', e=>{
+      if(e.target.checked){
+        // Adiciona todos os estados desta região que ainda não estão no array
+        validStates.forEach(s=>{ if(!selectedEstados.includes(s)) selectedEstados.push(s); });
+      } else {
+        // Remove todos os estados desta região
+        selectedEstados = selectedEstados.filter(s=>!validStates.includes(s));
+      }
+      filters.estados = [...selectedEstados];
+      buildEstadoDrop();
+      updateEstadoLabel();
+      update();
+    });
+    
     drop.appendChild(hdr);
-    states.forEach(addEstado);
+    validStates.forEach(addEstado);
   });
 
   // Outros estados não mapeados na const REGIOES
   const inRegion = new Set(Object.values(REGIOES).flat());
   const extras = [...all].filter(s=>!inRegion.has(s)).sort();
   if(extras.length){
+    const isExtrasSelected = extras.every(s => selectedEstados.includes(s));
     const hdr = document.createElement('div');
-    hdr.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 6px 3px;';
+    hdr.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 8px 4px;';
+    const id = 'reg-Outros';
+    
     hdr.innerHTML =
-      '<div style="flex:1;height:1px;background:var(--border);"></div>'+
-      '<span style="font-size:8px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;">Outros</span>'+
-      '<div style="flex:1;height:1px;background:var(--border);"></div>';
+      '<input type="checkbox" id="'+id+'" '+(isExtrasSelected?'checked':'')+' style="accent-color:var(--accent);width:12px;height:12px;cursor:pointer;">'+
+      '<label for="'+id+'" style="font-size:9px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;cursor:pointer;">Outros</label>'+
+      '<div style="flex:1;height:1px;background:var(--border);pointer-events:none;"></div>';
+    
+    hdr.querySelector('input').addEventListener('change', e=>{
+      if(e.target.checked){
+        extras.forEach(s=>{ if(!selectedEstados.includes(s)) selectedEstados.push(s); });
+      } else {
+        selectedEstados = selectedEstados.filter(s=>!extras.includes(s));
+      }
+      filters.estados = [...selectedEstados];
+      buildEstadoDrop();
+      updateEstadoLabel();
+      update();
+    });
+    
     drop.appendChild(hdr);
     extras.forEach(addEstado);
   }
