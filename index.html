@@ -2106,34 +2106,54 @@ function drawEstadoChart(){
   const titleEl = document.getElementById('estado-chart-title');
   if(titleEl) titleEl.textContent = selectedEstados.length===1 ? selectedEstados[0] : selectedEstados.join(' + ');
 
+  // ── LÓGICA DO FILTRO DE MESES GLOBAL ──
+  let activeMonths = [];
+  if (filters.dateFrom || filters.dateTo) {
+    let mStart = filters.dateFrom ? parseInt(filters.dateFrom.slice(5, 7)) : 1;
+    let mEnd = filters.dateTo ? parseInt(filters.dateTo.slice(5, 7)) : 12;
+    for (let m = mStart; m <= mEnd; m++) activeMonths.push(m);
+  } else {
+    // Padrão se não houver filtro: Mês Atual
+    activeMonths.push(new Date().getMonth() + 1); 
+  }
+
+  const ALL_MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const chartLabels = activeMonths.map(m => ALL_MONTHS_SHORT[m-1]);
+
+  const subEl = document.getElementById('estado-chart-sub');
+  if(subEl) {
+    const lbl = activeMonths.length > 1 
+      ? `${ALL_MONTHS_SHORT[activeMonths[0]-1]} a ${ALL_MONTHS_SHORT[activeMonths[activeMonths.length-1]-1]}` 
+      : ALL_MONTHS_SHORT[activeMonths[0]-1];
+    subEl.textContent = `Fat. Kedu mensal (${lbl}) dos estados selecionados`;
+  }
+
   const anos = ecSelectedAnos.slice().sort((a,b)=>a-b);
   const data = {};
   
   anos.forEach(y => {
     data[y] = {};
-    for(let m=1; m<=12; m++) { data[y][m]=0; }
+    activeMonths.forEach(m => { data[y][m]=0; });
   });
 
-  // Agrega os dados
   RAW.forEach(r => {
     if(!selectedEstados.includes(r.estado) || !r.assinatura || !r.fat_kedu) return;
-    const y = parseInt(r.assinatura.slice(0,4)), m = parseInt(r.assinatura.slice(5,7));
+    const y = parseInt(r.assinatura.slice(0,4));
+    const m = parseInt(r.assinatura.slice(5,7));
     if(data[y] && data[y][m] !== undefined){
       data[y][m] += r.fat_kedu;
     }
   });
 
-  const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const today = new Date(), nowMonth = today.getMonth() + 1, nowYear = today.getFullYear();
 
-  // Constrói os datasets no formato do Chart.js
   const datasets = anos.map((y, yi) => {
     const color = TREND_YEAR_COLORS[y] || ESTADO_COLORS[yi % ESTADO_COLORS.length];
     const arr = [];
-    for(let m=1; m<=12; m++){
-       if(y === nowYear && m > nowMonth) arr.push(null); // Oculta meses futuros no ano atual
+    activeMonths.forEach(m => {
+       if(y === nowYear && m > nowMonth) arr.push(null); 
        else arr.push(data[y][m] || 0);
-    }
+    });
     return {
       label: String(y),
       data: arr,
@@ -2152,12 +2172,13 @@ function drawEstadoChart(){
   if(typeof Chart === 'undefined') return setTimeout(drawEstadoChart, 100);
 
   if(_estadoChart){
+    _estadoChart.data.labels = chartLabels;
     _estadoChart.data.datasets = datasets;
     _estadoChart.update('none');
   } else {
     _estadoChart = new Chart(canvas, {
       type: 'line',
-      data: { labels: MONTHS_SHORT, datasets },
+      data: { labels: chartLabels, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -2189,7 +2210,6 @@ function drawEstadoChart(){
     });
   }
 
-  // Renderiza os totais por ano embaixo do gráfico
   const totalsWrap = document.getElementById('estado-totals');
   if(totalsWrap){
     totalsWrap.innerHTML = '';
@@ -2939,3 +2959,5 @@ window._rebuildFichas = ()=>{ if(_fichasOpen){ populateFichasFilters(); renderFi
     <div id="fichas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
   </div>
 </div>
+</body>
+</html>
