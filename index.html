@@ -778,20 +778,10 @@ function buildEstadoDrop(){
   // "Limpar" option
   const allItem = document.createElement('div');
   allItem.className = 'multisel-item';
-  const allEstados = [...all];
-  const allChecked = allEstados.every(s=>selectedEstados.includes(s));
-  allItem.innerHTML = '<input type="checkbox" id="est-all"'+(allChecked?' checked':'')+
-    '> <label for="est-all" style="cursor:pointer;color:var(--muted)">Todos os estados</label>';
-  allItem.querySelector('input').addEventListener('change', e=>{
-    if(e.target.checked){
-      // Seleciona todos
-      selectedEstados = [...all];
-      filters.estados = [...selectedEstados];
-    } else {
-      // Desmarca todos — sem filtro
-      selectedEstados = [];
-      filters.estados = [];
-    }
+  allItem.innerHTML = '<input type="checkbox" id="est-all"> <label for="est-all" style="cursor:pointer;color:var(--muted)">Todos (limpar)</label>';
+  allItem.querySelector('input').addEventListener('change', ()=>{
+    selectedEstados=[];
+    filters.estados=[];
     buildEstadoDrop();
     updateEstadoLabel();
     update();
@@ -850,14 +840,10 @@ function buildEstadoDrop(){
 function updateEstadoLabel(){
   const lbl = document.getElementById('estado-label');
   if(!lbl) return;
-  const totalEstados = new Set(RAW.map(r=>r.estado).filter(Boolean)).size;
-  if(!selectedEstados.length || selectedEstados.length===totalEstados){
-    lbl.textContent='Estado (todos)'; lbl.style.color='';
-  } else if(selectedEstados.length===1){
-    lbl.textContent=selectedEstados[0]; lbl.style.color='var(--accent)';
-  } else {
-    lbl.textContent=selectedEstados.length+' estados'; lbl.style.color='var(--accent)';
-  }
+  if(!selectedEstados.length){ lbl.textContent='Estado (todos)'; lbl.style.color=''; }
+  else if(selectedEstados.length===1){ lbl.textContent=selectedEstados[0]; lbl.style.color='var(--accent)'; }
+  else { lbl.textContent=selectedEstados.length+' estados'; lbl.style.color='var(--accent)'; }
+  // Add/remove chip
   renderEstadoChip();
 }
 
@@ -2423,14 +2409,17 @@ async function autoLoadCSV(showStatus){
     rows.forEach(r => RAW.push(r));
     invalidateCache();
     if(typeof _monthlyRawLen !== 'undefined') _monthlyRawLen = -1;
-    initEcYearColors();
-    populateSelects();
-    buildEstadoDrop();
-    update();
-    if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
-    if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
-    if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
-    if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
+    // Deixa o browser pintar a loading bar antes de executar operações pesadas
+    requestAnimationFrame(()=>{
+      initEcYearColors();
+      populateSelects();
+      buildEstadoDrop();
+      update();
+      if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
+      if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
+      if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
+      if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
+    });
     // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
