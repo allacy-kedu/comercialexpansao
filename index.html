@@ -2402,18 +2402,23 @@ async function autoLoadCSV(showStatus){
     const json = await resp.json();
     const rows = json.records||[];
     if(!rows.length) throw new Error('Sem dados');
+    // Popula o RAW
     RAW.length=0;
     rows.forEach(r=>RAW.push(r));
-    invalidateCache();
     if(typeof _monthlyRawLen!=='undefined') _monthlyRawLen=-1;
     initEcYearColors();
     populateSelects();
     buildEstadoDrop();
-    update();
-    if(typeof window._redrawTrendChart==='function') window._redrawTrendChart();
-    if(typeof rankingView!=='undefined'&&rankingView==='melhor') buildMelhorMes();
-    if(typeof window.buildCampanhas==='function') window.buildCampanhas();
+    // Usa o resetFilters para garantir que TUDO é renderizado
+    if(typeof window.resetFilters==='function'){
+      window.resetFilters();
+    } else {
+      update();
+      if(typeof window._redrawTrendChart==='function') window._redrawTrendChart();
+      if(typeof window.buildCampanhas==='function') window.buildCampanhas();
+    }
     if(typeof window._rebuildFichas==='function') window._rebuildFichas();
+    // Atualiza o subtítulo com horário
     const syncedAt=json.updated_at
       ?new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
       :new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
