@@ -947,8 +947,25 @@ const METAS_R2 = {'2026-01':728400,'2026-02':582700,'2026-03':1020000,'2026-04':
 const METAS_GERAL = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,'2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,'2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
 
 const RAW=[];
+let _filteredCache = null;
+let _filtersCacheKey = '';
 
-function invalidateCache(){ /* sem-op — mantido por compatibilidade */ }
+function getCacheKey(){
+  return JSON.stringify(filters);
+}
+
+function applyFiltersCached(){
+  const key = getCacheKey();
+  if(key === _filtersCacheKey && _filteredCache) return _filteredCache;
+  _filteredCache = applyFilters();
+  _filtersCacheKey = key;
+  return _filteredCache;
+}
+
+function invalidateCache(){
+  _filteredCache = null;
+  _filtersCacheKey = '';
+}
 
 // helpers
 const fmt=v=>{if(v===null||v===undefined||isNaN(v))return'—';if(v>=1e9)return'R$ '+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'R$ '+(v/1000).toFixed(0)+'K';return'R$ '+v.toFixed(0);};
@@ -1245,7 +1262,7 @@ function setRankingView(view){
 }
 
 function update(){
-  const data=applyFilters();
+  const data=applyFiltersCached();
   renderBadges();
   const fatK=data.reduce((s,r)=>s+(r.fat_kedu||0),0);
   const fatE=data.reduce((s,r)=>s+(r.fat_escola||0),0);
@@ -1757,6 +1774,8 @@ function onFilterChange(){
 }
 ['f-lideranca','f-executivo','f-cargo','f-status','f-modelo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',onFilterChange); });
 // resetFilters definido no seletor de meses
+
+update();
 
 // ── Trend Chart (Chart.js) ───────────────────────────────────
 (function(){
@@ -2343,23 +2362,20 @@ function parseCSVtoRAW(csv){
   return result;
 }
 
-function applyNewRAWFromCSV(newRaw, filename){
+function applyNewRAW(newRaw, filename){
   if(!newRaw||!newRaw.length){ setGsStatus('⚠ Nenhum dado encontrado','#e17055'); return; }
-  RAW.length = 0;
-  newRaw.forEach(r => RAW.push(r));
-  invalidateCache();
-  if(typeof _monthlyRawLen !== 'undefined') _monthlyRawLen = -1;
+  RAW.length=0;
+  newRaw.forEach(r=>RAW.push(r));
   initEcYearColors();
   populateSelects();
   buildEstadoDrop();
   update();
+  // Redraw trend chart since it's inside an IIFE with its own data snapshot
   if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
-  if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
-  if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
-  const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   setGsStatus('✓ '+newRaw.length+' contratos · '+now,'#52c77d');
-  const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
-  if(sub) sub.textContent = (filename||'CSV importado')+' · '+now;
+  const sub=document.getElementById('dash-sub')||document.querySelector('.hsub');
+  if(sub) sub.textContent=(filename||'CSV importado')+' · '+now;
 }
 
 async function handleCSVUpload(event){
@@ -2373,7 +2389,7 @@ async function handleCSVUpload(event){
   if(name.endsWith('.csv')){
     const text=await file.text();
     const rows=parseCSVtoRAW(text);
-    applyNewRAWFromCSV(rows, file.name);
+    applyNewRAW(rows, file.name);
   } else if(name.endsWith('.xlsx')||name.endsWith('.xls')){
     // Use SheetJS (already available in browser via CDN if needed)
     setGsStatus('Use o formato CSV para importar','#e17055');
@@ -2394,7 +2410,6 @@ function setLoadingBar(active){
   if(bar){ bar.className = active ? 'loading-bar active' : 'loading-bar'; bar.style.width = active ? '' : '0'; }
 }
 
-
 async function autoLoadCSV(showStatus){
   try {
     // GitHub Pages — lê o data.json gerado pela GitHub Action
@@ -2405,6 +2420,8 @@ async function autoLoadCSV(showStatus){
     if(!rows.length) throw new Error('Sem dados');
     RAW.length = 0;
     rows.forEach(r => RAW.push(r));
+    invalidateCache();
+    if(typeof _monthlyRawLen !== 'undefined') _monthlyRawLen = -1;
     initEcYearColors();
     populateSelects();
     buildEstadoDrop();
@@ -2412,8 +2429,8 @@ async function autoLoadCSV(showStatus){
     if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
     if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
     if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
-    if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
     if(typeof window._rebuildFichas === 'function') window._rebuildFichas();
+    // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
       : new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -2421,9 +2438,13 @@ async function autoLoadCSV(showStatus){
     if(sub) sub.textContent = 'atualizado às ' + syncedAt;
   } catch(e){
     console.warn('data.json load error:', e.message);
+    // Avisa o usuário se primeira carga falhar
+    if(showStatus && !RAW.length){
+      const sub = document.getElementById('dash-sub')||document.querySelector('.hsub');
+      if(sub){ sub.textContent = '⚠ Erro ao carregar dados'; sub.style.color = 'var(--red)'; }
+    }
   }
 }
-
 
 // Load on start + auto-refresh every 5 min
 if(document.readyState==='complete'||document.readyState==='interactive'){
