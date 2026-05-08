@@ -308,33 +308,21 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
 
 <div class="main">
 
-  <div class="estado-chart-card" id="estado-chart-card">
-    <div class="trend-header" style="flex-wrap:wrap;gap:10px;">
-      <div style="flex:1;min-width:200px;">
+  <div class="estado-chart-card trend-card" id="estado-chart-card" style="display:none;">
+    <div class="trend-header">
+      <div>
         <div class="trend-title" id="estado-chart-title">Faturamento por Estado</div>
-        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal acumulado dos estados selecionados</div>
+        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal dos estados selecionados</div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-        <!-- Meses -->
-        <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:8px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Meses</span>
-          <div id="ec-meses" style="display:flex;gap:3px;flex-wrap:wrap;max-width:280px;">
-          </div>
-        </div>
-        <div style="width:1px;height:32px;background:var(--border);"></div>
-        <!-- Anos -->
-        <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:8px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Anos</span>
-          <div id="ec-anos" style="display:flex;gap:3px;flex-wrap:wrap;">
-          </div>
-        </div>
+      <div class="trend-legend" id="ec-anos">
+        <!-- Botões de ano serão inseridos aqui pelo JS -->
       </div>
     </div>
-    <div class="trend-canvas-wrap" style="height:220px;margin-top:12px;">
+    <div class="trend-canvas-wrap" style="position:relative;height:220px;margin-top:12px;">
       <canvas id="estado-chart"></canvas>
     </div>
-    <div id="estado-month-btns" style="display:flex;justify-content:space-around;padding:10px 24px 0 70px;margin-top:4px;"></div>
-    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px 70px;"></div>
+    <!-- Totais anuais -->
+    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
   </div>
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -1913,6 +1901,7 @@ update();
 
   function initButtons(){
     document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
+      if (btn.closest('#ec-anos')) return; // Ignore buttons from Estado chart
       btn.addEventListener('click',()=>{
         const yr=btn.dataset.year==='meta'?'meta':btn.dataset.year==='forecast'?'forecast':parseInt(btn.dataset.year);
         if(activeYears.has(yr)){activeYears.delete(yr);btn.classList.remove('active');}
@@ -2029,8 +2018,14 @@ update();
   }
   if(document.readyState==='complete'||document.readyState==='interactive')setTimeout(init,100);
   else document.addEventListener('DOMContentLoaded',()=>setTimeout(init,100));
-  window.addEventListener('resize',()=>{if(_chart){_chart.destroy();_chart=null;}drawChart();});
-  window._redrawTrendChart=()=>{if(_chart){_chart.destroy();_chart=null;}drawChart();};
+  window.addEventListener('resize',()=>{
+    if(_chart){_chart.destroy();_chart=null;}drawChart();
+    if(typeof drawEstadoChart==='function') drawEstadoChart(); // Update other chart on resize too
+  });
+  window._redrawTrendChart=()=>{
+    if(_chart){_chart.destroy();_chart=null;}drawChart();
+    if(typeof drawEstadoChart==='function') drawEstadoChart(); // Re-draw estado chart on theme change
+  };
   window._getMelhorMesMonthly=buildMonthly;
 })();
 
@@ -2041,16 +2036,15 @@ if(document.readyState==='complete'||document.readyState==='interactive'){
   document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{if(typeof buildEstadoDrop==='function') buildEstadoDrop();},200));
 }
 
-
 // ── Estado Comparison Chart ───────────────────────────────────
 const ESTADO_COLORS = [
   '#a29bfe','#74b9ff','#ffeaa7','#fd79a8','#e17055',
   '#fdcb6e','#ff7675','#55efc4','#00b894','#4ECDC4',
 ];
 
-// Fixed color per year — same as trend chart
 const TREND_YEAR_COLORS = {2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
 var EC_YEAR_COLORS = {};
+
 function initEcYearColors(){
   const anos = [...new Set(RAW.map(r=>r.assinatura&&r.assinatura.slice(0,4)).filter(Boolean))].sort();
   anos.forEach((y,i)=>{
@@ -2060,40 +2054,14 @@ function initEcYearColors(){
 }
 initEcYearColors();
 
-// Estado chart state
-var ecSelectedMeses = [];
+// Chart instance and state
+let _estadoChart = null;
 var ecSelectedAnos  = [];
-const EC_NOMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 function initEstadoChartControls(){
-  // Build year list from RAW
   const anos = [...new Set(RAW.map(r=>r.assinatura&&r.assinatura.slice(0,4)).filter(Boolean))].sort();
-  // Default: all months selected, last 3 years selected
-  ecSelectedMeses = [1,2,3,4,5,6,7,8,9,10,11,12];
-  ecSelectedAnos  = anos.slice(-3).map(Number);
-  buildEcMeses();
+  ecSelectedAnos = anos.slice(-3).map(Number); // Pega os últimos 3 anos por padrão
   buildEcAnos(anos.map(Number));
-}
-
-function buildEcMeses(){
-  const wrap = document.getElementById('ec-meses');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  for(let m=1;m<=12;m++){
-    const btn = document.createElement('button');
-    const active = ecSelectedMeses.includes(m);
-    btn.textContent = EC_NOMES[m-1].slice(0,3);
-    btn.dataset.m = m;
-    btn.style.cssText = 'padding:2px 6px;font-size:9px;font-family:DM Mono,monospace;border-radius:5px;cursor:pointer;border:1px solid '+(active?'var(--accent)':'var(--border)')+';background:'+(active?'rgba(78,205,196,0.15)':'transparent')+';color:'+(active?'var(--accent)':'var(--muted)')+';transition:.15s;';
-    btn.onclick = ()=>{
-      if(ecSelectedMeses.includes(m)) ecSelectedMeses = ecSelectedMeses.filter(x=>x!==m);
-      else ecSelectedMeses.push(m);
-      if(!ecSelectedMeses.length) ecSelectedMeses=[1,2,3,4,5,6,7,8,9,10,11,12];
-      buildEcMeses();
-      drawEstadoChart();
-    };
-    wrap.appendChild(btn);
-  }
 }
 
 function buildEcAnos(anos){
@@ -2105,7 +2073,6 @@ function buildEcAnos(anos){
     const active = ecSelectedAnos.includes(a);
     const color = TREND_YEAR_COLORS[a] || '#fff';
     btn.textContent = a;
-    btn.dataset.a = a;
     btn.className = 'trend-yr-btn' + (active ? ' active' : '');
     btn.style.setProperty('--yr-c', color);
     btn.onclick = ()=>{
@@ -2124,71 +2091,111 @@ function drawEstadoChart(){
   const canvas = document.getElementById('estado-chart');
   if(!card||!canvas) return;
 
-  if(!selectedEstados.length){ card.classList.remove('visible'); return; }
+  if(!selectedEstados.length){
+    card.classList.remove('visible');
+    card.style.display = 'none';
+    return;
+  }
+  
   if(!ecSelectedAnos.length) initEstadoChartControls();
+
   card.classList.add('visible');
+  card.style.display = 'block';
 
-  const meses = ecSelectedMeses.slice().sort((a,b)=>a-b);
-  const anos  = ecSelectedAnos.slice().sort((a,b)=>a-b);
+  // Atualiza título com os estados selecionados
+  const titleEl = document.getElementById('estado-chart-title');
+  if(titleEl) titleEl.textContent = selectedEstados.length===1 ? selectedEstados[0] : selectedEstados.join(' + ');
 
-  const data={}, ctrData={};
-  anos.forEach(y=>{ data[y]={}; ctrData[y]={}; meses.forEach(m=>{ data[y][m]=0; ctrData[y][m]=0; }); });
-  RAW.forEach(r=>{
-    if(!selectedEstados.includes(r.estado)||!r.assinatura||!r.fat_kedu) return;
-    const y=parseInt(r.assinatura.slice(0,4)), m=parseInt(r.assinatura.slice(5,7));
-    if(data[y]&&data[y][m]!==undefined){ data[y][m]+=r.fat_kedu; ctrData[y][m]++; }
+  const anos = ecSelectedAnos.slice().sort((a,b)=>a-b);
+  const data = {};
+  
+  anos.forEach(y => {
+    data[y] = {};
+    for(let m=1; m<=12; m++) { data[y][m]=0; }
   });
 
-  const W=canvas.parentElement.offsetWidth||800, H=220;
-  canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.scale(devicePixelRatio,devicePixelRatio);
+  // Agrega os dados
+  RAW.forEach(r => {
+    if(!selectedEstados.includes(r.estado) || !r.assinatura || !r.fat_kedu) return;
+    const y = parseInt(r.assinatura.slice(0,4)), m = parseInt(r.assinatura.slice(5,7));
+    if(data[y] && data[y][m] !== undefined){
+      data[y][m] += r.fat_kedu;
+    }
+  });
 
-  const pad={top:20,right:24,bottom:8,left:70};
-  const cW=W-pad.left-pad.right, cH=H-pad.top-pad.bottom;
-  let maxVal=0;
-  anos.forEach(y=>meses.forEach(m=>{ if(data[y][m]>maxVal) maxVal=data[y][m]; }));
-  maxVal=maxVal*1.2||1000000;
-  const toX=i=>pad.left+i*(cW/(meses.length-1||1));
-  const toY=v=>pad.top+cH-(v/maxVal)*cH;
+  const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const today = new Date(), nowMonth = today.getMonth() + 1, nowYear = today.getFullYear();
 
-  ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='rgba(99,179,237,0.06)'; ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){ const yy=pad.top+(cH/4)*i; ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+cW,yy);ctx.stroke(); }
-  ctx.fillStyle='rgba(90,106,130,0.8)';ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
-  for(let i=0;i<=4;i++){ const v=maxVal*(1-i/4),yy=pad.top+(cH/4)*i; ctx.fillText('R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':(v/1000).toFixed(0)+'K'),pad.left-6,yy+3); }
-  ctx.textAlign='center'; ctx.fillStyle='rgba(90,106,130,0.8)'; ctx.font='9px DM Mono,monospace';
-  // X labels handled by month buttons below chart
+  // Constrói os datasets no formato do Chart.js
+  const datasets = anos.map((y, yi) => {
+    const color = TREND_YEAR_COLORS[y] || ESTADO_COLORS[yi % ESTADO_COLORS.length];
+    const arr = [];
+    for(let m=1; m<=12; m++){
+       if(y === nowYear && m > nowMonth) arr.push(null); // Oculta meses futuros no ano atual
+       else arr.push(data[y][m] || 0);
+    }
+    return {
+      label: String(y),
+      data: arr,
+      borderColor: color,
+      borderWidth: (y === 2025 || y === 2026) ? 2 : 1.5,
+      borderDash: y === 2026 ? [6,3] : [],
+      pointBackgroundColor: color,
+      pointRadius: (y === 2025 || y === 2026) ? 4 : 3,
+      pointHoverRadius: 6,
+      tension: 0.4,
+      fill: false,
+      spanGaps: false
+    };
+  });
 
-  const _ecDots=[];
-  anos.forEach((y,yi)=>{
-    const color=TREND_YEAR_COLORS[y]||ESTADO_COLORS[yi%ESTADO_COLORS.length];
-    const pts=meses.map((m,i)=>({x:toX(i),y:toY(data[y][m]),v:data[y][m],m,mi:i}));
-    ctx.beginPath();
-    pts.forEach((p,i)=>{ i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
-    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.setLineDash([]); ctx.stroke();
-    pts.forEach(p=>{
-      ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
-      if(p.v>0){ ctx.fillStyle=color;ctx.font='8px DM Mono,monospace';ctx.textAlign='center'; ctx.fillText('R$'+(p.v>=1e6?(p.v/1e6).toFixed(1)+'M':(p.v/1000).toFixed(0)+'K'),p.x,p.y-8); }
-      _ecDots.push({x:p.x*devicePixelRatio,y:p.y*devicePixelRatio,v:p.v,m:p.m,mi:p.mi,year:y,color,ctr:ctrData[y][p.m]});
+  if(typeof Chart === 'undefined') return setTimeout(drawEstadoChart, 100);
+
+  if(_estadoChart){
+    _estadoChart.data.datasets = datasets;
+    _estadoChart.update('none');
+  } else {
+    _estadoChart = new Chart(canvas, {
+      type: 'line',
+      data: { labels: MONTHS_SHORT, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(22, 25, 41, 0.95)',
+            titleColor: '#8394aa',
+            titleFont: { family: 'DM Mono', size: 10 },
+            bodyFont: { family: 'DM Mono', size: 11 },
+            padding: 12,
+            borderColor: 'rgba(99,179,237,0.25)',
+            borderWidth: 1,
+            callbacks: {
+              label: function(ctx) {
+                let v = ctx.raw;
+                if(v === null) return null;
+                return ctx.dataset.label + ': R$ ' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : (v/1000).toFixed(0)+'K');
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 } }, border: { display: false } },
+          y: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 }, maxTicksLimit: 5, callback: v => 'R$' + (v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : (v / 1000).toFixed(0) + 'K') }, border: { display: false } }
+        }
+      }
     });
-  });
+  }
 
-  const titleEl=document.getElementById('estado-chart-title'), subEl=document.getElementById('estado-chart-sub');
-  if(titleEl) titleEl.textContent=selectedEstados.length===1?selectedEstados[0]:selectedEstados.join(' + ');
-  if(subEl)   subEl.textContent=anos.join(' vs ')+' · '+meses.length+' mes'+(meses.length>1?'es':'');
-
-  // ── Month buttons for popup ────────────────────────────────────
-  buildEstadoMonthButtons(_ecDots, meses);
-
-  // ── Totals per year (sum of selected months) ──────────────────
+  // Renderiza os totais por ano embaixo do gráfico
   const totalsWrap = document.getElementById('estado-totals');
   if(totalsWrap){
     totalsWrap.innerHTML = '';
     const fv = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
     anos.forEach(y=>{
-      const total = meses.reduce((s,m)=>s+(data[y][m]||0), 0);
+      const total = Object.values(data[y]).reduce((s,v)=>s+(v||0), 0);
       if(total === 0) return;
       const color = TREND_YEAR_COLORS[y] || '#fff';
       const pill = document.createElement('div');
@@ -2200,78 +2207,6 @@ function drawEstadoChart(){
       totalsWrap.appendChild(pill);
     });
   }
-}
-
-function buildEstadoMonthButtons(dots, meses){
-  const wrap = document.getElementById('estado-month-btns');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-
-  const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const fv = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-
-  function removeEcPopup(){ const o=document.getElementById('ec-popup'); if(o) o.remove(); }
-  document.addEventListener('click', e=>{
-    const p=document.getElementById('ec-popup');
-    if(p&&!p.contains(e.target)&&!e.target.closest('#estado-month-btns')) removeEcPopup();
-  });
-
-  meses.forEach((m, mi)=>{
-    const btn = document.createElement('button');
-    btn.textContent = MONTHS_SHORT[m-1];
-    btn.style.cssText = 'background:transparent;border:none;border-bottom:1px solid rgba(99,179,237,0.15);color:rgba(90,106,130,0.8);font-size:9px;font-family:DM Mono,monospace;cursor:pointer;padding:2px 4px;transition:.15s;flex:1;text-align:center;';
-    btn.onmouseenter = ()=>{ btn.style.color='var(--accent)'; btn.style.borderBottomColor='var(--accent)'; };
-    btn.onmouseleave = ()=>{ btn.style.color='rgba(90,106,130,0.8)'; btn.style.borderBottomColor='rgba(99,179,237,0.15)'; };
-
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      const existing = document.getElementById('ec-popup');
-      const wasThis = existing && existing.dataset.month === String(m);
-      removeEcPopup();
-      if(wasThis) return;
-
-      const hits = dots.filter(d=>d.mi===mi);
-      if(!hits.length) return;
-
-      const popup = document.createElement('div');
-      popup.id = 'ec-popup';
-      popup.dataset.month = String(m);
-      popup.style.cssText = 'position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:210px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
-
-      const title = document.createElement('div');
-      title.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
-      title.innerHTML = MONTHS_PT[m-1]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="ec-popup-close">×</span>';
-      popup.appendChild(title);
-
-      if(selectedEstados.length){
-        const sub = document.createElement('div');
-        sub.style.cssText = 'font-size:9px;color:#5a6a82;margin-bottom:8px;';
-        sub.textContent = selectedEstados.length===1?selectedEstados[0]:selectedEstados.length+' estados';
-        popup.appendChild(sub);
-      }
-
-      hits.sort((a,b)=>a.year-b.year).forEach(d=>{
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
-        const ctrTxt = d.ctr?'<br><span style="color:#8394aa;font-size:9px;">'+d.ctr+' contrato'+(d.ctr!==1?'s':'')+'</span>':'';
-        row.innerHTML = '<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:'+d.color+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;">'+d.year+'</span></span><span style="font-weight:700;color:'+d.color+';text-align:right;">R$ '+fv(d.v)+ctrTxt+'</span>';
-        popup.appendChild(row);
-      });
-
-      document.body.appendChild(popup);
-      const pw=popup.offsetWidth||220, ph=popup.offsetHeight||160;
-      const br=btn.getBoundingClientRect();
-      let px=br.left+br.width/2-pw/2;
-      let py=br.top-ph-8;
-      if(px+pw>window.innerWidth-8) px=window.innerWidth-pw-8;
-      if(px<8) px=8;
-      if(py<8) py=br.bottom+8;
-      popup.style.left=px+'px'; popup.style.top=py+'px';
-      document.getElementById('ec-popup-close').addEventListener('click', e=>{e.stopPropagation();removeEcPopup();});
-    });
-    wrap.appendChild(btn);
-  });
 }
 
 // ═══════════════════════════════════════════════════════════════
