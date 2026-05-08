@@ -767,16 +767,27 @@ function buildEstadoDrop(){
   const drop = document.getElementById('estado-drop');
   if(!drop) return;
   const all = new Set(RAW.map(r=>r.estado).filter(Boolean));
+  const allArr = [...all]; // Guarda todos os estados disponíveis na base
   drop.innerHTML = '';
 
-  // "Limpar" option
+  // Verifica se todos os estados já estão selecionados
+  const isAllSelected = selectedEstados.length > 0 && selectedEstados.length === all.size;
+
+  // Opção "Selecionar Todos / Limpar"
   const allItem = document.createElement('div');
-  allItem.className = 'multisel-item';
-  allItem.innerHTML = '<input type="checkbox" id="est-all"> <label for="est-all" style="cursor:pointer;color:var(--muted)">Todos (limpar)</label>';
-  allItem.querySelector('input').addEventListener('change', ()=>{
-    selectedEstados=[];
-    filters.estados=[];
-    buildEstadoDrop();
+  allItem.className = 'multisel-item' + (isAllSelected ? ' checked' : '');
+  allItem.innerHTML = '<input type="checkbox" id="est-all"' + (isAllSelected ? ' checked' : '') + '> <label for="est-all" style="cursor:pointer;color:var(--text);font-weight:700;">Selecionar Todos</label>';
+  
+  allItem.querySelector('input').addEventListener('change', (e)=>{
+    if(e.target.checked){
+      // Se marcou, joga todos os estados para a lista de selecionados
+      selectedEstados = [...allArr];
+    } else {
+      // Se desmarcou, esvazia a lista
+      selectedEstados = [];
+    }
+    filters.estados = [...selectedEstados];
+    buildEstadoDrop(); // Recria o dropdown para atualizar o visual de todos os checks
     updateEstadoLabel();
     update();
   });
@@ -790,22 +801,34 @@ function buildEstadoDrop(){
     const id = 'est-'+est.replace(/ /g,'_');
     item.innerHTML = '<input type="checkbox" id="'+id+'"'+(checked?' checked':'')+'>'+
       '<label for="'+id+'" style="cursor:pointer;">'+est+'</label>';
+    
     item.querySelector('input').addEventListener('change', e=>{
-      if(e.target.checked){ if(!selectedEstados.includes(est)) selectedEstados.push(est); }
-      else { selectedEstados = selectedEstados.filter(s=>s!==est); }
+      if(e.target.checked){ 
+        if(!selectedEstados.includes(est)) selectedEstados.push(est); 
+      } else { 
+        selectedEstados = selectedEstados.filter(s=>s!==est); 
+      }
       filters.estados = [...selectedEstados];
       item.classList.toggle('checked', e.target.checked);
+      
+      // Sincroniza dinamicamente a caixa "Selecionar Todos" caso os itens individuais mudem
+      const allCb = document.getElementById('est-all');
+      if(allCb){
+         const nowAll = selectedEstados.length === all.size;
+         allCb.checked = nowAll;
+         allCb.parentElement.classList.toggle('checked', nowAll);
+      }
+
       updateEstadoLabel();
       update();
     });
     drop.appendChild(item);
   }
 
-  // Render by region with visual divider + label
+  // Renderiza separadores por região
   Object.entries(REGIOES).forEach(([regiao, states])=>{
     const hasAny = states.some(s=>all.has(s));
     if(!hasAny) return;
-    // Separator line + region label
     const hdr = document.createElement('div');
     hdr.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 6px 3px;';
     hdr.innerHTML =
@@ -816,7 +839,7 @@ function buildEstadoDrop(){
     states.forEach(addEstado);
   });
 
-  // Any state not mapped to a region
+  // Outros estados não mapeados na const REGIOES
   const inRegion = new Set(Object.values(REGIOES).flat());
   const extras = [...all].filter(s=>!inRegion.has(s)).sort();
   if(extras.length){
