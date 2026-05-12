@@ -143,7 +143,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .camp-exec-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
 .camp-pill{font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);}
 .camp-pill.done{border-color:rgba(0,184,148,0.3);color:#00b894;background:rgba(0,184,148,0.06);}
-@media(max-width:600px){.camp-grid{grid-template-columns:1fr;}}
 .melhor-avatar-wrap{position:relative;flex-shrink:0;}
 .melhor-avatar-ring{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);padding:2.5px;display:flex;align-items:center;justify-content:center;}
 .melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
@@ -164,7 +163,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-fat{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;}
 .ranking-ctr{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
 
-@media(max-width:600px){.ranking-cols{grid-template-columns:1fr;}}
 .trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
 .trend-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .trend-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
@@ -218,7 +216,22 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
 .sp-pos{color:var(--green);}.sp-neg{color:var(--red);}.sp-neu{color:var(--accent3);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:1200px){.kpi-grid,.kpi-grid-2{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){
+  .kpi-grid,.kpi-grid-2{grid-template-columns:repeat(2,1fr);}
+  .camp-grid{grid-template-columns:1fr;}
+  .ranking-cols{grid-template-columns:1fr;}
+  #quartil-grid{grid-template-columns:1fr 1fr!important;}
+  #melhor-mes-grid{grid-template-columns:repeat(3,1fr)!important;}
+  .filterbar{gap:6px;padding:8px 16px;}
+  .fb-group{flex-wrap:wrap;}
+  .fdiv{display:none;}
+  .trend-header{flex-direction:column;align-items:flex-start;}
+}
 @media(max-width:768px){.kpi-grid,.kpi-grid-2{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){
+  #melhor-mes-grid{grid-template-columns:repeat(2,1fr)!important;}
+  .filterbar{padding:8px 12px;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
