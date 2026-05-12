@@ -18,11 +18,10 @@
 [data-theme="light"] .header{background:rgba(255,255,255,0.95);}
 [data-theme="light"] .filterbar{background:rgba(240,244,248,0.95);}
 [data-theme="light"] select,[data-theme="light"] input[type=month]{color-scheme:light;background-color:var(--card);color:var(--text);}
-[data-theme="light"] .trend-card,[data-theme="light"] .ranking-card,[data-theme="light"] .camp-section-wrap,[data-theme="light"] .meta-bar-wrap,[data-theme="light"] .reg-card,[data-theme="light"] .table-card,[data-theme="light"] .kpi{box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+[data-theme="light"] .trend-card,[data-theme="light"] .ranking-card,[data-theme="light"] .camp-section-wrap,[data-theme="light"] .meta-bar-wrap,[data-theme="light"] .reg-card,[data-theme="light"] .kpi{box-shadow:0 1px 4px rgba(0,0,0,0.07);}
 [data-theme="light"] .camp-tier.next{background:rgba(14,159,142,0.08);border-color:rgba(14,159,142,0.3);}
 [data-theme="light"] .camp-tier.done{background:rgba(39,103,73,0.08);border-color:rgba(39,103,73,0.25);}
 [data-theme="light"] .multisel-drop{box-shadow:0 8px 24px rgba(0,0,0,0.12);}
-[data-theme="light"] td{border-bottom-color:rgba(0,0,0,0.05);}
 [data-theme="light"] tr:hover td{background:rgba(14,159,142,0.04);}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;background-image:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(78,205,196,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%,rgba(162,155,254,0.06) 0%,transparent 60%);}
@@ -197,23 +196,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .kpi-sub{font-size:10px;color:var(--muted2);font-family:'DM Mono',monospace;}
 
 .kpi:nth-child(1){animation-delay:.04s;}.kpi:nth-child(2){animation-delay:.08s;}.kpi:nth-child(3){animation-delay:.12s;}.kpi:nth-child(4){animation-delay:.16s;}.kpi:nth-child(5){animation-delay:.2s;}
-.table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-.table-header{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.table-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;}
-.table-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-.tbl-wrap{overflow:auto;max-height:540px;}
-.tbl-wrap::-webkit-scrollbar{width:4px;height:4px;}.tbl-wrap::-webkit-scrollbar-thumb{background:var(--card2);border-radius:2px;}
-table{width:100%;border-collapse:collapse;}
-th{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-family:'DM Mono',monospace;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s;}
-th:hover{color:var(--accent);}th.sorted-col{color:var(--accent);}
-td{padding:7px 10px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.025);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.025);}
-.mono{font-family:'DM Mono',monospace;font-size:10px;}
-.badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
-.b-ativo{background:rgba(82,199,125,.12);color:var(--green);}.b-churn{background:rgba(255,107,107,.12);color:var(--red);}.b-cancelado{background:rgba(246,173,85,.12);color:var(--orange);}.b-implantando{background:rgba(178,148,244,.12);color:var(--purple);}.b-descredenciamento{background:rgba(107,127,154,.1);color:var(--muted2);}
-.rank{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;}
-.r1{background:rgba(255,230,109,.15);color:var(--accent3);}.r2{background:rgba(162,155,254,.12);color:var(--accent4);}.rn{background:rgba(255,255,255,.04);color:var(--muted);}
-.sp-pos{color:var(--green);}.sp-neg{color:var(--red);}.sp-neu{color:var(--accent3);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:1200px){.kpi-grid,.kpi-grid-2{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:900px){
@@ -662,40 +644,6 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
   </div>
 
 
-  <div class="stitle">Contratos</div>
-  <div class="table-card">
-    <div class="table-header">
-      <div>
-        <div class="table-title">Listagem de Contratos</div>
-        <div class="table-sub" id="tbl-sub">—</div>
-      </div>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th data-f="num">#</th>
-          <th data-f="escola">Escola</th>
-          <th data-f="executivo">Executivo</th>
-          <th data-f="lideranca">Liderança</th>
-          <th data-f="status">Status</th>
-          <th data-f="modelo">Modelo</th>
-          <th data-f="fat_escola">Fat. Escola</th>
-          <th data-f="fat_kedu">Fat. Kedu</th>
-          <th data-f="taxa">Taxa</th>
-          <th data-f="alunos">Alunos</th>
-          <th data-f="ticket_medio">Ticket Méd.</th>
-          <th data-f="spread">Spread</th>
-          <th data-f="margem">Margem</th>
-          <th data-f="assinatura">Assinatura</th>
-          <th data-f="estado">Estado</th>
-        </tr></thead>
-        <tbody id="tbl-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
 <div id="loading-bar" class="loading-bar"></div>
 <script>
 
@@ -1023,7 +971,6 @@ const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 
 let filters={dateFrom:'',dateTo:'',lideranca:'',executivo:'',cargo:'',status:'',modelo:'',estados:[],};
-let sortField='num',sortDir=1,sortedData=[];
 
 function populateSelects(){
   const sel=(id,vals)=>{
@@ -1640,57 +1587,7 @@ function rankingAvatar(nome, metaHit){
   drawEstadoChart();
   renderEstadoChip();
   document.getElementById('hcount').textContent=uniqueContratos(data)+' contratos';
-  sortedData=[...data];
-  renderTable();
-  set('tbl-sub', uniqueContratos(data)+' contratos filtrados');
 }
-
-function renderTable(){
-  const tbody=document.getElementById('tbl-body');
-  if(!tbody) return;
-  sortedData.sort((a,b)=>{
-    const av=a[sortField],bv=b[sortField];
-    if(av==null)return 1;if(bv==null)return -1;
-    if(typeof av==='string')return sortDir*av.localeCompare(bv,'pt-BR');
-    return sortDir*(av-bv);
-  });
-  if(!sortedData.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--muted)">Nenhum contrato encontrado</td></tr>';return;}
-  tbody.innerHTML=sortedData.slice(0,300).map((r,i)=>{
-    const sc='b-'+(r.status||'').toLowerCase().replace(/ê/g,'e').replace(/ç/g,'c').replace(/ã/g,'a').replace(/ /g,'-');
-    const rc='rn';
-    const sp=r.spread;
-    const spc=sp===null||sp===undefined?'':sp>0?'sp-pos':sp<0?'sp-neg':'sp-neu';
-    return`<tr>
-      <td><span class="rank ${rc}">${r.num}</span></td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.escola||''}">${r.escola||'—'}</td>
-      <td style="white-space:nowrap;font-size:10px">${(r.executivo||'—').replace(' [EduPay]','')}</td>
-      <td style="font-size:10px;color:var(--muted2)">${r.lideranca||'—'}</td>
-      <td><span class="badge ${sc}">${r.status||'—'}</span></td>
-      <td style="font-size:10px;color:var(--muted2)">${r.modelo||'—'}</td>
-      <td class="mono" style="color:var(--muted2)">${fmt(r.fat_escola)}</td>
-      <td class="mono" style="color:var(--accent4)">${fmt(r.fat_kedu)}</td>
-      <td class="mono">${fmtPct(r.taxa)}</td>
-      <td class="mono">${fmtN(r.alunos)}</td>
-      <td class="mono">${r.ticket_medio?fmt(r.ticket_medio):'—'}</td>
-      <td class="mono ${spc}">${fmtPct(sp)}</td>
-      <td class="mono" style="color:${r.margem==null?'var(--muted)':r.margem>0.015?'var(--green)':r.margem<0.015?'var(--red)':'var(--text)'}">${fmtPct(r.margem)}</td>
-      <td class="mono" style="color:var(--muted)">${r.assinatura||'—'}</td>
-      <td style="font-size:10px;color:var(--muted2)">${r.estado||'—'}</td>
-    </tr>`;
-  }).join('');
-  if(sortedData.length>300){const tr=document.createElement('tr');tr.innerHTML=`<td colspan="15" style="text-align:center;color:var(--muted);font-size:10px;padding:10px">+ ${sortedData.length-300} contratos · refine os filtros</td>`;tbody.appendChild(tr);}
-}
-
-document.querySelectorAll('th[data-f]').forEach(th=>{
-  th.addEventListener('click',()=>{
-    if(!document.getElementById('tbl-body')) return;
-    const f=th.dataset.f;
-    if(sortField===f)sortDir*=-1;else{sortField=f;sortDir=-1;}
-    document.querySelectorAll('th').forEach(t=>t.classList.remove('sorted-col'));
-    th.classList.add('sorted-col');
-    renderTable();
-  });
-});
 
 const LABELS={dateFrom:'De',dateTo:'Até',lideranca:'Liderança',executivo:'Executivo',cargo:'Cargo',status:'Status',modelo:'Modelo',estados:'Estado'};
 function renderBadges(){
@@ -2803,7 +2700,6 @@ function toggleTheme(){
 })();
 
 
-// ── Toggle Contratos ──────────────────────────────────────────
 
 </script>
 
