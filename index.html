@@ -2415,14 +2415,23 @@ function drawEstadoChart(){
   }
 
   // Build aggregated fat_kedu per key, filtered by active period
-  function buildSeriesData(mode, activeMonths){
+  function buildSeriesData(mode, periodFilter){
     const agg={};
+    // periodFilter = {months:[...], dateFrom, dateTo}
+    const pMonths = periodFilter && periodFilter.months;
+    const pFrom   = periodFilter && periodFilter.dateFrom;
+    const pTo     = periodFilter && periodFilter.dateTo;
     RAW.forEach(r=>{
       if(!r.assinatura||!r.fat_kedu) return;
-      // Period filter — respect filterbar months when provided
-      if(activeMonths && activeMonths.length){
+      // Filter by full YYYY-MM range when set (respects year + month)
+      if(pFrom||pTo){
+        const ym=r.assinatura.slice(0,7);
+        if(pFrom&&ym<pFrom) return;
+        if(pTo&&ym>pTo) return;
+      } else if(pMonths&&pMonths.length<12){
+        // No year constraint but month range: filter by month only
         const mo=parseInt(r.assinatura.slice(5,7));
-        if(!activeMonths.includes(mo)) return;
+        if(!pMonths.includes(mo)) return;
       }
       let k=null;
       if(mode==='lideranca'){
@@ -2570,9 +2579,7 @@ function drawEstadoChart(){
   }
 
   function getActiveMonths(){
-    // Returns month numbers to show on x-axis
-    // When a period is selected, show all months in range (Jan=1..Dec=12)
-    // When no period, show all 12 months (chart aggregates per year anyway)
+    // Returns {months: [1..12], dateFrom, dateTo} for x-axis labels + data filtering
     let months=[];
     if(filters.dateFrom||filters.dateTo){
       const mStart=filters.dateFrom?parseInt(filters.dateFrom.slice(5,7)):1;
@@ -2581,7 +2588,11 @@ function drawEstadoChart(){
     } else {
       for(let m=1;m<=12;m++) months.push(m);
     }
-    return months;
+    return {
+      months,
+      dateFrom: filters.dateFrom||null,
+      dateTo:   filters.dateTo||null
+    };
   }
 
   function redraw(){
@@ -2589,9 +2600,10 @@ function drawEstadoChart(){
     const canvas=document.getElementById('equipe-chart');
     if(!card||!canvas) return;
     if(!_curMode||!_curKey){card.style.display='none';if(_chart){_chart.destroy();_chart=null;}return;}
-    const activeMonths=getActiveMonths();
+    const periodFilter=getActiveMonths();
+    const activeMonths=periodFilter.months;
     const allKeys=_getAllKeys(_curMode);
-    const agg=buildSeriesData(_curMode, activeMonths);
+    const agg=buildSeriesData(_curMode, periodFilter);
     const yrs=[..._activeYrs].sort();
     const mainKeys=[..._selectedKeys].filter(k=>allKeys.includes(k));
     const shownKeys=[...new Set([...mainKeys,...[..._activeComp].filter(k=>allKeys.includes(k))])];
@@ -2635,8 +2647,8 @@ function drawEstadoChart(){
       const yrs=getAvailYears();
       _activeYrs=new Set(yrs.slice(-3));
       const allKeys=_getAllKeys(mode);
-      // peers = everything not already selected
-      _activeComp=new Set(allKeys.filter(k=>!_selectedKeys.has(k)));
+      // peers start empty — user adds comparisons manually
+      _activeComp=new Set();
       buildCompBar(mode,allKeys,selectedKeys);
       buildYrBtns(yrs);
       if(_chart){_chart.destroy();_chart=null;}
