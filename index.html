@@ -1003,6 +1003,114 @@ const fmtN=v=>(v!==null&&v!==undefined)?v.toLocaleString('pt-BR'):'—';
 const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—';
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 
+
+function toggleEquipeDrop(e, tipo){
+  e.stopPropagation();
+  ['lideranca','cargo','executivo'].forEach(t=>{
+    if(t!==tipo){ const d=document.getElementById(t+'-drop'); if(d) d.style.display='none'; }
+  });
+  const drop=document.getElementById(tipo+'-drop');
+  if(!drop) return;
+  const wasOpen = drop.style.display!=='none';
+  drop.style.display = wasOpen ? 'none' : 'block';
+  if(!wasOpen) buildEquipeDrop(tipo);
+}
+
+document.addEventListener('click',function(e){
+  ['lideranca','cargo','executivo'].forEach(function(tipo){
+    const wrap=document.getElementById(tipo+'-wrap');
+    if(wrap&&!wrap.contains(e.target)){
+      const drop=document.getElementById(tipo+'-drop');
+      if(drop) drop.style.display='none';
+    }
+  });
+});
+
+function buildEquipeDrop(tipo){
+  const drop=document.getElementById(tipo+'-drop'); if(!drop) return;
+  let all=[], selected, setSelected;
+  if(tipo==='lideranca'){
+    all=[...new Set(RAW.map(function(r){return r.lideranca;}).filter(Boolean))];
+    const pri=['Regional 1','Regional 2'];
+    all=[...pri.filter(function(v){return all.includes(v);}), ...all.filter(function(v){return !pri.includes(v);})].sort(function(a,b){
+      const ai=pri.indexOf(a), bi=pri.indexOf(b);
+      if(ai>=0&&bi>=0) return ai-bi;
+      if(ai>=0) return -1; if(bi>=0) return 1;
+      return a.localeCompare(b,'pt-BR');
+    });
+    selected=selectedLiderancas;
+    setSelected=function(v){selectedLiderancas=v; filters.liderancas=[...selectedLiderancas];};
+  } else if(tipo==='cargo'){
+    const s=new Set();
+    RAW.forEach(function(r){
+      const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
+      if(rc&&rc!=='Coordenador Comercial'&&rc!=='Coordenadora Comercial') s.add(rc);
+    });
+    all=[...s].sort();
+    selected=selectedCargos;
+    setSelected=function(v){selectedCargos=v; filters.cargos=[...selectedCargos];};
+  } else {
+    all=[...new Set(RAW.map(function(r){return r.executivo;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'pt-BR');});
+    selected=selectedExecutivos;
+    setSelected=function(v){selectedExecutivos=v; filters.executivos=[...selectedExecutivos];};
+  }
+  drop.innerHTML='';
+  const isAll=all.length>0&&selected.length===all.length;
+  // "Selecionar todos"
+  const allItem=document.createElement('div');
+  allItem.className='multisel-item'+(isAll?' checked':'');
+  const allInp=document.createElement('input');
+  allInp.type='checkbox'; allInp.id='eq-all-'+tipo; allInp.checked=isAll;
+  allInp.style.cssText='accent-color:var(--accent);width:12px;height:12px;cursor:pointer;';
+  const allLbl=document.createElement('label');
+  allLbl.htmlFor='eq-all-'+tipo;
+  allLbl.style.cssText='cursor:pointer;font-weight:700;font-family:DM Mono,monospace;font-size:10px;';
+  allLbl.textContent='Selecionar Todos';
+  allInp.addEventListener('change',function(ev){
+    setSelected(ev.target.checked?[...all]:[]);
+    buildEquipeDrop(tipo); updateEquipeLabel(tipo); invalidateCache(); update();
+  });
+  allItem.appendChild(allInp); allItem.appendChild(allLbl);
+  drop.appendChild(allItem);
+  // Individual items
+  all.forEach(function(val){
+    const on=selected.includes(val);
+    const item=document.createElement('div');
+    item.className='multisel-item'+(on?' checked':'');
+    const inp=document.createElement('input');
+    inp.type='checkbox';
+    inp.id='eq-'+tipo+'-'+val.replace(/[^a-z0-9]/gi,'_');
+    inp.checked=on;
+    inp.style.cssText='accent-color:var(--accent);width:12px;height:12px;cursor:pointer;';
+    const lbl=document.createElement('label');
+    lbl.htmlFor=inp.id; lbl.style.cursor='pointer';
+    lbl.style.cssText='cursor:pointer;font-family:DM Mono,monospace;font-size:10px;';
+    lbl.textContent=val;
+    inp.addEventListener('change',function(ev){
+      if(ev.target.checked){ if(!selected.includes(val)) selected.push(val); }
+      else { const idx=selected.indexOf(val); if(idx>-1) selected.splice(idx,1); }
+      item.classList.toggle('checked',ev.target.checked);
+      const allCb=document.getElementById('eq-all-'+tipo);
+      if(allCb){ const nowAll=selected.length===all.length; allCb.checked=nowAll; allCb.parentElement.classList.toggle('checked',nowAll); }
+      setSelected(selected);
+      updateEquipeLabel(tipo); invalidateCache(); update();
+    });
+    item.appendChild(inp); item.appendChild(lbl);
+    drop.appendChild(item);
+  });
+}
+
+function updateEquipeLabel(tipo){
+  const lbl=document.getElementById(tipo+'-label'); if(!lbl) return;
+  var selected, placeholder;
+  if(tipo==='lideranca'){selected=selectedLiderancas;placeholder='Regional (todas)';}
+  else if(tipo==='cargo'){selected=selectedCargos;placeholder='Cargo (todos)';}
+  else {selected=selectedExecutivos;placeholder='Executivo (todos)';}
+  if(!selected.length){lbl.textContent=placeholder;lbl.style.color='';}
+  else if(selected.length===1){lbl.textContent=selected[0];lbl.style.color='var(--accent)';}
+  else{lbl.textContent=selected.length+' itens';lbl.style.color='var(--accent)';}
+}
+
 let filters={dateFrom:'',dateTo:'',liderancas:[],executivos:[],cargos:[],status:'',modelo:'',estados:[],};
 var selectedLiderancas=[], selectedCargos=[], selectedExecutivos=[];
 
