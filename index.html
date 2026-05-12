@@ -2544,8 +2544,6 @@ function drawEstadoChart(){
   }
 
   function getActiveMonths(){
-    // Returns {months, dateFrom, dateTo} — always year-aware
-    // When no period selected: default to current month of selected year
     let months=[], dateFrom=null, dateTo=null;
     if(filters.dateFrom||filters.dateTo){
       dateFrom=filters.dateFrom||null;
@@ -2554,8 +2552,10 @@ function drawEstadoChart(){
       const mEnd  =dateTo  ?parseInt(dateTo.slice(5,7)):12;
       for(let m=mStart;m<=mEnd;m++) months.push(m);
     } else {
-      // No period set — use all months but NO year constraint
-      // (user sees full year view; _activeYrs controls which years show)
+      const yrEl=document.getElementById('fb-year');
+      const yr=yrEl?yrEl.value:'2026';
+      dateFrom=yr+'-01';
+      dateTo  =yr+'-12';
       for(let m=1;m<=12;m++) months.push(m);
     }
     return {months, dateFrom, dateTo};
