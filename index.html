@@ -971,6 +971,8 @@ const TEAM = {
   'Mônica Gomes':      {regional:'R2', cargo:'Closer'},
   'Pedro Barrocas':    {regional:'R2', cargo:'Inside Sales'},
 };
+
+// --- METAS ATUALIZADAS AQUI ---
 const METAS_CLOSER = {'2026-01':143000,'2026-02':115000,'2026-03':200000,'2026-04':267000,'2026-05':341000,'2026-06':341000,'2026-07':341000,'2026-08':341000,'2026-09':341000,'2026-10':341000,'2026-11':341000,'2026-12':341000};
 const METAS_IS     = {'2026-01':100000,'2026-02':80000,'2026-03':140000,'2026-04':187000,'2026-05':252000,'2026-06':252000,'2026-07':252000,'2026-08':252000,'2026-09':252000,'2026-10':252000,'2026-11':252000,'2026-12':252000};
 function getMetaVendedor(nome, ym){
@@ -2278,20 +2280,42 @@ function drawEstadoChart(){
     });
   }
 
+  // Renderiza os totais por ano embaixo do gráfico com indicador de Crescimento/Queda
   const totalsWrap = document.getElementById('estado-totals');
   if(totalsWrap){
     totalsWrap.innerHTML = '';
     const fv = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-    anos.forEach(y=>{
+    
+    anos.forEach((y, i) => {
       const total = Object.values(data[y]).reduce((s,v)=>s+(v||0), 0);
       if(total === 0) return;
+      
+      let pctHtml = '';
+      if (i > 0) {
+        const prevY = anos[i - 1]; // Pega o ano anterior ativo na legenda
+        const prevTotal = Object.values(data[prevY]).reduce((s,v)=>s+(v||0), 0);
+        
+        if (prevTotal > 0) {
+          const diff = ((total / prevTotal) - 1) * 100;
+          const isUp = diff > 0;
+          const isDown = diff < 0;
+          const pColor = isUp ? 'var(--green)' : isDown ? 'var(--red)' : 'var(--muted)';
+          const pIcon = isUp ? '↑' : isDown ? '↓' : '';
+          const pSign = isUp ? '+' : '';
+          
+          pctHtml = `<span style="font-size:9px;font-weight:700;color:${pColor};margin-left:4px;padding-left:6px;border-left:1px solid var(--border2);">${pSign}${diff.toFixed(1)}% ${pIcon}</span>`;
+        }
+      }
+
       const color = TREND_YEAR_COLORS[y] || '#fff';
       const pill = document.createElement('div');
       pill.style.cssText = 'display:flex;align-items:center;gap:6px;background:'+color+'18;border:1px solid '+color+'44;border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
       pill.innerHTML =
         '<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0;display:inline-block;"></span>'+
         '<span style="font-size:9px;color:#8394aa;">'+y+'</span>'+
-        '<span style="font-size:11px;font-weight:700;color:'+color+';">R$ '+fv(total)+'</span>';
+        '<span style="font-size:11px;font-weight:700;color:'+color+';">R$ '+fv(total)+'</span>' +
+        pctHtml; // Injeta a porcentagem dinâmica
+        
       totalsWrap.appendChild(pill);
     });
   }
@@ -2981,4 +3005,51 @@ window._rebuildFichas = ()=>{ if(_fichasOpen){ populateFichasFilters(); renderFi
         <div class="fb-group">
           <span class="fb-group-label">Localização</span>
           <select id="fichas-cidade" onchange="renderFichas()" style="height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;color-scheme:dark;background-image:url('data:image/svg+xml,%3Csvg xmlns=&apos;http://www.w3.org/2000/svg&apos; width=&apos;8&apos; height=&apos;5&apos;%3E%3Cpath d=&apos;M0 0l4 5 4-5z&apos; fill=&apos;%235a6a82&apos;/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 4px center;min-width:120px;">
-            <option value="">Não consigo te ajudar com isso, eu sou apenas um modelo de linguagem.
+            <option value="">Cidade (todas)</option>
+          </select>
+          <select id="fichas-estado" onchange="renderFichas()" style="height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;color-scheme:dark;background-image:url('data:image/svg+xml,%3Csvg xmlns=&apos;http://www.w3.org/2000/svg&apos; width=&apos;8&apos; height=&apos;5&apos;%3E%3Cpath d=&apos;M0 0l4 5 4-5z&apos; fill=&apos;%235a6a82&apos;/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 4px center;min-width:100px;">
+            <option value="">Estado (todos)</option>
+          </select>
+        </div>
+
+        <div class="fdiv"></div>
+
+        <!-- Contrato -->
+        <div class="fb-group">
+          <span class="fb-group-label">Contrato</span>
+          <select id="fichas-status" onchange="renderFichas()" style="height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;color-scheme:dark;background-image:url('data:image/svg+xml,%3Csvg xmlns=&apos;http://www.w3.org/2000/svg&apos; width=&apos;8&apos; height=&apos;5&apos;%3E%3Cpath d=&apos;M0 0l4 5 4-5z&apos; fill=&apos;%235a6a82&apos;/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 4px center;min-width:110px;">
+            <option value="">Status (todos)</option>
+            <option>Ativo</option>
+            <option>Implantando</option>
+            <option>Cancelado</option>
+            <option>Churn</option>
+            <option>Descredenciamento</option>
+          </select>
+          <select id="fichas-modelo" onchange="renderFichas()" style="height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;color-scheme:dark;background-image:url('data:image/svg+xml,%3Csvg xmlns=&apos;http://www.w3.org/2000/svg&apos; width=&apos;8&apos; height=&apos;5&apos;%3E%3Cpath d=&apos;M0 0l4 5 4-5z&apos; fill=&apos;%235a6a82&apos;/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 4px center;min-width:130px;">
+            <option value="">Modelo (todos)</option>
+          </select>
+        </div>
+
+        <div class="fdiv"></div>
+
+        <!-- Ordenação -->
+        <div class="fb-group">
+          <span class="fb-group-label">Ordenar</span>
+          <select id="fichas-sort" onchange="renderFichas()" style="height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;color-scheme:dark;background-image:url('data:image/svg+xml,%3Csvg xmlns=&apos;http://www.w3.org/2000/svg&apos; width=&apos;8&apos; height=&apos;5&apos;%3E%3Cpath d=&apos;M0 0l4 5 4-5z&apos; fill=&apos;%235a6a82&apos;/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 4px center;min-width:130px;">
+            <option value="fat_kedu">Fat. Kedu ↓</option>
+            <option value="fat_escola">Fat. Escola ↓</option>
+            <option value="alunos">Alunos ↓</option>
+            <option value="nome">Nome A→Z</option>
+          </select>
+        </div>
+
+        <div class="fdiv"></div>
+        <button onclick="fichasReset()" class="btn-reset">↺ Limpar</button>
+      </div>
+    </div>
+
+    <div id="fichas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+  </div>
+</div>
+</body>
+</html>
