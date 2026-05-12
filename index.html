@@ -342,7 +342,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       </div>
       <div class="trend-legend" id="equipe-chart-anos"></div>
     </div>
-    <div id="equipe-comp-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin:0 0 14px;"></div>
     <div class="trend-canvas-wrap" style="position:relative;height:220px;">
       <canvas id="equipe-chart"></canvas>
     </div>
@@ -2447,6 +2446,8 @@ function drawEstadoChart(){
       if(!k) return;
       const yr=parseInt(r.assinatura.slice(0,4));
       const mo=parseInt(r.assinatura.slice(5,7));
+      // Only aggregate years that are active in the year toggle
+      if(_activeYrs.size>0&&!_activeYrs.has(yr)) return;
       if(!agg[k]) agg[k]={};
       if(!agg[k][yr]) agg[k][yr]={};
       agg[k][yr][mo]=(agg[k][yr][mo]||0)+r.fat_kedu;
@@ -2480,42 +2481,6 @@ function drawEstadoChart(){
     }
     return [];
   }
-
-  function buildCompBar(mode,allKeys,selectedKeys){
-    const bar=document.getElementById('equipe-comp-bar'); if(!bar) return;
-    bar.innerHTML='<span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;font-family:DM Mono,monospace;margin-right:4px;">Comparar com</span>';
-    const mainSet=selectedKeys&&selectedKeys.length?new Set(selectedKeys):new Set([_curKey]);
-    const peers=allKeys.filter(k=>!mainSet.has(k));
-    if(!peers.length){bar.style.display='none';return;}
-    bar.style.display='flex';
-    peers.forEach(k=>{
-      const color=keyColor(k,allKeys.indexOf(k));
-      const on=_activeComp.has(k);
-      const chip=document.createElement('label');
-      chip.dataset.k=k;
-      chip.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;border:1px solid '+hexA(color,on?.5:.2)+';background:'+hexA(color,on?.08:.02)+';cursor:pointer;font-size:10px;font-family:DM Mono,monospace;color:'+color+';opacity:'+(on?1:.4)+';transition:.15s;user-select:none;';
-      const inp=document.createElement('input');
-      inp.type='checkbox'; inp.checked=on;
-      inp.style.cssText='accent-color:'+color+';width:11px;height:11px;cursor:pointer;flex-shrink:0;';
-      inp.addEventListener('change',function(){window._equipeToggleComp(k,this);});
-      chip.appendChild(inp);
-      chip.appendChild(document.createTextNode(' '+k));
-      bar.appendChild(chip);
-    });
-  }
-
-  window._equipeToggleComp=function(k,cb){
-    if(cb.checked) _activeComp.add(k); else _activeComp.delete(k);
-    const allKeys=_getAllKeys(_curMode);
-    document.querySelectorAll('#equipe-comp-bar label[data-k]').forEach(chip=>{
-      const ck=chip.dataset.k; const on=_activeComp.has(ck);
-      const color=keyColor(ck,allKeys.indexOf(ck));
-      chip.style.borderColor=hexA(color,on?.5:.2);
-      chip.style.background=hexA(color,on?.08:.02);
-      chip.style.opacity=on?1:.4;
-    });
-    redraw();
-  };
 
   window._equipeToggleYr=function(yr,btn){
     if(_activeYrs.has(yr)&&_activeYrs.size>1){_activeYrs.delete(yr);btn.classList.remove('active');}
@@ -2579,20 +2544,21 @@ function drawEstadoChart(){
   }
 
   function getActiveMonths(){
-    // Returns {months: [1..12], dateFrom, dateTo} for x-axis labels + data filtering
-    let months=[];
+    // Returns {months, dateFrom, dateTo} — always year-aware
+    // When no period selected: default to current month of selected year
+    let months=[], dateFrom=null, dateTo=null;
     if(filters.dateFrom||filters.dateTo){
-      const mStart=filters.dateFrom?parseInt(filters.dateFrom.slice(5,7)):1;
-      const mEnd=filters.dateTo?parseInt(filters.dateTo.slice(5,7)):12;
+      dateFrom=filters.dateFrom||null;
+      dateTo  =filters.dateTo||null;
+      const mStart=dateFrom?parseInt(dateFrom.slice(5,7)):1;
+      const mEnd  =dateTo  ?parseInt(dateTo.slice(5,7)):12;
       for(let m=mStart;m<=mEnd;m++) months.push(m);
     } else {
+      // No period set — use all months but NO year constraint
+      // (user sees full year view; _activeYrs controls which years show)
       for(let m=1;m<=12;m++) months.push(m);
     }
-    return {
-      months,
-      dateFrom: filters.dateFrom||null,
-      dateTo:   filters.dateTo||null
-    };
+    return {months, dateFrom, dateTo};
   }
 
   function redraw(){
@@ -2647,9 +2613,7 @@ function drawEstadoChart(){
       const yrs=getAvailYears();
       _activeYrs=new Set(yrs.slice(-3));
       const allKeys=_getAllKeys(mode);
-      // peers start empty — user adds comparisons manually
-      _activeComp=new Set();
-      buildCompBar(mode,allKeys,selectedKeys);
+      _activeComp=new Set(); // no peer comparison — user controls via filter
       buildYrBtns(yrs);
       if(_chart){_chart.destroy();_chart=null;}
     } else {
