@@ -2622,7 +2622,17 @@ function drawEstadoChart(){
       _curMode=mode; _curKey=stateKey;
       _selectedKeys=new Set(selectedKeys);
       const yrs=getAvailYears();
-      _activeYrs=new Set([2026]);
+      // Default active year: 2026 if it has data for selected keys, else most recent year with data
+      const yrsWithData=yrs.filter(yr=>RAW.some(r=>{
+        if(!r.assinatura||!r.fat_kedu) return false;
+        if(parseInt(r.assinatura.slice(0,4))!==yr) return false;
+        if(mode==='lideranca') return selectedKeys.includes(r.lideranca);
+        if(mode==='cargo'){const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;return selectedKeys.includes(rc);}
+        if(mode==='executivo') return selectedKeys.includes(r.executivo);
+        return false;
+      }));
+      const defaultYr=yrsWithData.includes(2026)?2026:(yrsWithData[yrsWithData.length-1]||2026);
+      _activeYrs=new Set([defaultYr]);
       const allKeys=_getAllKeys(mode);
       _activeComp=new Set(); // no peer comparison — user controls via filter
       buildYrBtns(yrs);
