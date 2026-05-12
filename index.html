@@ -263,9 +263,27 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   <!-- Equipe -->
   <div class="fb-group">
     <span class="fb-group-label">Equipe</span>
-    <select id="f-lideranca"><option value="">Regional (todas)</option></select>
-    <select id="f-cargo"><option value="">Cargo (todos)</option><option value="Closer">Closer</option><option value="Inside Sales">Inside Sales</option></select>
-    <select id="f-executivo"><option value="">Executivo (todos)</option></select>
+    <div class="multisel-wrap" id="lideranca-wrap" style="position:relative;">
+      <button class="multisel-btn" id="lideranca-btn" onclick="toggleEquipeDrop(event,'lideranca')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:110px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <span id="lideranca-label">Regional (todas)</span>
+        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
+      </button>
+      <div class="multisel-drop" id="lideranca-drop" style="display:none;"></div>
+    </div>
+    <div class="multisel-wrap" id="cargo-wrap" style="position:relative;">
+      <button class="multisel-btn" id="cargo-btn" onclick="toggleEquipeDrop(event,'cargo')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:100px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <span id="cargo-label">Cargo (todos)</span>
+        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
+      </button>
+      <div class="multisel-drop" id="cargo-drop" style="display:none;"></div>
+    </div>
+    <div class="multisel-wrap" id="executivo-wrap" style="position:relative;">
+      <button class="multisel-btn" id="executivo-btn" onclick="toggleEquipeDrop(event,'executivo')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:120px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <span id="executivo-label">Executivo (todos)</span>
+        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
+      </button>
+      <div class="multisel-drop" id="executivo-drop" style="display:none;"></div>
+    </div>
   </div>
 
   <div class="fdiv"></div>
@@ -985,7 +1003,8 @@ const fmtN=v=>(v!==null&&v!==undefined)?v.toLocaleString('pt-BR'):'—';
 const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—';
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 
-let filters={dateFrom:'',dateTo:'',lideranca:'',executivo:'',cargo:'',status:'',modelo:'',estados:[],};
+let filters={dateFrom:'',dateTo:'',liderancas:[],executivos:[],cargos:[],status:'',modelo:'',estados:[],};
+var selectedLiderancas=[], selectedCargos=[], selectedExecutivos=[];
 
 function populateSelects(){
   const sel=(id,vals)=>{
@@ -998,18 +1017,18 @@ function populateSelects(){
     sorted.forEach(v=>el.appendChild(new Option(v,v)));
   };
   const u=f=>RAW.map(r=>r[f]).filter(Boolean);
-  sel('f-lideranca',u('lideranca'));sel('f-executivo',u('executivo'));sel('f-status',u('status'));sel('f-modelo',u('modelo'));
+  sel('f-status',u('status'));sel('f-modelo',u('modelo'));
 }
 populateSelects();
 
 function applyFilters(){
   return RAW.filter(r=>{
-    if(filters.lideranca&&r.lideranca!==filters.lideranca)return false;
-    if(filters.executivo&&r.executivo!==filters.executivo)return false;
+    if(filters.liderancas&&filters.liderancas.length>0&&!filters.liderancas.includes(r.lideranca))return false;
+    if(filters.executivos&&filters.executivos.length>0&&!filters.executivos.includes(r.executivo))return false;
+    if(filters.cargos&&filters.cargos.length>0){const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||'';if(!filters.cargos.includes(rc))return false;}
     if(filters.status&&r.status!==filters.status)return false;
     if(filters.modelo&&r.modelo!==filters.modelo)return false;
-    if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado))return false;
-    if(filters.cargo){const t=TEAM[r.executivo];if(!t||t.cargo!==filters.cargo)return false;}    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
+    if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado))return false;    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
     else if(filters.dateFrom||filters.dateTo)return false;
     return true;
   });
@@ -1605,20 +1624,36 @@ function rankingAvatar(nome, metaHit){
   document.getElementById('hcount').textContent=uniqueContratos(data)+' contratos';
 }
 
-const LABELS={dateFrom:'De',dateTo:'Até',lideranca:'Liderança',executivo:'Executivo',cargo:'Cargo',status:'Status',modelo:'Modelo',estados:'Estado'};
+const LABELS={dateFrom:'De',dateTo:'Até',liderancas:'Regional',executivos:'Executivo',cargos:'Cargo',status:'Status',modelo:'Modelo',estados:'Estado'};
 function renderBadges(){
   const c=document.getElementById('active-filters');c.innerHTML='';
   Object.entries(filters).forEach(([k,v])=>{
-    if(!v)return;
-    const b=document.createElement('div');b.className='afbadge';
-    const lbl=v;
-    b.innerHTML=`${LABELS[k]}: ${lbl} <span class="x" data-key="${k}">×</span>`;
-    b.querySelector('.x').addEventListener('click',e=>{
-      const key=e.target.dataset.key;filters[key]='';
-      const map={dateFrom:'f-date-from',dateTo:'f-date-to',lideranca:'f-lideranca',executivo:'f-executivo',cargo:'f-cargo',status:'f-status',modelo:'f-modelo',estados:'estado-btn'};
-      document.getElementById(map[key]).value='';update();
-    });
-    c.appendChild(b);
+    if(!v||!LABELS[k])return;
+    if(Array.isArray(v)){
+      if(!v.length)return;
+      v.forEach(item=>{
+        const b=document.createElement('div');b.className='afbadge';
+        b.innerHTML=LABELS[k]+': '+item+' <span class="x" style="cursor:pointer;margin-left:2px;">×</span>';
+        b.querySelector('.x').addEventListener('click',()=>{
+          if(k==='liderancas'){selectedLiderancas=selectedLiderancas.filter(s=>s!==item);filters.liderancas=[...selectedLiderancas];buildEquipeDrop('lideranca');updateEquipeLabel('lideranca');}
+          if(k==='cargos'){selectedCargos=selectedCargos.filter(s=>s!==item);filters.cargos=[...selectedCargos];buildEquipeDrop('cargo');updateEquipeLabel('cargo');}
+          if(k==='executivos'){selectedExecutivos=selectedExecutivos.filter(s=>s!==item);filters.executivos=[...selectedExecutivos];buildEquipeDrop('executivo');updateEquipeLabel('executivo');}
+          invalidateCache();update();
+        });
+        c.appendChild(b);
+      });
+    } else {
+      if(!v)return;
+      const b=document.createElement('div');b.className='afbadge';
+      b.innerHTML=LABELS[k]+': '+v+' <span class="x" data-key="'+k+'">×</span>';
+      b.querySelector('.x').addEventListener('click',e=>{
+        const key=e.target.dataset.key;filters[key]='';
+        const map={dateFrom:'f-date-from',dateTo:'f-date-to',status:'f-status',modelo:'f-modelo'};
+        if(map[key])document.getElementById(map[key]).value='';
+        invalidateCache();update();
+      });
+      c.appendChild(b);
+    }
   });
 }
 
@@ -1705,14 +1740,17 @@ function renderBadges(){
     if(yrEl){ yrEl.value='2026'; fbYear=2026; }
     fbRender(); fbLabel(); fbApply();
     // Limpa todos os selects
-    ['f-lideranca','f-executivo','f-cargo','f-status','f-modelo'].forEach(id=>{
+    ['f-status','f-modelo'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value='';
     });
+    selectedLiderancas=[]; selectedCargos=[]; selectedExecutivos=[];
+    if(typeof buildEquipeDrop==='function'){buildEquipeDrop('lideranca');buildEquipeDrop('cargo');buildEquipeDrop('executivo');}
+    if(typeof updateEquipeLabel==='function'){updateEquipeLabel('lideranca');updateEquipeLabel('cargo');updateEquipeLabel('executivo');}
     // Limpa estados
     selectedEstados=[]; filters.estados=[];
     buildEstadoDrop(); updateEstadoLabel();
     // Limpa filtros e cache
-    filters={dateFrom:'',dateTo:'',lideranca:'',executivo:'',cargo:'',status:'',modelo:'',estados:[]};
+    filters={dateFrom:'',dateTo:'',liderancas:[],executivos:[],cargos:[],status:'',modelo:'',estados:[]};
     invalidateCache();
     if(typeof _monthlyRawLen!=='undefined') _monthlyRawLen=-1;
     // Redesenha tudo
@@ -1736,15 +1774,14 @@ function onFilterChange(){
   invalidateCache();
   filters.dateFrom=document.getElementById('f-date-from')?.value||'';
   filters.dateTo=document.getElementById('f-date-to')?.value||'';
-  filters.lideranca=document.getElementById('f-lideranca').value;
-  filters.executivo=document.getElementById('f-executivo').value;
-  filters.cargo=document.getElementById('f-cargo').value;
+  filters.liderancas=[...selectedLiderancas];
+  filters.executivos=[...selectedExecutivos];
+  filters.cargos=[...selectedCargos];
   filters.status=document.getElementById('f-status').value;
   filters.modelo=document.getElementById('f-modelo').value;
-  // estado handled via selectedEstados
   update();
 }
-['f-lideranca','f-executivo','f-cargo','f-status','f-modelo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',onFilterChange); });
+['f-status','f-modelo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',onFilterChange); });
 // resetFilters definido no seletor de meses
 
 update();
@@ -2334,10 +2371,11 @@ function drawEstadoChart(){
     return [];
   }
 
-  function buildCompBar(mode,allKeys){
+  function buildCompBar(mode,allKeys,selectedKeys){
     const bar=document.getElementById('equipe-comp-bar'); if(!bar) return;
     bar.innerHTML='<span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;font-family:DM Mono,monospace;margin-right:4px;">Comparar com</span>';
-    const peers=allKeys.filter(k=>k!==_curKey);
+    const mainSet=selectedKeys&&selectedKeys.length?new Set(selectedKeys):new Set([_curKey]);
+    const peers=allKeys.filter(k=>!mainSet.has(k));
     if(!peers.length){bar.style.display='none';return;}
     bar.style.display='flex';
     peers.forEach(k=>{
@@ -2393,7 +2431,8 @@ function drawEstadoChart(){
     const wrap=document.getElementById('equipe-totals'); if(!wrap) return;
     wrap.innerHTML='';
     const fv=v=>v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-    const shownKeys=[_curKey,...[..._activeComp].filter(k=>allKeys.includes(k))];
+    const mainKeys2=_selectedKeys&&_selectedKeys.size>0?[..._selectedKeys]:([_curKey]);
+    const shownKeys=[...new Set([...mainKeys2,...[..._activeComp].filter(k=>allKeys.includes(k))])];
     shownKeys.forEach(k=>{
       const color=keyColor(k,allKeys.indexOf(k));
       yrs.forEach(yr=>{
@@ -2429,14 +2468,16 @@ function drawEstadoChart(){
   }
 
   function getActiveMonths(){
-    const ALL_MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    // Returns month numbers to show on x-axis
+    // When a period is selected, show all months in range (Jan=1..Dec=12)
+    // When no period, show all 12 months (chart aggregates per year anyway)
     let months=[];
     if(filters.dateFrom||filters.dateTo){
       const mStart=filters.dateFrom?parseInt(filters.dateFrom.slice(5,7)):1;
       const mEnd=filters.dateTo?parseInt(filters.dateTo.slice(5,7)):12;
       for(let m=mStart;m<=mEnd;m++) months.push(m);
     } else {
-      months=[new Date().getMonth()+1];
+      for(let m=1;m<=12;m++) months.push(m);
     }
     return months;
   }
