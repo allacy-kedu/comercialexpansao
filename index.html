@@ -83,7 +83,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .reg-track-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent4));transition:width .6s ease;}
 @media(max-width:600px){.regional-grid{grid-template-columns:1fr;}}
 
-
 .multisel-wrap{position:relative;}
 .multisel-btn{height:var(--pill-h);padding:0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:space-between;transition:border-color .2s;}
 .multisel-btn:hover{border-color:var(--accent);}
@@ -324,6 +323,25 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
     <!-- Totais anuais -->
     <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
   </div>
+
+  <!-- NOVO GRÁFICO: COMPARATIVO MENSAL -->
+  <div class="trend-card" id="comparativo-chart-card">
+    <div class="trend-header">
+      <div>
+        <div class="trend-title" id="comp-chart-title">Comparativo Mensal</div>
+        <div class="trend-sub">Evolução de Fat. Kedu (R$) no período filtrado</div>
+      </div>
+      <div class="trend-legend">
+        <!-- Botões de toggle para alternar a visão -->
+        <button class="trend-yr-btn active" id="btn-comp-regional" onclick="setCompView('regional')" style="--yr-c: #4ECDC4">Regionais</button>
+        <button class="trend-yr-btn" id="btn-comp-executivo" onclick="setCompView('executivo')" style="--yr-c: #A29BFE">Executivos</button>
+      </div>
+    </div>
+    <div class="trend-canvas-wrap" style="position:relative;height:240px;margin-top:12px;">
+      <canvas id="comparativo-chart"></canvas>
+    </div>
+  </div>
+  <!-- FIM NOVO GRÁFICO -->
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="stitle" style="margin-bottom:0;">Meta Faturamento Kedu — 2026</div>
@@ -689,6 +707,112 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(78,205,196,0.02
 
 <div id="loading-bar" class="loading-bar"></div>
 <script>
+
+// ── Gráfico Comparativo: Regionais x Executivos ────────────────
+let _compView = 'regional'; // Padrão: comparar regionais
+let _compChart = null;
+
+window.setCompView = function(view) {
+  _compView = view;
+  document.getElementById('btn-comp-regional').classList.toggle('active', view === 'regional');
+  document.getElementById('btn-comp-executivo').classList.toggle('active', view === 'executivo');
+  drawComparativoChart();
+};
+
+function drawComparativoChart() {
+  const canvas = document.getElementById('comparativo-chart');
+  if(!canvas) return;
+  if(typeof Chart === 'undefined') return setTimeout(drawComparativoChart, 100);
+
+  const data = applyFiltersCached();
+  const mesesStr = getMeses2026(); 
+  const ALL_MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const chartLabels = mesesStr.map(m => ALL_MONTHS_SHORT[parseInt(m.split('-')[1])-1]);
+
+  const grouped = {};
+
+  data.forEach(r => {
+    if(!r.assinatura || !r.fat_kedu) return;
+    const ym = r.assinatura.slice(0, 7);
+    if(!mesesStr.includes(ym)) return; 
+
+    let chave = _compView === 'regional' ? r.lideranca : r.executivo;
+    if(!chave) return; 
+    
+    if(_compView === 'regional') chave = chave.trim();
+    if(_compView === 'executivo') chave = chave.split(' ').slice(0,2).join(' '); 
+
+    if(!grouped[chave]) {
+      grouped[chave] = {};
+      mesesStr.forEach(m => grouped[chave][m] = 0);
+    }
+    grouped[chave][ym] += r.fat_kedu;
+  });
+
+  const chaves = Object.keys(grouped).sort();
+  const palette = [
+    '#4ECDC4', '#A29BFE', '#FFE66D', '#FF6B6B', '#f6ad55', 
+    '#e17dfa', '#52c77d', '#74b9ff', '#00b894', '#fd79a8'
+  ];
+
+  const datasets = chaves.map((chave, index) => {
+    const color = palette[index % palette.length];
+    const arr = mesesStr.map(m => grouped[chave][m]);
+    
+    return {
+      label: chave,
+      data: arr,
+      borderColor: color,
+      borderWidth: 2,
+      pointBackgroundColor: color,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      tension: 0.3, 
+      fill: false
+    };
+  });
+
+  if(_compChart){
+    _compChart.data.labels = chartLabels;
+    _compChart.data.datasets = datasets;
+    _compChart.update('none');
+  } else {
+    _compChart = new Chart(canvas, {
+      type: 'line',
+      data: { labels: chartLabels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { 
+            display: true, 
+            position: 'bottom',
+            labels: { color: '#8394aa', font: { family: 'DM Mono', size: 10 }, usePointStyle: true, boxWidth: 6 } 
+          },
+          tooltip: {
+            backgroundColor: 'rgba(22, 25, 41, 0.95)',
+            titleColor: '#8394aa',
+            bodyFont: { family: 'DM Mono', size: 11 },
+            padding: 12,
+            borderColor: 'rgba(99,179,237,0.25)',
+            borderWidth: 1,
+            callbacks: {
+              label: function(ctx) {
+                let v = ctx.raw;
+                return ctx.dataset.label + ': R$ ' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : (v/1000).toFixed(0)+'K');
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono', size: 9 } } },
+          y: { grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono', size: 9 }, callback: v => 'R$' + (v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : (v / 1000).toFixed(0) + 'K') } }
+        }
+      }
+    });
+  }
+}
 
 // ── Export Meta PNG ───────────────────────────────────────────
 function exportMeta(){
@@ -1629,6 +1753,7 @@ function rankingAvatar(nome, metaHit){
   renderRanking();
   renderQuartil();
   drawEstadoChart();
+  if(typeof drawComparativoChart === 'function') drawComparativoChart();
   renderEstadoChip();
   document.getElementById('hcount').textContent=uniqueContratos(data)+' contratos';
   sortedData=[...data];
@@ -1972,6 +2097,7 @@ update();
   function initButtons(){
     document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
       if (btn.closest('#ec-anos')) return; // Ignore buttons from Estado chart
+      if (btn.closest('#comparativo-chart-card')) return; // Ignore buttons from Comparativo chart
       btn.addEventListener('click',()=>{
         const yr=btn.dataset.year==='meta'?'meta':btn.dataset.year==='forecast'?'forecast':parseInt(btn.dataset.year);
         if(activeYears.has(yr)){activeYears.delete(yr);btn.classList.remove('active');}
@@ -2091,10 +2217,12 @@ update();
   window.addEventListener('resize',()=>{
     if(_chart){_chart.destroy();_chart=null;}drawChart();
     if(typeof drawEstadoChart==='function') drawEstadoChart(); // Update other chart on resize too
+    if(_compChart){_compChart.resize();} // Update comp chart on resize too
   });
   window._redrawTrendChart=()=>{
     if(_chart){_chart.destroy();_chart=null;}drawChart();
     if(typeof drawEstadoChart==='function') drawEstadoChart(); // Re-draw estado chart on theme change
+    if(typeof drawComparativoChart==='function') drawComparativoChart(); // Re-draw comp chart on theme change
   };
   window._getMelhorMesMonthly=buildMonthly;
 })();
@@ -2271,12 +2399,13 @@ function drawEstadoChart(){
               }
             }
           }
-        },
-        scales: {
-          x: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 } }, border: { display: false } },
-          y: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 }, maxTicksLimit: 5, callback: v => 'R$' + (v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : (v / 1000).toFixed(0) + 'K') }, border: { display: false } }
         }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 } }, border: { display: false } },
+        y: { grid: { color: 'rgba(99,179,237,0.06)', drawBorder: false }, ticks: { color: 'rgba(90,106,130,0.8)', font: { family: 'DM Mono,monospace', size: 9 }, maxTicksLimit: 5, callback: v => 'R$' + (v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : (v / 1000).toFixed(0) + 'K') }, border: { display: false } }
       }
+    }
     });
   }
 
