@@ -1438,7 +1438,7 @@ function update(){
   const cidades=new Set(data.map(r=>r.cidade).filter(Boolean)).size;
 
   // meta — detecta se há filtro de executivo ativo
-  const execFiltrado = filters.executivo || null;
+  const execFiltrado = (filters.executivos&&filters.executivos.length===1) ? filters.executivos[0] : null;
   const teamInfo = execFiltrado ? TEAM[execFiltrado] : null;
 
   const meses2026=getMeses2026();
@@ -1451,19 +1451,19 @@ function update(){
   if(execFiltrado && teamInfo){
     meta = meses2026.reduce((s,m)=>s+(getMetaVendedor(execFiltrado,m)||0),0);
     metaLabel = teamInfo.cargo+' · '+teamInfo.regional;
-  } else if(filters.cargo==='Closer'){
+  } else if(filters.cargos&&filters.cargos.length===1&&filters.cargos[0]==='Closer'){
     // Meta = soma das metas de cada Closer no período
     const nClosers = Object.keys(TEAM).filter(n=>TEAM[n].cargo==='Closer').length;
     meta = meses2026.reduce((s,m)=>s+(METAS_CLOSER[m]||0),0) * nClosers;
     metaLabel = 'Meta Closers (×'+nClosers+')';
-  } else if(filters.cargo==='Inside Sales'){
+  } else if(filters.cargos&&filters.cargos.length===1&&filters.cargos[0]==='Inside Sales'){
     const nIS = Object.keys(TEAM).filter(n=>TEAM[n].cargo==='Inside Sales').length;
     meta = meses2026.reduce((s,m)=>s+(METAS_IS[m]||0),0) * nIS;
     metaLabel = 'Meta Inside Sales (×'+nIS+')';
-  } else if(filters.lideranca==='Regional 1'){
+  } else if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 1'){
     meta = meses2026.reduce((s,m)=>s+(METAS_R1[m]||0),0);
     metaLabel = 'Meta Regional 1 2026';
-  } else if(filters.lideranca==='Regional 2'){
+  } else if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 2'){
     meta = meses2026.reduce((s,m)=>s+(METAS_R2[m]||0),0);
     metaLabel = 'Meta Regional 2 2026';
   } else {
@@ -1504,7 +1504,7 @@ function update(){
 
   // Regional 1 e Regional 2 — oculta quando filtro de executivo individual ativo
   const regGrid = document.querySelector('.regional-grid');
-  if(regGrid) regGrid.style.display = (execFiltrado || filters.cargo) ? 'none' : 'grid';
+  if(regGrid) regGrid.style.display = (execFiltrado || (filters.cargos&&filters.cargos.length>0)) ? 'none' : 'grid';
   const meses2026reg = getMeses2026();
   const metaR1 = meses2026reg.reduce((s,m)=>s+(METAS_R1[m]||0),0);
   const metaR2 = meses2026reg.reduce((s,m)=>s+(METAS_R2[m]||0),0);
@@ -1675,7 +1675,7 @@ function rankingAvatar(nome, metaHit){
     const colsCargo = document.getElementById('ranking-cols');
     const colsReg   = document.getElementById('ranking-cols-reg');
     const colsGeral = document.getElementById('ranking-cols-geral');
-    const cargoFilter = filters.cargo;
+    const cargoFilter = filters.cargos&&filters.cargos.length===1 ? filters.cargos[0] : '';
 
     // Hide all first
     if(colsCargo) colsCargo.style.display='none';
@@ -2619,26 +2619,41 @@ function drawEstadoChart(){
 
   window.drawEquipeChart=function(){
     const card=document.getElementById('equipe-chart-card'); if(!card) return;
-    const lideranca=filters.lideranca, cargo=filters.cargo, executivo=filters.executivo;
-    let mode=null,key=null;
-    if(executivo){mode='executivo';key=executivo;}
-    else if(cargo){mode='cargo';key=cargo;}
-    else if(lideranca){mode='lideranca';key=lideranca;}
-    if(!mode||!key){card.style.display='none';if(_chart){_chart.destroy();_chart=null;}return;}
-    if(key!==_curKey||mode!==_curMode){
-      _curMode=mode;_curKey=key;
+    const hasLid  = filters.liderancas && filters.liderancas.length>0;
+    const hasCargo= filters.cargos     && filters.cargos.length>0;
+    const hasExec = filters.executivos  && filters.executivos.length>0;
+    // priority: executivo > cargo > lideranca
+    let mode=null, selectedKeys=[];
+    if(hasExec)       { mode='executivo'; selectedKeys=[...filters.executivos]; }
+    else if(hasCargo) { mode='cargo';     selectedKeys=[...filters.cargos]; }
+    else if(hasLid)   { mode='lideranca'; selectedKeys=[...filters.liderancas]; }
+    if(!mode||!selectedKeys.length){
+      card.style.display='none';
+      if(_chart){_chart.destroy();_chart=null;}
+      return;
+    }
+    // state key — rebuilds when selection changes
+    const stateKey=mode+'::'+selectedKeys.slice().sort().join(',');
+    if(stateKey!==_curKey||mode!==_curMode){
+      _curMode=mode; _curKey=stateKey;
+      _selectedKeys=new Set(selectedKeys);
       const yrs=getAvailYears();
       _activeYrs=new Set(yrs.slice(-3));
       const allKeys=_getAllKeys(mode);
-      _activeComp=new Set(allKeys.filter(k=>k!==key));
-      buildCompBar(mode,allKeys);
+      // peers = everything not already selected
+      _activeComp=new Set(allKeys.filter(k=>!_selectedKeys.has(k)));
+      buildCompBar(mode,allKeys,selectedKeys);
       buildYrBtns(yrs);
       if(_chart){_chart.destroy();_chart=null;}
+    } else {
+      // selection unchanged — just refresh selectedKeys in case order changed
+      _selectedKeys=new Set(selectedKeys);
     }
-    const titleMap={lideranca:key+' — Evolução Mensal',cargo:key+'s — Evolução Mensal',executivo:key+' — Evolução Mensal'};
+    const label = selectedKeys.length===1
+      ? selectedKeys[0]
+      : selectedKeys.length+' '+({lideranca:'regionais',cargo:'cargos',executivo:'executivos'}[mode]||mode);
     const el=document.getElementById('equipe-chart-title');
-    if(el) el.textContent=titleMap[mode]||key;
-    // subtitle updated inside redraw() with period context
+    if(el) el.textContent=label+' — Evolução Mensal';
     redraw();
   };
 
