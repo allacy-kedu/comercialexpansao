@@ -1437,30 +1437,23 @@ function update(){
   const estados=new Set(data.map(r=>r.estado).filter(Boolean)).size;
   const cidades=new Set(data.map(r=>r.cidade).filter(Boolean)).size;
 
-  // meta — detecta se há filtro de executivo ativo
-  const execFiltrado = (filters.executivos&&filters.executivos.length===1) ? filters.executivos[0] : null;
-  const teamInfo = execFiltrado ? TEAM[execFiltrado] : null;
-
+  // meta — usa dados brutos (sem filtro de cargo/executivo) para manter contexto geral
   const meses2026=getMeses2026();
-  const fatK2026=data.filter(r=>r.assinatura&&meses2026.includes(r.assinatura.slice(0,7))).reduce((s,r)=>s+(r.fat_kedu||0),0);
-  const ctrK2026=data.filter(r=>r.assinatura&&meses2026.includes(r.assinatura.slice(0,7))).length;
+  // Fat. realizado: sempre sobre RAW filtrado apenas por período e estados/liderança
+  const dataParaMeta = RAW.filter(r=>{
+    if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado)) return false;
+    if(filters.liderancas&&filters.liderancas.length>0&&!filters.liderancas.includes(r.lideranca)) return false;
+    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
+    else if(filters.dateFrom||filters.dateTo) return false;
+    return true;
+  });
+  const fatK2026=dataParaMeta.filter(r=>r.assinatura&&meses2026.includes(r.assinatura.slice(0,7))).reduce((s,r)=>s+(r.fat_kedu||0),0);
+  const ctrK2026=dataParaMeta.filter(r=>r.assinatura&&meses2026.includes(r.assinatura.slice(0,7))).length;
 
-  // Calcula meta conforme contexto: vendedor individual > cargo > regional > geral
+  // Meta: somente liderança (Regional 1/2) altera a meta — cargo e executivo não
   let meta = 0;
   let metaLabel = 'Meta Geral 2026';
-  if(execFiltrado && teamInfo){
-    meta = meses2026.reduce((s,m)=>s+(getMetaVendedor(execFiltrado,m)||0),0);
-    metaLabel = teamInfo.cargo+' · '+teamInfo.regional;
-  } else if(filters.cargos&&filters.cargos.length===1&&filters.cargos[0]==='Closer'){
-    // Meta = soma das metas de cada Closer no período
-    const nClosers = Object.keys(TEAM).filter(n=>TEAM[n].cargo==='Closer').length;
-    meta = meses2026.reduce((s,m)=>s+(METAS_CLOSER[m]||0),0) * nClosers;
-    metaLabel = 'Meta Closers (×'+nClosers+')';
-  } else if(filters.cargos&&filters.cargos.length===1&&filters.cargos[0]==='Inside Sales'){
-    const nIS = Object.keys(TEAM).filter(n=>TEAM[n].cargo==='Inside Sales').length;
-    meta = meses2026.reduce((s,m)=>s+(METAS_IS[m]||0),0) * nIS;
-    metaLabel = 'Meta Inside Sales (×'+nIS+')';
-  } else if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 1'){
+  if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 1'){
     meta = meses2026.reduce((s,m)=>s+(METAS_R1[m]||0),0);
     metaLabel = 'Meta Regional 1 2026';
   } else if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 2'){
@@ -1504,7 +1497,7 @@ function update(){
 
   // Regional 1 e Regional 2 — oculta quando filtro de executivo individual ativo
   const regGrid = document.querySelector('.regional-grid');
-  if(regGrid) regGrid.style.display = (execFiltrado || (filters.cargos&&filters.cargos.length>0)) ? 'none' : 'grid';
+  if(regGrid) regGrid.style.display='grid';
   const meses2026reg = getMeses2026();
   const metaR1 = meses2026reg.reduce((s,m)=>s+(METAS_R1[m]||0),0);
   const metaR2 = meses2026reg.reduce((s,m)=>s+(METAS_R2[m]||0),0);
@@ -2554,10 +2547,11 @@ function drawEstadoChart(){
     });
   }
 
-  function buildDatasets(agg,shownKeys,yrs,activeMonths){
+  function buildDatasets(agg,shownKeys,yrs,activeMonths,mainKeys){
+    const mainSet=new Set(mainKeys||[]);
     const datasets=[];
     shownKeys.forEach((k,ki)=>{
-      const isMain=(k===_curKey);
+      const isMain=mainSet.size>0?mainSet.has(k):(k===_curKey);
       const color=keyColor(k,_getAllKeys(_curMode).indexOf(k));
       yrs.forEach(yr=>{
         const ys=YS[yr]||{dash:[],w:1.5,pr:3};
@@ -2599,8 +2593,9 @@ function drawEstadoChart(){
     const allKeys=_getAllKeys(_curMode);
     const agg=buildSeriesData(_curMode, activeMonths);
     const yrs=[..._activeYrs].sort();
-    const shownKeys=[_curKey,...[..._activeComp].filter(k=>allKeys.includes(k))];
-    const datasets=buildDatasets(agg,shownKeys,yrs,activeMonths);
+    const mainKeys=[..._selectedKeys].filter(k=>allKeys.includes(k));
+    const shownKeys=[...new Set([...mainKeys,...[..._activeComp].filter(k=>allKeys.includes(k))])];
+    const datasets=buildDatasets(agg,shownKeys,yrs,activeMonths,mainKeys);
     buildTotals(agg,allKeys,yrs);
     // Update subtitle with period info
     const sub=document.getElementById('equipe-chart-sub');
