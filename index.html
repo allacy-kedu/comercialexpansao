@@ -231,6 +231,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
 
+    <a href="analise.html" style="height:32px;padding:0 14px;background:rgba(162,155,254,0.08);border:1px solid rgba(162,155,254,0.2);color:#A29BFE;border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;text-decoration:none;" onmouseover="this.style.background='rgba(162,155,254,0.15)'" onmouseout="this.style.background='rgba(162,155,254,0.08)'">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Análise de Equipe
+    </a>
     <div class="hbadge" id="hcount">— contratos</div>
     <button id="theme-btn" onclick="toggleTheme()" title="Alternar tema"
       style="height:32px;width:32px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-size:14px;"
@@ -256,34 +260,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <span class="fb-range-lbl" id="fb-range-lbl" style="display:none;"></span>
     <input type="hidden" id="f-date-from">
     <input type="hidden" id="f-date-to">
-  </div>
-
-  <div class="fdiv"></div>
-
-  <!-- Equipe -->
-  <div class="fb-group">
-    <span class="fb-group-label">Equipe</span>
-    <div class="multisel-wrap" id="lideranca-wrap" style="position:relative;">
-      <button class="multisel-btn" id="lideranca-btn" onclick="toggleEquipeDrop(event,'lideranca')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:110px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
-        <span id="lideranca-label">Regional (todas)</span>
-        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
-      </button>
-      <div class="multisel-drop" id="lideranca-drop" style="display:none;"></div>
-    </div>
-    <div class="multisel-wrap" id="cargo-wrap" style="position:relative;">
-      <button class="multisel-btn" id="cargo-btn" onclick="toggleEquipeDrop(event,'cargo')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:100px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
-        <span id="cargo-label">Cargo (todos)</span>
-        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
-      </button>
-      <div class="multisel-drop" id="cargo-drop" style="display:none;"></div>
-    </div>
-    <div class="multisel-wrap" id="executivo-wrap" style="position:relative;">
-      <button class="multisel-btn" id="executivo-btn" onclick="toggleEquipeDrop(event,'executivo')" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:120px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
-        <span id="executivo-label">Executivo (todos)</span>
-        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
-      </button>
-      <div class="multisel-drop" id="executivo-drop" style="display:none;"></div>
-    </div>
   </div>
 
   <div class="fdiv"></div>
@@ -334,19 +310,6 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
   </div>
 
-  <div class="trend-card" id="equipe-chart-card" style="display:none;">
-    <div class="trend-header">
-      <div>
-        <div class="trend-title" id="equipe-chart-title">—</div>
-        <div class="trend-sub" id="equipe-chart-sub">Fat. Kedu mensal</div>
-      </div>
-      <div class="trend-legend" id="equipe-chart-anos"></div>
-    </div>
-    <div class="trend-canvas-wrap" style="position:relative;height:220px;">
-      <canvas id="equipe-chart"></canvas>
-    </div>
-    <div id="equipe-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;"></div>
-  </div>
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="stitle" style="margin-bottom:0;">Meta Faturamento Kedu — 2026</div>
@@ -673,6 +636,57 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div class="kpi-value" id="kpi-descredenciamento" style="color:#b2bec3">—</div>
       <div class="kpi-sub" id="kpi-descredenciamento-sub">—</div>
     </div>
+  </div>
+
+
+  <div class="stitle" style="margin-top:8px;">Análise de Equipe</div>
+
+  <!-- Filtros de Análise -->
+  <div class="trend-card" id="ae-panel" style="margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Filtros</div>
+      <button onclick="aeReset()" style="height:26px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Anos</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-anos"></div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Meses</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-meses"></div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Regional / Liderança</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-regionais"></div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Cargo</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-cargos"></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Executivos</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px 8px;" id="ae-executivos"></div>
+    </div>
+  </div>
+
+  <!-- Gráfico de Análise -->
+  <div class="trend-card" id="ae-chart-card">
+    <div class="trend-header">
+      <div>
+        <div class="trend-title" id="ae-chart-title">—</div>
+        <div class="trend-sub" id="ae-chart-sub">Selecione filtros acima para visualizar</div>
+      </div>
+    </div>
+    <div id="ae-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;gap:8px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Selecione ao menos um filtro de equipe para ver o gráfico
+    </div>
+    <div id="ae-canvas-wrap" style="display:none;position:relative;height:240px;">
+      <canvas id="ae-chart"></canvas>
+    </div>
+    <div id="ae-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;"></div>
   </div>
 
 
@@ -1003,115 +1017,7 @@ const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 
 
-function toggleEquipeDrop(e, tipo){
-  e.stopPropagation();
-  ['lideranca','cargo','executivo'].forEach(t=>{
-    if(t!==tipo){ const d=document.getElementById(t+'-drop'); if(d) d.style.display='none'; }
-  });
-  const drop=document.getElementById(tipo+'-drop');
-  if(!drop) return;
-  const wasOpen = drop.style.display!=='none';
-  drop.style.display = wasOpen ? 'none' : 'block';
-  if(!wasOpen) buildEquipeDrop(tipo);
-}
-
-document.addEventListener('click',function(e){
-  ['lideranca','cargo','executivo'].forEach(function(tipo){
-    const wrap=document.getElementById(tipo+'-wrap');
-    if(wrap&&!wrap.contains(e.target)){
-      const drop=document.getElementById(tipo+'-drop');
-      if(drop) drop.style.display='none';
-    }
-  });
-});
-
-function buildEquipeDrop(tipo){
-  const drop=document.getElementById(tipo+'-drop'); if(!drop) return;
-  let all=[], selected, setSelected;
-  if(tipo==='lideranca'){
-    all=[...new Set(RAW.map(function(r){return r.lideranca;}).filter(Boolean))];
-    const pri=['Regional 1','Regional 2'];
-    all=[...pri.filter(function(v){return all.includes(v);}), ...all.filter(function(v){return !pri.includes(v);})].sort(function(a,b){
-      const ai=pri.indexOf(a), bi=pri.indexOf(b);
-      if(ai>=0&&bi>=0) return ai-bi;
-      if(ai>=0) return -1; if(bi>=0) return 1;
-      return a.localeCompare(b,'pt-BR');
-    });
-    selected=selectedLiderancas;
-    setSelected=function(v){selectedLiderancas=v; filters.liderancas=[...selectedLiderancas];};
-  } else if(tipo==='cargo'){
-    const s=new Set();
-    RAW.forEach(function(r){
-      const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
-      if(rc&&rc!=='Coordenador Comercial'&&rc!=='Coordenadora Comercial') s.add(rc);
-    });
-    all=[...s].sort();
-    selected=selectedCargos;
-    setSelected=function(v){selectedCargos=v; filters.cargos=[...selectedCargos];};
-  } else {
-    all=[...new Set(RAW.map(function(r){return r.executivo;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'pt-BR');});
-    selected=selectedExecutivos;
-    setSelected=function(v){selectedExecutivos=v; filters.executivos=[...selectedExecutivos];};
-  }
-  drop.innerHTML='';
-  const isAll=all.length>0&&selected.length===all.length;
-  // "Selecionar todos"
-  const allItem=document.createElement('div');
-  allItem.className='multisel-item'+(isAll?' checked':'');
-  const allInp=document.createElement('input');
-  allInp.type='checkbox'; allInp.id='eq-all-'+tipo; allInp.checked=isAll;
-  allInp.style.cssText='accent-color:var(--accent);width:12px;height:12px;cursor:pointer;';
-  const allLbl=document.createElement('label');
-  allLbl.htmlFor='eq-all-'+tipo;
-  allLbl.style.cssText='cursor:pointer;font-weight:700;font-family:DM Mono,monospace;font-size:10px;';
-  allLbl.textContent='Selecionar Todos';
-  allInp.addEventListener('change',function(ev){
-    setSelected(ev.target.checked?[...all]:[]);
-    buildEquipeDrop(tipo); updateEquipeLabel(tipo); invalidateCache(); update();
-  });
-  allItem.appendChild(allInp); allItem.appendChild(allLbl);
-  drop.appendChild(allItem);
-  // Individual items
-  all.forEach(function(val){
-    const on=selected.includes(val);
-    const item=document.createElement('div');
-    item.className='multisel-item'+(on?' checked':'');
-    const inp=document.createElement('input');
-    inp.type='checkbox';
-    inp.id='eq-'+tipo+'-'+val.replace(/[^a-z0-9]/gi,'_');
-    inp.checked=on;
-    inp.style.cssText='accent-color:var(--accent);width:12px;height:12px;cursor:pointer;';
-    const lbl=document.createElement('label');
-    lbl.htmlFor=inp.id; lbl.style.cursor='pointer';
-    lbl.style.cssText='cursor:pointer;font-family:DM Mono,monospace;font-size:10px;';
-    lbl.textContent=val;
-    inp.addEventListener('change',function(ev){
-      if(ev.target.checked){ if(!selected.includes(val)) selected.push(val); }
-      else { const idx=selected.indexOf(val); if(idx>-1) selected.splice(idx,1); }
-      item.classList.toggle('checked',ev.target.checked);
-      const allCb=document.getElementById('eq-all-'+tipo);
-      if(allCb){ const nowAll=selected.length===all.length; allCb.checked=nowAll; allCb.parentElement.classList.toggle('checked',nowAll); }
-      setSelected(selected);
-      updateEquipeLabel(tipo); invalidateCache(); update();
-    });
-    item.appendChild(inp); item.appendChild(lbl);
-    drop.appendChild(item);
-  });
-}
-
-function updateEquipeLabel(tipo){
-  const lbl=document.getElementById(tipo+'-label'); if(!lbl) return;
-  var selected, placeholder;
-  if(tipo==='lideranca'){selected=selectedLiderancas;placeholder='Regional (todas)';}
-  else if(tipo==='cargo'){selected=selectedCargos;placeholder='Cargo (todos)';}
-  else {selected=selectedExecutivos;placeholder='Executivo (todos)';}
-  if(!selected.length){lbl.textContent=placeholder;lbl.style.color='';}
-  else if(selected.length===1){lbl.textContent=selected[0];lbl.style.color='var(--accent)';}
-  else{lbl.textContent=selected.length+' itens';lbl.style.color='var(--accent)';}
-}
-
-let filters={dateFrom:'',dateTo:'',liderancas:[],executivos:[],cargos:[],status:'',modelo:'',estados:[],};
-var selectedLiderancas=[], selectedCargos=[], selectedExecutivos=[];
+let filters={dateFrom:'',dateTo:'',status:'',modelo:'',estados:[],};
 
 function populateSelects(){
   const sel=(id,vals)=>{
@@ -1130,9 +1036,6 @@ populateSelects();
 
 function applyFilters(){
   return RAW.filter(r=>{
-    if(filters.liderancas&&filters.liderancas.length>0&&!filters.liderancas.includes(r.lideranca))return false;
-    if(filters.executivos&&filters.executivos.length>0&&!filters.executivos.includes(r.executivo))return false;
-    if(filters.cargos&&filters.cargos.length>0){const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||'';if(!filters.cargos.includes(rc))return false;}
     if(filters.status&&r.status!==filters.status)return false;
     if(filters.modelo&&r.modelo!==filters.modelo)return false;
     if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado))return false;    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
@@ -1441,7 +1344,6 @@ function update(){
   // Fat. realizado: sempre sobre RAW filtrado apenas por período e estados/liderança
   const dataParaMeta = RAW.filter(r=>{
     if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado)) return false;
-    if(filters.liderancas&&filters.liderancas.length>0&&!filters.liderancas.includes(r.lideranca)) return false;
     if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
     else if(filters.dateFrom||filters.dateTo) return false;
     return true;
@@ -1452,15 +1354,7 @@ function update(){
   // Meta: somente liderança (Regional 1/2) altera a meta — cargo e executivo não
   let meta = 0;
   let metaLabel = 'Meta Geral 2026';
-  if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 1'){
-    meta = meses2026.reduce((s,m)=>s+(METAS_R1[m]||0),0);
-    metaLabel = 'Meta Regional 1 2026';
-  } else if(filters.liderancas&&filters.liderancas.length===1&&filters.liderancas[0]==='Regional 2'){
-    meta = meses2026.reduce((s,m)=>s+(METAS_R2[m]||0),0);
-    metaLabel = 'Meta Regional 2 2026';
-  } else {
-    meta = getMeta();
-  }
+  meta = getMeta();
 
   const pct=meta?Math.min((fatK2026/meta)*100,999):0;
   const pctD=Math.min(pct,100);
@@ -1720,40 +1614,24 @@ function rankingAvatar(nome, metaHit){
   renderQuartil();
   drawEstadoChart();
   renderEstadoChip();
-  if(typeof drawEquipeChart==='function') drawEquipeChart();
   document.getElementById('hcount').textContent=uniqueContratos(data)+' contratos';
 }
 
-const LABELS={dateFrom:'De',dateTo:'Até',liderancas:'Regional',executivos:'Executivo',cargos:'Cargo',status:'Status',modelo:'Modelo',estados:'Estado'};
+const LABELS={dateFrom:'De',dateTo:'Até',status:'Status',modelo:'Modelo',estados:'Estado'};
 function renderBadges(){
   const c=document.getElementById('active-filters');c.innerHTML='';
   Object.entries(filters).forEach(([k,v])=>{
     if(!v||!LABELS[k])return;
-    if(Array.isArray(v)){
-      if(!v.length)return;
-      v.forEach(item=>{
-        const b=document.createElement('div');b.className='afbadge';
-        b.innerHTML=LABELS[k]+': '+item+' <span class="x" style="cursor:pointer;margin-left:2px;">×</span>';
-        b.querySelector('.x').addEventListener('click',()=>{
-          if(k==='liderancas'){selectedLiderancas=selectedLiderancas.filter(s=>s!==item);filters.liderancas=[...selectedLiderancas];buildEquipeDrop('lideranca');updateEquipeLabel('lideranca');}
-          if(k==='cargos'){selectedCargos=selectedCargos.filter(s=>s!==item);filters.cargos=[...selectedCargos];buildEquipeDrop('cargo');updateEquipeLabel('cargo');}
-          if(k==='executivos'){selectedExecutivos=selectedExecutivos.filter(s=>s!==item);filters.executivos=[...selectedExecutivos];buildEquipeDrop('executivo');updateEquipeLabel('executivo');}
-          invalidateCache();update();
-        });
-        c.appendChild(b);
-      });
-    } else {
-      if(!v)return;
-      const b=document.createElement('div');b.className='afbadge';
-      b.innerHTML=LABELS[k]+': '+v+' <span class="x" data-key="'+k+'">×</span>';
-      b.querySelector('.x').addEventListener('click',e=>{
-        const key=e.target.dataset.key;filters[key]='';
-        const map={dateFrom:'f-date-from',dateTo:'f-date-to',status:'f-status',modelo:'f-modelo'};
-        if(map[key])document.getElementById(map[key]).value='';
-        invalidateCache();update();
-      });
-      c.appendChild(b);
-    }
+    if(!v||Array.isArray(v)) return;
+    const b=document.createElement('div');b.className='afbadge';
+    b.innerHTML=LABELS[k]+': '+v+' <span class="x" data-key="'+k+'">×</span>';
+    b.querySelector('.x').addEventListener('click',e=>{
+      const key=e.target.dataset.key;filters[key]='';
+      const map={dateFrom:'f-date-from',dateTo:'f-date-to',status:'f-status',modelo:'f-modelo'};
+      if(map[key])document.getElementById(map[key]).value='';
+      invalidateCache();update();
+    });
+    c.appendChild(b);
   });
 }
 
@@ -1843,14 +1721,11 @@ function renderBadges(){
     ['f-status','f-modelo'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value='';
     });
-    selectedLiderancas=[]; selectedCargos=[]; selectedExecutivos=[];
-    if(typeof buildEquipeDrop==='function'){buildEquipeDrop('lideranca');buildEquipeDrop('cargo');buildEquipeDrop('executivo');}
-    if(typeof updateEquipeLabel==='function'){updateEquipeLabel('lideranca');updateEquipeLabel('cargo');updateEquipeLabel('executivo');}
     // Limpa estados
     selectedEstados=[]; filters.estados=[];
     buildEstadoDrop(); updateEstadoLabel();
     // Limpa filtros e cache
-    filters={dateFrom:'',dateTo:'',liderancas:[],executivos:[],cargos:[],status:'',modelo:'',estados:[]};
+    filters={dateFrom:'',dateTo:'',status:'',modelo:'',estados:[]};
     invalidateCache();
     if(typeof _monthlyRawLen!=='undefined') _monthlyRawLen=-1;
     // Redesenha tudo
@@ -1874,9 +1749,6 @@ function onFilterChange(){
   invalidateCache();
   filters.dateFrom=document.getElementById('f-date-from')?.value||'';
   filters.dateTo=document.getElementById('f-date-to')?.value||'';
-  filters.liderancas=[...selectedLiderancas];
-  filters.executivos=[...selectedExecutivos];
-  filters.cargos=[...selectedCargos];
   filters.status=document.getElementById('f-status').value;
   filters.modelo=document.getElementById('f-modelo').value;
   update();
@@ -2150,13 +2022,11 @@ update();
   window.addEventListener('resize',()=>{
     if(_chart){_chart.destroy();_chart=null;}drawChart();
     if(typeof drawEstadoChart==='function') drawEstadoChart(); // Update other chart on resize too
-    if(typeof drawEquipeChart==='function') drawEquipeChart();
-  });
+    });
   window._redrawTrendChart=()=>{
     if(_chart){_chart.destroy();_chart=null;}drawChart();
     if(typeof drawEstadoChart==='function') drawEstadoChart(); // Re-draw estado chart on theme change
-    if(typeof drawEquipeChart==='function') drawEquipeChart();
-  };
+    };
   window._getMelhorMesMonthly=buildMonthly;
 })();
 
@@ -2382,275 +2252,6 @@ function drawEstadoChart(){
   }
 }
 
-// ── Equipe Comparison Chart ───────────────────────────────────
-(function(){
-  let _chart = null;
-  let _activeYrs = new Set();
-  let _activeComp = new Set();
-  let _curMode = null;
-  let _curKey  = null;
-
-  const YS = {
-    2022:{dash:[2,3],w:1,pr:2},
-    2023:{dash:[2,3],w:1,pr:2},
-    2024:{dash:[4,4],w:1.3,pr:2.5},
-    2025:{dash:[],   w:2,  pr:3.5},
-    2026:{dash:[6,3],w:2,  pr:3.5},
-  };
-
-  function hexA(h,a){
-    const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
-    return 'rgba('+r+','+g+','+b+','+a+')';
-  }
-
-  const KEY_COLORS = {
-    'Regional 1':'#4ECDC4','Regional 2':'#A29BFE',
-    'Closer':'#FFE66D','Inside Sales':'#FF6B6B',
-  };
-  function keyColor(k,idx){
-    if(KEY_COLORS[k]) return KEY_COLORS[k];
-    const p=['#4ECDC4','#A29BFE','#FFE66D','#FF6B6B','#fd79a8','#74b9ff','#00b894','#e17055','#fdcb6e','#55efc4'];
-    return p[idx%p.length];
-  }
-
-  // Build aggregated fat_kedu per key, filtered by active period
-  function buildSeriesData(mode, periodFilter){
-    const agg={};
-    // periodFilter = {months:[...], dateFrom, dateTo}
-    const pMonths = periodFilter && periodFilter.months;
-    const pFrom   = periodFilter && periodFilter.dateFrom;
-    const pTo     = periodFilter && periodFilter.dateTo;
-    RAW.forEach(r=>{
-      if(!r.assinatura||!r.fat_kedu) return;
-      // Filter by full YYYY-MM range when set (respects year + month)
-      if(pFrom||pTo){
-        const ym=r.assinatura.slice(0,7);
-        if(pFrom&&ym<pFrom) return;
-        if(pTo&&ym>pTo) return;
-      } else if(pMonths&&pMonths.length<12){
-        // No year constraint but month range: filter by month only
-        const mo=parseInt(r.assinatura.slice(5,7));
-        if(!pMonths.includes(mo)) return;
-      }
-      let k=null;
-      if(mode==='lideranca'){
-        k=r.lideranca||null;
-      } else if(mode==='cargo'){
-        // Use r.cargo (from CSV col[3]=Perfil); fall back to TEAM lookup
-        const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
-        if(!rc||rc==='Coordenador Comercial'||rc==='Coordenadora Comercial') return;
-        k=rc;
-      } else if(mode==='executivo'){
-        k=r.executivo;
-      }
-      if(!k) return;
-      const yr=parseInt(r.assinatura.slice(0,4));
-      const mo=parseInt(r.assinatura.slice(5,7));
-      // Only aggregate years that are active in the year toggle
-      if(_activeYrs.size>0&&!_activeYrs.has(yr)) return;
-      if(!agg[k]) agg[k]={};
-      if(!agg[k][yr]) agg[k][yr]={};
-      agg[k][yr][mo]=(agg[k][yr][mo]||0)+r.fat_kedu;
-    });
-    return agg;
-  }
-
-  function getAvailYears(){
-    const s=new Set(RAW.map(r=>r.assinatura&&parseInt(r.assinatura.slice(0,4))).filter(Boolean));
-    return [...s].sort();
-  }
-
-  // Derive all possible keys from RAW directly — no TEAM dependency
-  function _getAllKeys(mode){
-    if(!mode) return [];
-    if(mode==='lideranca'){
-      const s=new Set(RAW.map(r=>r.lideranca).filter(Boolean));
-      return [...s].sort();
-    }
-    if(mode==='cargo'){
-      const s=new Set(RAW.map(r=>{
-        const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
-        if(!rc||rc==='Coordenador Comercial'||rc==='Coordenadora Comercial') return null;
-        return rc;
-      }).filter(Boolean));
-      return [...s].sort();
-    }
-    if(mode==='executivo'){
-      const s=new Set(RAW.map(r=>r.executivo).filter(Boolean));
-      return [...s].sort();
-    }
-    return [];
-  }
-
-  window._equipeToggleYr=function(yr,btn){
-    if(_activeYrs.has(yr)&&_activeYrs.size>1){_activeYrs.delete(yr);btn.classList.remove('active');}
-    else{_activeYrs.add(yr);btn.classList.add('active');}
-    if(_chart){_chart.destroy();_chart=null;}
-    redraw();
-  };
-
-  function buildYrBtns(yrs){
-    const wrap=document.getElementById('equipe-chart-anos'); if(!wrap) return;
-    wrap.innerHTML='';
-    yrs.forEach(yr=>{
-      const color=TREND_YEAR_COLORS[yr]||'#aaa';
-      const on=_activeYrs.has(yr);
-      const btn=document.createElement('button');
-      btn.textContent=yr; btn.className='trend-yr-btn'+(on?' active':'');
-      btn.style.setProperty('--yr-c',color);
-      btn.onclick=()=>window._equipeToggleYr(yr,btn);
-      wrap.appendChild(btn);
-    });
-  }
-
-  function buildTotals(agg,allKeys,yrs){
-    const wrap=document.getElementById('equipe-totals'); if(!wrap) return;
-    wrap.innerHTML='';
-    const fv=v=>v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
-    const mainKeys2=_selectedKeys&&_selectedKeys.size>0?[..._selectedKeys]:([_curKey]);
-    const shownKeys=[...new Set([...mainKeys2,...[..._activeComp].filter(k=>allKeys.includes(k))])];
-    shownKeys.forEach(k=>{
-      const color=keyColor(k,allKeys.indexOf(k));
-      yrs.forEach(yr=>{
-        const total=Object.values((agg[k]&&agg[k][yr])||{}).reduce((s,v)=>s+v,0);
-        if(!total) return;
-        const pill=document.createElement('div');
-        pill.style.cssText='display:flex;align-items:center;gap:6px;background:'+hexA(color,.08)+';border:1px solid '+hexA(color,.25)+';border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
-        pill.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0;display:inline-block;"></span><span style="font-size:9px;color:var(--muted2);">'+k+' · '+yr+'</span><span style="font-size:11px;font-weight:700;color:'+color+';">R$ '+fv(total)+'</span>';
-        wrap.appendChild(pill);
-      });
-    });
-  }
-
-  function buildDatasets(agg,shownKeys,yrs,activeMonths,mainKeys){
-    const mainSet=new Set(mainKeys||[]);
-    const datasets=[];
-    shownKeys.forEach((k,ki)=>{
-      const isMain=mainSet.size>0?mainSet.has(k):(k===_curKey);
-      const color=keyColor(k,_getAllKeys(_curMode).indexOf(k));
-      yrs.forEach(yr=>{
-        const ys=YS[yr]||{dash:[],w:1.5,pr:3};
-        const alpha=isMain?1:.32;
-        const col=hexA(color,alpha);
-        const today=new Date();
-        const months=activeMonths&&activeMonths.length?activeMonths:Array.from({length:12},(_,i)=>i+1);
-        const data=months.map(m=>{
-          if(yr===today.getFullYear()&&m>today.getMonth()+1) return null;
-          return(agg[k]&&agg[k][yr]&&agg[k][yr][m])||0;
-        });
-        datasets.push({label:k+' '+yr,data,borderColor:col,borderWidth:isMain?ys.w:ys.w*.7,borderDash:ys.dash,pointBackgroundColor:col,pointRadius:isMain?ys.pr:ys.pr*.55,pointHoverRadius:isMain?6:4,tension:.4,fill:false,spanGaps:false,_main:isMain,_k:k,_yr:yr});
-      });
-    });
-    return datasets;
-  }
-
-  function getActiveMonths(){
-    let months=[], dateFrom=null, dateTo=null;
-    if(filters.dateFrom||filters.dateTo){
-      dateFrom=filters.dateFrom||null;
-      dateTo  =filters.dateTo||null;
-      const mStart=dateFrom?parseInt(dateFrom.slice(5,7)):1;
-      const mEnd  =dateTo  ?parseInt(dateTo.slice(5,7)):12;
-      for(let m=mStart;m<=mEnd;m++) months.push(m);
-    } else {
-      const yrEl=document.getElementById('fb-year');
-      const yr=yrEl?yrEl.value:'2026';
-      dateFrom=yr+'-01';
-      dateTo  =yr+'-12';
-      for(let m=1;m<=12;m++) months.push(m);
-    }
-    return {months, dateFrom, dateTo};
-  }
-
-  function redraw(){
-    const card=document.getElementById('equipe-chart-card');
-    const canvas=document.getElementById('equipe-chart');
-    if(!card||!canvas) return;
-    if(!_curMode||!_curKey){card.style.display='none';if(_chart){_chart.destroy();_chart=null;}return;}
-    const periodFilter=getActiveMonths();
-    const activeMonths=periodFilter.months;
-    const allKeys=_getAllKeys(_curMode);
-    const agg=buildSeriesData(_curMode, periodFilter);
-    const yrs=[..._activeYrs].sort();
-    const mainKeys=[..._selectedKeys].filter(k=>allKeys.includes(k));
-    const shownKeys=[...new Set([...mainKeys,...[..._activeComp].filter(k=>allKeys.includes(k))])];
-    const datasets=buildDatasets(agg,shownKeys,yrs,activeMonths,mainKeys);
-    buildTotals(agg,allKeys,yrs);
-    // Update subtitle with period info
-    const sub=document.getElementById('equipe-chart-sub');
-    if(sub){
-      const MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      const comp=[..._activeComp].join(' + ');
-      const perStr=activeMonths.length>1?MN[activeMonths[0]-1]+' a '+MN[activeMonths[activeMonths.length-1]-1]:MN[activeMonths[0]-1];
-      sub.textContent='Fat. Kedu · '+perStr+(comp?' · vs: '+comp:'');
-    }
-    card.style.display='block';
-    const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const chartLabels=activeMonths&&activeMonths.length?activeMonths.map(m=>MONTHS_SHORT[m-1]):MONTHS_SHORT;
-    if(_chart){
-      // Destroy and recreate if label count changed (period changed)
-      if(_chart.data.labels.length!==chartLabels.length){
-        _chart.destroy(); _chart=null;
-      } else {
-        _chart.data.labels=chartLabels;
-        _chart.data.datasets=datasets;
-        _chart.update('none');
-        return;
-      }
-    }
-    _chart=new Chart(canvas,{type:'line',data:{labels:chartLabels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;const pre=ctx.dataset._main?'● ':'○ ';return pre+ctx.dataset._k+' '+ctx.dataset._yr+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v)},border:{display:false}}}}});
-  }
-
-  window.drawEquipeChart=function(){
-    const card=document.getElementById('equipe-chart-card'); if(!card) return;
-    const hasLid  = filters.liderancas && filters.liderancas.length>0;
-    const hasCargo= filters.cargos     && filters.cargos.length>0;
-    const hasExec = filters.executivos  && filters.executivos.length>0;
-    // priority: executivo > cargo > lideranca
-    let mode=null, selectedKeys=[];
-    if(hasExec)       { mode='executivo'; selectedKeys=[...filters.executivos]; }
-    else if(hasCargo) { mode='cargo';     selectedKeys=[...filters.cargos]; }
-    else if(hasLid)   { mode='lideranca'; selectedKeys=[...filters.liderancas]; }
-    if(!mode||!selectedKeys.length){
-      card.style.display='none';
-      if(_chart){_chart.destroy();_chart=null;}
-      return;
-    }
-    // state key — rebuilds when selection changes
-    const stateKey=mode+'::'+selectedKeys.slice().sort().join(',');
-    if(stateKey!==_curKey||mode!==_curMode){
-      _curMode=mode; _curKey=stateKey;
-      _selectedKeys=new Set(selectedKeys);
-      const yrs=getAvailYears();
-      // Default active year: 2026 if it has data for selected keys, else most recent year with data
-      const yrsWithData=yrs.filter(yr=>RAW.some(r=>{
-        if(!r.assinatura||!r.fat_kedu) return false;
-        if(parseInt(r.assinatura.slice(0,4))!==yr) return false;
-        if(mode==='lideranca') return selectedKeys.includes(r.lideranca);
-        if(mode==='cargo'){const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;return selectedKeys.includes(rc);}
-        if(mode==='executivo') return selectedKeys.includes(r.executivo);
-        return false;
-      }));
-      const defaultYr=yrsWithData.includes(2026)?2026:(yrsWithData[yrsWithData.length-1]||2026);
-      _activeYrs=new Set([defaultYr]);
-      const allKeys=_getAllKeys(mode);
-      _activeComp=new Set(); // no peer comparison — user controls via filter
-      buildYrBtns(yrs);
-      if(_chart){_chart.destroy();_chart=null;}
-    } else {
-      // selection unchanged — just refresh selectedKeys in case order changed
-      _selectedKeys=new Set(selectedKeys);
-    }
-    const label = selectedKeys.length===1
-      ? selectedKeys[0]
-      : selectedKeys.length+' '+({lideranca:'regionais',cargo:'cargos',executivo:'executivos'}[mode]||mode);
-    const el=document.getElementById('equipe-chart-title');
-    if(el) el.textContent=label+' — Evolução Mensal';
-    redraw();
-  };
-
-})();
-
 // ═══════════════════════════════════════════════════════════════
 // CSV / XLSX UPLOAD — atualização manual da base
 // ═══════════════════════════════════════════════════════════════
@@ -2845,6 +2446,8 @@ async function autoLoadCSV(showStatus){
     if(typeof window._redrawTrendChart === 'function') window._redrawTrendChart();
     if(typeof rankingView !== 'undefined' && rankingView === 'melhor') buildMelhorMes();
     if(typeof window.buildCampanhas === 'function') window.buildCampanhas();
+    if(typeof window.aeBuildFilters === 'function') window.aeBuildFilters();
+    if(typeof window._aeRedraw === 'function') window._aeRedraw();
     // Exibe horário da última sincronização do data.json
     const syncedAt = json.updated_at
       ? new Date(json.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
@@ -3125,6 +2728,179 @@ function toggleTheme(){
 })();
 
 
+
+
+// ── Análise de Equipe ─────────────────────────────────────────
+(function(){
+  const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const YR_COLORS={2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
+  const KEY_COLORS={'Regional 1':'#4ECDC4','Regional 2':'#A29BFE','Closer':'#FFE66D','Inside Sales':'#FF6B6B'};
+  const YS={2022:{dash:[2,3],w:1,pr:2},2023:{dash:[2,3],w:1,pr:2},2024:{dash:[4,4],w:1.3,pr:2.5},2025:{dash:[],w:2,pr:3.5},2026:{dash:[6,3],w:2,pr:3.5}};
+
+  let aeChart=null;
+  let aeAnos=new Set([2026]);
+  let aeMeses=new Set();
+  let aeRegs=new Set();
+  let aeCargos=new Set();
+  let aeExecs=new Set();
+
+  function hexA(h,a){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return 'rgba('+r+','+g+','+b+','+a+')';}
+  function aeKeyColor(k,allKeys){if(KEY_COLORS[k])return KEY_COLORS[k];const p=['#4ECDC4','#A29BFE','#FFE66D','#FF6B6B','#fd79a8','#74b9ff','#00b894','#e17055','#fdcb6e','#55efc4'];return p[(allKeys||[]).indexOf(k)%p.length];}
+  function fmtV(v){if(!v&&v!==0)return'—';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K';return'R$ '+v.toFixed(0);}
+
+  function pill(containerId, val, set, colorFn){
+    const btn=document.createElement('button');
+    btn.style.cssText='padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;white-space:nowrap;';
+    btn.textContent=val;
+    const applyStyle=()=>{
+      const on=set.has(val);
+      const c=colorFn?colorFn(val):'var(--accent)';
+      btn.style.background=on?hexA(c,.12):'transparent';
+      btn.style.borderColor=on?c:'var(--border2)';
+      btn.style.color=on?c:'var(--muted)';
+      btn.style.fontWeight=on?'700':'400';
+    };
+    applyStyle();
+    btn.onclick=()=>{set.has(val)?set.delete(val):set.add(val);applyStyle();aeRedraw();};
+    document.getElementById(containerId).appendChild(btn);
+  }
+
+  window.aeBuildFilters=function(){
+    // Anos
+    const anos=[...new Set(RAW.map(r=>r.assinatura&&parseInt(r.assinatura.slice(0,4))).filter(Boolean))].sort();
+    const ae=document.getElementById('ae-anos'); if(!ae) return;
+    ae.innerHTML='';
+    anos.forEach(yr=>pill('ae-anos',yr,aeAnos,v=>YR_COLORS[v]||'#fff'));
+
+    // Meses
+    const am=document.getElementById('ae-meses'); am.innerHTML='';
+    MONTHS_SHORT.forEach((m,i)=>{
+      const btn=document.createElement('button');
+      btn.style.cssText='padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;';
+      btn.textContent=m;
+      const n=i+1;
+      const apply=()=>{const on=aeMeses.has(n);btn.style.background=on?'rgba(78,205,196,0.12)':'transparent';btn.style.borderColor=on?'var(--accent)':'var(--border2)';btn.style.color=on?'var(--accent)':'var(--muted)';btn.style.fontWeight=on?'700':'400';};
+      apply();
+      btn.onclick=()=>{aeMeses.has(n)?aeMeses.delete(n):aeMeses.add(n);apply();aeRedraw();};
+      am.appendChild(btn);
+    });
+
+    // Regionais
+    const regs=[...new Set(RAW.map(r=>r.lideranca).filter(Boolean))];
+    const pri=['Regional 1','Regional 2'];
+    const sorted=[...pri.filter(v=>regs.includes(v)),...regs.filter(v=>!pri.includes(v)).sort()];
+    const ar=document.getElementById('ae-regionais'); ar.innerHTML='';
+    sorted.forEach(r=>pill('ae-regionais',r,aeRegs));
+
+    // Cargos
+    const cargosSet=new Set();
+    RAW.forEach(r=>{const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;if(rc&&rc!=='Coordenador Comercial'&&rc!=='Coordenadora Comercial')cargosSet.add(rc);});
+    const ac=document.getElementById('ae-cargos'); ac.innerHTML='';
+    [...cargosSet].sort().forEach(c=>pill('ae-cargos',c,aeCargos));
+
+    // Executivos
+    const execs=[...new Set(RAW.map(r=>r.executivo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    const ax=document.getElementById('ae-executivos'); ax.innerHTML='';
+    execs.forEach(e=>pill('ae-executivos',e,aeExecs));
+  };
+
+  function aeAgg(){
+    const agg={};
+    const meses=aeMeses.size>0?[...aeMeses]:null;
+    RAW.forEach(r=>{
+      if(!r.assinatura||!r.fat_kedu) return;
+      const yr=parseInt(r.assinatura.slice(0,4));
+      const mo=parseInt(r.assinatura.slice(5,7));
+      if(!aeAnos.has(yr)) return;
+      if(meses&&!meses.includes(mo)) return;
+      const keys=new Set();
+      if(aeRegs.size>0&&aeRegs.has(r.lideranca)) keys.add(r.lideranca);
+      if(aeCargos.size>0){const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;if(rc&&aeCargos.has(rc))keys.add(rc);}
+      if(aeExecs.size>0&&aeExecs.has(r.executivo)) keys.add(r.executivo);
+      if(!aeRegs.size&&!aeCargos.size&&!aeExecs.size) keys.add('Todos');
+      keys.forEach(k=>{
+        if(!agg[k])agg[k]={};
+        if(!agg[k][yr])agg[k][yr]={};
+        agg[k][yr][mo]=(agg[k][yr][mo]||0)+r.fat_kedu;
+      });
+    });
+    return agg;
+  }
+
+  function aeRedraw(){
+    const agg=aeAgg();
+    const keys=Object.keys(agg);
+    const anos=[...aeAnos].sort();
+    const meses=aeMeses.size>0?[...aeMeses].sort():Array.from({length:12},(_,i)=>i+1);
+    const labels=meses.map(m=>MONTHS_SHORT[m-1]);
+    const empty=document.getElementById('ae-empty');
+    const wrap=document.getElementById('ae-canvas-wrap');
+    const totals=document.getElementById('ae-totals');
+
+    if(!keys.length||keys[0]==='Todos'&&!aeRegs.size&&!aeCargos.size&&!aeExecs.size){
+      empty.style.display='flex'; wrap.style.display='none';
+      if(aeChart){aeChart.destroy();aeChart=null;}
+      totals.innerHTML='';
+      document.getElementById('ae-chart-title').textContent='—';
+      document.getElementById('ae-chart-sub').textContent='Selecione filtros acima para visualizar';
+      return;
+    }
+    empty.style.display='none'; wrap.style.display='block';
+
+    const titleEl=document.getElementById('ae-chart-title');
+    const subEl=document.getElementById('ae-chart-sub');
+    titleEl.textContent=keys.length===1?keys[0]+' — Evolução Mensal':keys.length+' séries — Evolução Mensal';
+    const perStr=aeMeses.size>0?labels.join(', '):'Jan a Dez';
+    subEl.textContent='Fat. Kedu · '+anos.join(', ')+' · '+perStr;
+
+    const today=new Date();
+    const datasets=[];
+    keys.forEach((k,ki)=>{
+      const color=aeKeyColor(k,keys);
+      anos.forEach(yr=>{
+        const ys=YS[yr]||{dash:[],w:1.5,pr:3};
+        const data=meses.map(m=>{
+          if(yr===today.getFullYear()&&m>today.getMonth()+1)return null;
+          return(agg[k]&&agg[k][yr]&&agg[k][yr][m])||0;
+        });
+        if(!data.some(v=>v!==null&&v>0))return;
+        const lineColor=anos.length>1?(hexA(YR_COLORS[yr]||color,.9)):color;
+        const finalColor=keys.length>1?color:lineColor;
+        datasets.push({label:k+(anos.length>1?' '+yr:''),data,borderColor:finalColor,borderWidth:ys.w,borderDash:ys.dash,pointBackgroundColor:finalColor,pointRadius:ys.pr,pointHoverRadius:6,tension:.4,fill:false,spanGaps:false,_k:k,_yr:yr});
+      });
+    });
+
+    // Totals
+    totals.innerHTML='';
+    datasets.forEach(ds=>{
+      const total=ds.data.reduce((s,v)=>s+(v||0),0);
+      if(!total)return;
+      const pill=document.createElement('div');
+      pill.style.cssText='display:flex;align-items:center;gap:6px;background:'+hexA(ds.borderColor,.08)+';border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
+      pill.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;"></span><span style="font-size:9px;color:var(--muted2);">'+ds.label+'</span><span style="font-size:11px;font-weight:700;color:'+ds.borderColor+';">'+fmtV(total)+'</span>';
+      totals.appendChild(pill);
+    });
+
+    if(!datasets.length){empty.style.display='flex';wrap.style.display='none';if(aeChart){aeChart.destroy();aeChart=null;}subEl.textContent='Nenhum dado para os filtros selecionados';return;}
+
+    if(aeChart&&aeChart.data.labels.join()!==labels.join()){aeChart.destroy();aeChart=null;}
+    if(aeChart){aeChart.data.labels=labels;aeChart.data.datasets=datasets;aeChart.update('none');return;}
+
+    const canvas=document.getElementById('ae-chart');
+    aeChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;return ctx.dataset.label+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v)},border:{display:false}}}}});
+  }
+
+  window.aeReset=function(){
+    aeAnos=new Set([2026]); aeMeses.clear(); aeRegs.clear(); aeCargos.clear(); aeExecs.clear();
+    aeBuildFilters();
+    aeRedraw();
+  };
+
+  window._aeRedraw=aeRedraw;
+})();
+
+
+// call aeBuildFilters after RAW loaded
 
 </script>
 
