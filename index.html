@@ -2485,6 +2485,7 @@ function drawEstadoChart(){
   window._equipeToggleYr=function(yr,btn){
     if(_activeYrs.has(yr)&&_activeYrs.size>1){_activeYrs.delete(yr);btn.classList.remove('active');}
     else{_activeYrs.add(yr);btn.classList.add('active');}
+    if(_chart){_chart.destroy();_chart=null;}
     redraw();
   };
 
@@ -2621,7 +2622,7 @@ function drawEstadoChart(){
       _curMode=mode; _curKey=stateKey;
       _selectedKeys=new Set(selectedKeys);
       const yrs=getAvailYears();
-      _activeYrs=new Set(yrs.slice(-3));
+      _activeYrs=new Set([2026]);
       const allKeys=_getAllKeys(mode);
       _activeComp=new Set(); // no peer comparison — user controls via filter
       buildYrBtns(yrs);
