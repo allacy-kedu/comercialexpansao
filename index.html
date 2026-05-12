@@ -2276,19 +2276,24 @@ function drawEstadoChart(){
     return p[idx%p.length];
   }
 
-  function buildSeriesData(mode){
+  // Build aggregated fat_kedu per key, filtered by active period
+  function buildSeriesData(mode, activeMonths){
     const agg={};
     RAW.forEach(r=>{
       if(!r.assinatura||!r.fat_kedu) return;
+      // Period filter — respect filterbar months when provided
+      if(activeMonths && activeMonths.length){
+        const mo=parseInt(r.assinatura.slice(5,7));
+        if(!activeMonths.includes(mo)) return;
+      }
       let k=null;
       if(mode==='lideranca'){
-        const t=TEAM[r.executivo]; if(!t) return;
-        k=(t.regional==='R1'||t.regional==='Regional 1')?'Regional 1':'Regional 2';
+        k=r.lideranca||null;
       } else if(mode==='cargo'){
-        const t=TEAM[r.executivo]; if(!t) return;
-        const c=t.cargo;
-        if(c==='Coordenador Comercial'||c==='Coordenadora Comercial') k='Closer';
-        else k=c;
+        // Use r.cargo (from CSV col[3]=Perfil); fall back to TEAM lookup
+        const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
+        if(!rc||rc==='Coordenador Comercial'||rc==='Coordenadora Comercial') return;
+        k=rc;
       } else if(mode==='executivo'){
         k=r.executivo;
       }
@@ -2307,11 +2312,25 @@ function drawEstadoChart(){
     return [...s].sort();
   }
 
+  // Derive all possible keys from RAW directly — no TEAM dependency
   function _getAllKeys(mode){
     if(!mode) return [];
-    if(mode==='lideranca') return ['Regional 1','Regional 2'];
-    if(mode==='cargo') return ['Closer','Inside Sales'];
-    if(mode==='executivo') return Object.keys(TEAM).filter(n=>TEAM[n].cargo!=='Coordenador Comercial'&&TEAM[n].cargo!=='Coordenadora Comercial');
+    if(mode==='lideranca'){
+      const s=new Set(RAW.map(r=>r.lideranca).filter(Boolean));
+      return [...s].sort();
+    }
+    if(mode==='cargo'){
+      const s=new Set(RAW.map(r=>{
+        const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;
+        if(!rc||rc==='Coordenador Comercial'||rc==='Coordenadora Comercial') return null;
+        return rc;
+      }).filter(Boolean));
+      return [...s].sort();
+    }
+    if(mode==='executivo'){
+      const s=new Set(RAW.map(r=>r.executivo).filter(Boolean));
+      return [...s].sort();
+    }
     return [];
   }
 
@@ -2388,7 +2407,7 @@ function drawEstadoChart(){
     });
   }
 
-  function buildDatasets(agg,shownKeys,yrs){
+  function buildDatasets(agg,shownKeys,yrs,activeMonths){
     const datasets=[];
     shownKeys.forEach((k,ki)=>{
       const isMain=(k===_curKey);
@@ -2398,8 +2417,8 @@ function drawEstadoChart(){
         const alpha=isMain?1:.32;
         const col=hexA(color,alpha);
         const today=new Date();
-        const data=Array.from({length:12},(_,i)=>{
-          const m=i+1;
+        const months=activeMonths&&activeMonths.length?activeMonths:Array.from({length:12},(_,i)=>i+1);
+        const data=months.map(m=>{
           if(yr===today.getFullYear()&&m>today.getMonth()+1) return null;
           return(agg[k]&&agg[k][yr]&&agg[k][yr][m])||0;
         });
@@ -2409,21 +2428,44 @@ function drawEstadoChart(){
     return datasets;
   }
 
+  function getActiveMonths(){
+    const ALL_MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    let months=[];
+    if(filters.dateFrom||filters.dateTo){
+      const mStart=filters.dateFrom?parseInt(filters.dateFrom.slice(5,7)):1;
+      const mEnd=filters.dateTo?parseInt(filters.dateTo.slice(5,7)):12;
+      for(let m=mStart;m<=mEnd;m++) months.push(m);
+    } else {
+      months=[new Date().getMonth()+1];
+    }
+    return months;
+  }
+
   function redraw(){
     const card=document.getElementById('equipe-chart-card');
     const canvas=document.getElementById('equipe-chart');
     if(!card||!canvas) return;
     if(!_curMode||!_curKey){card.style.display='none';if(_chart){_chart.destroy();_chart=null;}return;}
+    const activeMonths=getActiveMonths();
     const allKeys=_getAllKeys(_curMode);
-    const agg=buildSeriesData(_curMode);
+    const agg=buildSeriesData(_curMode, activeMonths);
     const yrs=[..._activeYrs].sort();
     const shownKeys=[_curKey,...[..._activeComp].filter(k=>allKeys.includes(k))];
-    const datasets=buildDatasets(agg,shownKeys,yrs);
+    const datasets=buildDatasets(agg,shownKeys,yrs,activeMonths);
     buildTotals(agg,allKeys,yrs);
+    // Update subtitle with period info
+    const sub=document.getElementById('equipe-chart-sub');
+    if(sub){
+      const MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const comp=[..._activeComp].join(' + ');
+      const perStr=activeMonths.length>1?MN[activeMonths[0]-1]+' a '+MN[activeMonths[activeMonths.length-1]-1]:MN[activeMonths[0]-1];
+      sub.textContent='Fat. Kedu · '+perStr+(comp?' · vs: '+comp:'');
+    }
     card.style.display='block';
     if(_chart){_chart.data.datasets=datasets;_chart.update('none');return;}
     const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    _chart=new Chart(canvas,{type:'line',data:{labels:MONTHS_SHORT,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;const pre=ctx.dataset._main?'● ':'○ ';return pre+ctx.dataset._k+' '+ctx.dataset._yr+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v)},border:{display:false}}}}});
+    const chartLabels=activeMonths&&activeMonths.length?activeMonths.map(m=>MONTHS_SHORT[m-1]):MONTHS_SHORT;
+    _chart=new Chart(canvas,{type:'line',data:{labels:chartLabels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;const pre=ctx.dataset._main?'● ':'○ ';return pre+ctx.dataset._k+' '+ctx.dataset._yr+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v)},border:{display:false}}}}});
   }
 
   window.drawEquipeChart=function(){
@@ -2431,8 +2473,8 @@ function drawEstadoChart(){
     const lideranca=filters.lideranca, cargo=filters.cargo, executivo=filters.executivo;
     let mode=null,key=null;
     if(executivo){mode='executivo';key=executivo;}
-    else if(cargo){mode='cargo';key=cargo==='Closer'?'Closer':'Inside Sales';}
-    else if(lideranca){mode='lideranca';key=(lideranca==='Regional 1'||lideranca==='R1')?'Regional 1':'Regional 2';}
+    else if(cargo){mode='cargo';key=cargo;}
+    else if(lideranca){mode='lideranca';key=lideranca;}
     if(!mode||!key){card.style.display='none';if(_chart){_chart.destroy();_chart=null;}return;}
     if(key!==_curKey||mode!==_curMode){
       _curMode=mode;_curKey=key;
@@ -2447,8 +2489,7 @@ function drawEstadoChart(){
     const titleMap={lideranca:key+' — Evolução Mensal',cargo:key+'s — Evolução Mensal',executivo:key+' — Evolução Mensal'};
     const el=document.getElementById('equipe-chart-title');
     if(el) el.textContent=titleMap[mode]||key;
-    const sub=document.getElementById('equipe-chart-sub');
-    if(sub){const c=[..._activeComp].join(' + ');sub.textContent='Fat. Kedu mensal'+(c?' · comparando com: '+c:'');}
+    // subtitle updated inside redraw() with period context
     redraw();
   };
 
@@ -2559,6 +2600,7 @@ function parseCSVtoRAW(csv){
       num,
       executivo:    d(c[1]),
       lideranca:    d(c[2]),
+      cargo:        d(c[3]),
       escola:       d(c[4]),
       fat_escola:   n(c[7]),
       fat_kedu:     n(c[8]),
