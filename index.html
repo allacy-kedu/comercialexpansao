@@ -2584,9 +2584,19 @@ function drawEstadoChart(){
       sub.textContent='Fat. Kedu · '+perStr+(comp?' · vs: '+comp:'');
     }
     card.style.display='block';
-    if(_chart){_chart.data.datasets=datasets;_chart.update('none');return;}
     const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const chartLabels=activeMonths&&activeMonths.length?activeMonths.map(m=>MONTHS_SHORT[m-1]):MONTHS_SHORT;
+    if(_chart){
+      // Destroy and recreate if label count changed (period changed)
+      if(_chart.data.labels.length!==chartLabels.length){
+        _chart.destroy(); _chart=null;
+      } else {
+        _chart.data.labels=chartLabels;
+        _chart.data.datasets=datasets;
+        _chart.update('none');
+        return;
+      }
+    }
     _chart=new Chart(canvas,{type:'line',data:{labels:chartLabels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;const pre=ctx.dataset._main?'● ':'○ ';return pre+ctx.dataset._k+' '+ctx.dataset._yr+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v)},border:{display:false}}}}});
   }
 
