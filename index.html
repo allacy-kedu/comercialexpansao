@@ -2731,6 +2731,9 @@ function toggleTheme(){
   const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const YR_COLORS={2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
   const KEY_COLORS={'Regional 1':'#4ECDC4','Regional 2':'#A29BFE','Closer':'#FFE66D','Inside Sales':'#FF6B6B'};
+  const AE_PALETTE=['#4ECDC4','#A29BFE','#FFE66D','#FF6B6B','#fd79a8','#74b9ff','#00b894','#e17055','#fdcb6e','#55efc4'];
+  const aeColorMap={}; // key → fixed color, assigned on first selection
+  let aeColorIdx=0;
   const YS={2022:{dash:[2,3],w:1,pr:2},2023:{dash:[2,3],w:1,pr:2},2024:{dash:[4,4],w:1.3,pr:2.5},2025:{dash:[],w:2,pr:3.5},2026:{dash:[6,3],w:2,pr:3.5}};
 
   let aeChart=null;
@@ -2741,7 +2744,19 @@ function toggleTheme(){
   let aeExecs=new Set();
 
   function hexA(h,a){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return 'rgba('+r+','+g+','+b+','+a+')';}
-  function aeKeyColor(k,allKeys){if(KEY_COLORS[k])return KEY_COLORS[k];const p=['#4ECDC4','#A29BFE','#FFE66D','#FF6B6B','#fd79a8','#74b9ff','#00b894','#e17055','#fdcb6e','#55efc4'];return p[(allKeys||[]).indexOf(k)%p.length];}
+  function aeKeyColor(k){
+    if(KEY_COLORS[k]) return KEY_COLORS[k];
+    if(!aeColorMap[k]){
+      // assign next available palette color not already in use
+      const used=new Set(Object.values(aeColorMap));
+      let c=AE_PALETTE[aeColorIdx%AE_PALETTE.length];
+      let tries=0;
+      while(used.has(c)&&tries<AE_PALETTE.length){aeColorIdx++;c=AE_PALETTE[aeColorIdx%AE_PALETTE.length];tries++;}
+      aeColorMap[k]=c;
+      aeColorIdx++;
+    }
+    return aeColorMap[k];
+  }
   function fmtV(v){if(!v&&v!==0)return'—';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K';return'R$ '+v.toFixed(0);}
 
   function pill(containerId, val, set, colorFn){
@@ -2757,7 +2772,17 @@ function toggleTheme(){
       btn.style.fontWeight=on?'700':'400';
     };
     applyStyle();
-    btn.onclick=()=>{set.has(val)?set.delete(val):set.add(val);applyStyle();aeRedraw();};
+    btn.onclick=()=>{
+      if(set.has(val)){
+        set.delete(val);
+        // release color only if not a KEY_COLORS entry
+        if(!KEY_COLORS[val]) delete aeColorMap[val];
+      } else {
+        set.add(val);
+        aeKeyColor(val); // assign color immediately on select
+      }
+      applyStyle();aeRedraw();
+    };
     document.getElementById(containerId).appendChild(btn);
   }
 
@@ -2852,7 +2877,7 @@ function toggleTheme(){
     const today=new Date();
     const datasets=[];
     keys.forEach((k,ki)=>{
-      const color=aeKeyColor(k,keys);
+      const color=aeKeyColor(k);
       anos.forEach(yr=>{
         const ys=YS[yr]||{dash:[],w:1.5,pr:3};
         const data=meses.map(m=>{
@@ -2866,15 +2891,22 @@ function toggleTheme(){
       });
     });
 
-    // Totals
+    // Totals — with % gap from leader
     totals.innerHTML='';
-    datasets.forEach(ds=>{
-      const total=ds.data.reduce((s,v)=>s+(v||0),0);
-      if(!total)return;
-      const pill=document.createElement('div');
-      pill.style.cssText='display:flex;align-items:center;gap:6px;background:'+hexA(ds.borderColor,.08)+';border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
-      pill.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;"></span><span style="font-size:9px;color:var(--muted2);">'+ds.label+'</span><span style="font-size:11px;font-weight:700;color:'+ds.borderColor+';">'+fmtV(total)+'</span>';
-      totals.appendChild(pill);
+    const dsWithTotal=datasets.map(ds=>({ds,total:ds.data.reduce((s,v)=>s+(v||0),0)})).filter(d=>d.total>0);
+    const maxTotal=dsWithTotal.reduce((m,d)=>Math.max(m,d.total),0);
+    dsWithTotal.forEach(({ds,total})=>{
+      const p=document.createElement('div');
+      p.style.cssText='display:flex;align-items:center;gap:6px;background:'+hexA(ds.borderColor,.08)+';border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
+      const isLeader=total>=maxTotal;
+      const pctHtml=isLeader
+        ?'<span style="font-size:9px;color:#00b894;margin-left:2px;">↑ líder</span>'
+        :'<span style="font-size:9px;color:#ff7675;margin-left:2px;">↓ '+Math.abs(((total-maxTotal)/maxTotal*100).toFixed(1))+'%</span>';
+      p.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;"></span>'
+        +'<span style="font-size:9px;color:var(--muted2);">'+ds.label+'</span>'
+        +'<span style="font-size:11px;font-weight:700;color:'+ds.borderColor+';">'+fmtV(total)+'</span>'
+        +pctHtml;
+      totals.appendChild(p);
     });
 
     if(!datasets.length){empty.style.display='flex';wrap.style.display='none';if(aeChart){aeChart.destroy();aeChart=null;}subEl.textContent='Nenhum dado para os filtros selecionados';return;}
@@ -2883,11 +2915,51 @@ function toggleTheme(){
     if(aeChart){aeChart.data.labels=labels;aeChart.data.datasets=datasets;aeChart.update('none');return;}
 
     const canvas=document.getElementById('ae-chart');
-    aeChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,19,32,0.97)',titleColor:'#8394aa',titleFont:{family:'DM Mono,monospace',size:10},bodyFont:{family:'DM Mono,monospace',size:11},padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,filter:i=>i.raw!==null&&i.raw!==0,callbacks:{label:ctx=>{const v=ctx.raw;if(!v)return null;return ctx.dataset.label+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0));}}}},scales:{x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v)},border:{display:false}}}}});
+    aeChart=new Chart(canvas,{
+      type:'line',
+      data:{labels,datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,animation:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            backgroundColor:'rgba(17,19,32,0.97)',
+            titleColor:'#8394aa',
+            titleFont:{family:'DM Mono,monospace',size:10},
+            bodyFont:{family:'DM Mono,monospace',size:11},
+            padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,
+            filter:i=>i.raw!==null&&i.raw!==0,
+            callbacks:{
+              label:ctx=>{
+                const v=ctx.raw; if(!v) return null;
+                return ctx.dataset.label+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0));
+              },
+              afterLabel:ctx=>{
+                const v=ctx.raw; if(!v) return null;
+                const idx=ctx.dataIndex;
+                const allVals=ctx.chart.data.datasets.map(ds=>ds.data[idx]).filter(x=>x!=null&&x>0);
+                if(allVals.length<2) return null;
+                const maxVal=Math.max(...allVals);
+                if(v>=maxVal) return '  ↑ líder neste mês';
+                return '  ↓ '+Math.abs(((v-maxVal)/maxVal*100).toFixed(1))+'% vs líder';
+              }
+            }
+          }
+        },
+        scales:{
+          x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},
+          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v)},border:{display:false}}
+        }
+      }
+    })
   }
 
   window.aeReset=function(){
     aeAnos=new Set([2026]); aeMeses.clear(); aeRegs.clear(); aeCargos.clear(); aeExecs.clear();
+    // clear color assignments so fresh selections get clean colors
+    Object.keys(aeColorMap).forEach(k=>delete aeColorMap[k]);
+    aeColorIdx=0;
     aeBuildFilters();
     aeRedraw();
   };
