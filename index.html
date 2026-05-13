@@ -2915,6 +2915,56 @@ function toggleTheme(){
     if(aeChart){aeChart.data.labels=labels;aeChart.data.datasets=datasets;aeChart.update('none');return;}
 
     const canvas=document.getElementById('ae-chart');
+
+    // External HTML tooltip
+    function aeTooltipHandler(ctx){
+      const {chart,tooltip}=ctx;
+      let el=document.getElementById('ae-tooltip');
+      if(!el){
+        el=document.createElement('div');
+        el.id='ae-tooltip';
+        el.style.cssText='position:absolute;pointer-events:none;z-index:999;background:rgba(17,19,32,0.97);border:1px solid rgba(99,179,237,0.18);border-radius:10px;padding:12px 14px;font-family:DM Mono,monospace;min-width:200px;transition:opacity .15s;';
+        chart.canvas.parentNode.style.position='relative';
+        chart.canvas.parentNode.appendChild(el);
+      }
+      if(tooltip.opacity===0){el.style.opacity='0';return;}
+      const idx=tooltip.dataIndex;
+      const MONTHS_S=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const titleStr=tooltip.title&&tooltip.title[0]?tooltip.title[0]:'';
+      // Collect visible data points at this index
+      const pts=chart.data.datasets
+        .map(ds=>({label:ds.label,color:ds.borderColor,v:ds.data[idx]}))
+        .filter(p=>p.v!=null&&p.v>0);
+      if(!pts.length){el.style.opacity='0';return;}
+      // Sort descending
+      pts.sort((a,b)=>b.v-a.v);
+      const maxV=pts[0].v;
+      const fv=v=>v>=1e6?'R$'+(v/1e6).toFixed(2)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v.toFixed(0);
+      let html='<div style="font-size:9px;color:#5a6a82;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid rgba(99,179,237,0.08);">'+titleStr+'</div>';
+      pts.forEach(p=>{
+        const isLeader=p.v>=maxV;
+        const pct=isLeader?'':Math.abs(((p.v-maxV)/maxV*100).toFixed(0));
+        const badge=isLeader
+          ?'<span style="font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(0,184,148,0.12);color:#00b894;white-space:nowrap;">↑ líder</span>'
+          :'<span style="font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(255,118,117,0.12);color:#ff7675;white-space:nowrap;">↓ '+pct+'%</span>';
+        html+='<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);">'
+          +'<span style="width:7px;height:7px;border-radius:50%;background:'+p.color+';flex-shrink:0;"></span>'
+          +'<span style="font-size:10px;color:#8394aa;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.label+'</span>'
+          +'<span style="font-size:11px;font-weight:700;color:'+p.color+';white-space:nowrap;">'+fv(p.v)+'</span>'
+          +badge
+          +'</div>';
+      });
+      el.innerHTML=html;
+      el.style.opacity='1';
+      // Position
+      const pos=chart.canvas.getBoundingClientRect();
+      const wrap=chart.canvas.parentNode.getBoundingClientRect();
+      let left=tooltip.caretX+12;
+      if(left+el.offsetWidth>wrap.width-8) left=tooltip.caretX-el.offsetWidth-12;
+      el.style.left=left+'px';
+      el.style.top=Math.max(0,tooltip.caretY-el.offsetHeight/2)+'px';
+    }
+
     aeChart=new Chart(canvas,{
       type:'line',
       data:{labels,datasets},
@@ -2923,29 +2973,7 @@ function toggleTheme(){
         interaction:{mode:'index',intersect:false},
         plugins:{
           legend:{display:false},
-          tooltip:{
-            backgroundColor:'rgba(17,19,32,0.97)',
-            titleColor:'#8394aa',
-            titleFont:{family:'DM Mono,monospace',size:10},
-            bodyFont:{family:'DM Mono,monospace',size:11},
-            padding:12,borderColor:'rgba(99,179,237,0.2)',borderWidth:1,
-            filter:i=>i.raw!==null&&i.raw!==0,
-            callbacks:{
-              label:ctx=>{
-                const v=ctx.raw; if(!v) return null;
-                return ctx.dataset.label+': R$'+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0));
-              },
-              afterLabel:ctx=>{
-                const v=ctx.raw; if(!v) return null;
-                const idx=ctx.dataIndex;
-                const allVals=ctx.chart.data.datasets.map(ds=>ds.data[idx]).filter(x=>x!=null&&x>0);
-                if(allVals.length<2) return null;
-                const maxVal=Math.max(...allVals);
-                if(v>=maxVal) return '  ↑ líder neste mês';
-                return '  ↓ '+Math.abs(((v-maxVal)/maxVal*100).toFixed(1))+'% vs líder';
-              }
-            }
-          }
+          tooltip:{enabled:false,external:aeTooltipHandler}
         },
         scales:{
           x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},
