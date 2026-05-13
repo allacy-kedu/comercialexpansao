@@ -2920,12 +2920,13 @@ function toggleTheme(){
     function aeTooltipHandler(ctx){
       const {chart,tooltip}=ctx;
       let el=document.getElementById('ae-tooltip');
+      const card=document.getElementById('ae-chart-card');
       if(!el){
         el=document.createElement('div');
         el.id='ae-tooltip';
-        el.style.cssText='position:absolute;pointer-events:none;z-index:999;background:rgba(17,19,32,0.97);border:1px solid rgba(99,179,237,0.18);border-radius:10px;padding:12px 14px;font-family:DM Mono,monospace;min-width:200px;transition:opacity .15s;';
-        chart.canvas.parentNode.style.position='relative';
-        chart.canvas.parentNode.appendChild(el);
+        el.style.cssText='position:absolute;pointer-events:none;z-index:999;background:rgba(17,19,32,0.97);border:1px solid rgba(99,179,237,0.18);border-radius:10px;padding:12px 14px;font-family:DM Mono,monospace;min-width:200px;transition:opacity .15s;box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+        if(card){card.style.position='relative';card.style.overflow='visible';card.appendChild(el);}
+        else{chart.canvas.parentNode.style.position='relative';chart.canvas.parentNode.appendChild(el);}
       }
       if(tooltip.opacity===0){el.style.opacity='0';return;}
       const idx=tooltip.dataIndex;
@@ -2956,13 +2957,16 @@ function toggleTheme(){
       });
       el.innerHTML=html;
       el.style.opacity='1';
-      // Position
-      const pos=chart.canvas.getBoundingClientRect();
-      const wrap=chart.canvas.parentNode.getBoundingClientRect();
-      let left=tooltip.caretX+12;
-      if(left+el.offsetWidth>wrap.width-8) left=tooltip.caretX-el.offsetWidth-12;
-      el.style.left=left+'px';
-      el.style.top=Math.max(0,tooltip.caretY-el.offsetHeight/2)+'px';
+      // Position relative to card
+      const cardRect=card?card.getBoundingClientRect():chart.canvas.parentNode.getBoundingClientRect();
+      const canvasRect=chart.canvas.getBoundingClientRect();
+      const offsetX=canvasRect.left-cardRect.left;
+      const offsetY=canvasRect.top-cardRect.top;
+      let left=offsetX+tooltip.caretX+14;
+      const tipW=el.offsetWidth||220;
+      if(left+tipW>cardRect.width-8) left=offsetX+tooltip.caretX-tipW-14;
+      el.style.left=Math.max(0,left)+'px';
+      el.style.top=Math.max(0,offsetY+tooltip.caretY-(el.offsetHeight||100)/2)+'px';
     }
 
     aeChart=new Chart(canvas,{
