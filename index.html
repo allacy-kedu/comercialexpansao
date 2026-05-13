@@ -2920,25 +2920,20 @@ function toggleTheme(){
     function aeTooltipHandler(ctx){
       const {chart,tooltip}=ctx;
       let el=document.getElementById('ae-tooltip');
-      const card=document.getElementById('ae-chart-card');
       if(!el){
         el=document.createElement('div');
         el.id='ae-tooltip';
-        el.style.cssText='position:absolute;pointer-events:none;z-index:999;background:rgba(17,19,32,0.97);border:1px solid rgba(99,179,237,0.18);border-radius:10px;padding:12px 14px;font-family:DM Mono,monospace;min-width:200px;transition:opacity .15s;box-shadow:0 4px 20px rgba(0,0,0,0.4);';
-        if(card){card.style.position='relative';card.style.overflow='visible';card.appendChild(el);}
-        else{chart.canvas.parentNode.style.position='relative';chart.canvas.parentNode.appendChild(el);}
+        el.style.cssText='position:fixed;pointer-events:none;z-index:9999;background:rgba(17,19,32,0.97);border:1px solid rgba(99,179,237,0.18);border-radius:10px;padding:12px 14px;font-family:DM Mono,monospace;min-width:210px;opacity:0;transition:opacity .1s;';
+        document.body.appendChild(el);
       }
       if(tooltip.opacity===0){el.style.opacity='0';return;}
       const idx=tooltip.dataIndex;
-      const MONTHS_S=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
       const titleStr=tooltip.title&&tooltip.title[0]?tooltip.title[0]:'';
-      // Collect visible data points at this index
       const pts=chart.data.datasets
         .map(ds=>({label:ds.label,color:ds.borderColor,v:ds.data[idx]}))
-        .filter(p=>p.v!=null&&p.v>0);
+        .filter(p=>p.v!=null&&p.v>0)
+        .sort((a,b)=>b.v-a.v);
       if(!pts.length){el.style.opacity='0';return;}
-      // Sort descending
-      pts.sort((a,b)=>b.v-a.v);
       const maxV=pts[0].v;
       const fv=v=>v>=1e6?'R$'+(v/1e6).toFixed(2)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v.toFixed(0);
       let html='<div style="font-size:9px;color:#5a6a82;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid rgba(99,179,237,0.08);">'+titleStr+'</div>';
@@ -2952,21 +2947,26 @@ function toggleTheme(){
           +'<span style="width:7px;height:7px;border-radius:50%;background:'+p.color+';flex-shrink:0;"></span>'
           +'<span style="font-size:10px;color:#8394aa;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.label+'</span>'
           +'<span style="font-size:11px;font-weight:700;color:'+p.color+';white-space:nowrap;">'+fv(p.v)+'</span>'
-          +badge
-          +'</div>';
+          +badge+'</div>';
       });
       el.innerHTML=html;
-      el.style.opacity='1';
-      // Position relative to card
-      const cardRect=card?card.getBoundingClientRect():chart.canvas.parentNode.getBoundingClientRect();
+      // Position using fixed coords from canvas bounding rect
       const canvasRect=chart.canvas.getBoundingClientRect();
-      const offsetX=canvasRect.left-cardRect.left;
-      const offsetY=canvasRect.top-cardRect.top;
-      let left=offsetX+tooltip.caretX+14;
+      const x=canvasRect.left+tooltip.caretX;
+      const y=canvasRect.top+tooltip.caretY;
+      el.style.opacity='1';
+      // Force layout to get real dimensions
       const tipW=el.offsetWidth||220;
-      if(left+tipW>cardRect.width-8) left=offsetX+tooltip.caretX-tipW-14;
-      el.style.left=Math.max(0,left)+'px';
-      el.style.top=Math.max(0,offsetY+tooltip.caretY-(el.offsetHeight||100)/2)+'px';
+      const tipH=el.offsetHeight||160;
+      const vw=window.innerWidth;
+      const vh=window.innerHeight;
+      let left=x+16;
+      if(left+tipW>vw-12) left=x-tipW-16;
+      let top=y-tipH/2;
+      if(top<8) top=8;
+      if(top+tipH>vh-8) top=vh-tipH-8;
+      el.style.left=left+'px';
+      el.style.top=top+'px';
     }
 
     aeChart=new Chart(canvas,{
