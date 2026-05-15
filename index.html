@@ -2908,6 +2908,18 @@ function toggleTheme(){
         +pctHtml;
       totals.appendChild(p);
     });
+    // Grand total pill — only when more than one series
+    if(dsWithTotal.length>1){
+      const grandTotal=dsWithTotal.reduce((s,d)=>s+d.total,0);
+      const sep=document.createElement('div');
+      sep.style.cssText='width:1px;height:28px;background:var(--border);align-self:center;margin:0 2px;';
+      totals.appendChild(sep);
+      const gt=document.createElement('div');
+      gt.style.cssText='display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:4px 12px;font-family:DM Mono,monospace;';
+      gt.innerHTML='<span style="font-size:9px;color:var(--muted);">Total consolidado</span>'
+        +'<span style="font-size:12px;font-weight:700;color:var(--text);">'+fmtV(grandTotal)+'</span>';
+      totals.appendChild(gt);
+    }
 
     if(!datasets.length){empty.style.display='flex';wrap.style.display='none';if(aeChart){aeChart.destroy();aeChart=null;}subEl.textContent='Nenhum dado para os filtros selecionados';return;}
 
