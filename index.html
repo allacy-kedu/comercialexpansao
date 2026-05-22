@@ -1011,7 +1011,7 @@ function invalidateCache(){
 }
 
 // helpers
-const fmt=v=>{if(v===null||v===undefined||isNaN(v))return'—';if(v>=1e9)return'R$ '+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'R$ '+(v/1000).toFixed(0)+'K';return'R$ '+v.toFixed(0);};
+const fmt=v=>{if(v===null||v===undefined||isNaN(v))return'—';if(v>=1e9)return'R$ '+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';}return'R$ '+v.toFixed(0);};
 const fmtN=v=>(v!==null&&v!==undefined)?v.toLocaleString('pt-BR'):'—';
 const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—';
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
@@ -1490,7 +1490,7 @@ function rankingAvatar(nome, metaHit){
       ctr[exec] = (ctr[exec]||0) + 1;
     });
 
-    const fmtR = v => v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
+    const fmtR = v => v>=1000000?(v/1000000).toFixed(2)+'M':(()=>{const k=v/1000;return(Number.isInteger(k)?k:k.toFixed(1))+'K';})();
     const hoje = new Date();
     const mesAtual = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
     const emAndamento = meses.includes(mesAtual);
@@ -1602,7 +1602,7 @@ function rankingAvatar(nome, metaHit){
       buildRows(isSales, metaIS, 'ranking-is');
 
       // Always show meta individual alongside col titles
-      const fmtMeta = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
+      const fmtMeta = v => v>=1e6?(v/1e6).toFixed(2)+'M':(()=>{const k=v/1000;return(Number.isInteger(k)?k:k.toFixed(1))+'K';})();
       const metaCloserLabel = document.getElementById('ranking-meta-closer');
       const metaISLabel     = document.getElementById('ranking-meta-is');
       if(metaCloserLabel) metaCloserLabel.textContent = '· Meta R$ '+fmtMeta(metaCloser);
@@ -2559,7 +2559,7 @@ function buildMelhorMes(){
   const _campMesMap = {4:'abril',5:'maio',6:'junho'};
   let campMesAtivo = _campMesMap[new Date().getMonth()+1] || 'abril';
 
-  function fmtR(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':v>=1000?'R$ '+(v/1000).toFixed(0)+'K':'R$ '+Math.round(v).toLocaleString('pt-BR'); }
+  function fmtR(v){ if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1000){ const k=v/1000; return 'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K'; } return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
   function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
@@ -2763,7 +2763,7 @@ function toggleTheme(){
     }
     return aeColorMap[k];
   }
-  function fmtV(v){if(!v&&v!==0)return'—';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K';return'R$ '+v.toFixed(0);}
+  function fmtV(v){if(!v&&v!==0)return'—';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';}return'R$ '+v.toFixed(0);}
 
   function pill(containerId, val, set, colorFn){
     const btn=document.createElement('button');
@@ -2996,7 +2996,7 @@ function toggleTheme(){
 let _modalData = [];
 let _modalSort = {col:'assina', dir:1};
 
-function fmtCur(v){ if(!v&&v!==0)return'—'; if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K'; return'R$ '+v.toFixed(0); }
+function fmtCur(v){ if(!v&&v!==0)return'—'; if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';} return'R$ '+v.toFixed(0); }
 
 const STATUS_COLORS = {
   'Ativo':'rgba(82,199,125,.12)||#52c77d',
@@ -3104,6 +3104,44 @@ function updateModalBtn(){
 }
 
 </script>
+
+<!-- Modal Contratos -->
+<div id="contratos-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:1200px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div>
+        <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text);" id="modal-title">Contratos</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="modal-sub">—</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input id="modal-search" type="text" placeholder="Buscar escola ou executivo..." oninput="filterModalTable()" style="height:30px;padding:0 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;outline:none;width:240px;">
+        <button onclick="closeContratosModal()" style="width:30px;height:30px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+      </div>
+    </div>
+    <div style="overflow:auto;flex:1;">
+      <table id="modal-table" style="width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;">
+        <thead>
+          <tr style="position:sticky;top:0;background:var(--card);z-index:1;">
+            <th data-col="num"    onclick="sortModal(this,'num')"    style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Nº ↕</th>
+            <th data-col="exec"   onclick="sortModal(this,'exec')"   style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Executivo ↕</th>
+            <th data-col="escola" onclick="sortModal(this,'escola')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Escola ↕</th>
+            <th data-col="fat_e"  onclick="sortModal(this,'fat_e')"  style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Escola ↕</th>
+            <th data-col="fat_k"  onclick="sortModal(this,'fat_k')"  style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Kedu ↕</th>
+            <th data-col="taxa"   onclick="sortModal(this,'taxa')"   style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Taxa ↕</th>
+            <th data-col="assina" onclick="sortModal(this,'assina')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Assinatura ↕</th>
+            <th data-col="estado" onclick="sortModal(this,'estado')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Estado ↕</th>
+            <th data-col="status" onclick="sortModal(this,'status')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Status ↕</th>
+          </tr>
+        </thead>
+        <tbody id="modal-tbody"></tbody>
+      </table>
+    </div>
+    <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span id="modal-count">—</span>
+      <span style="font-size:9px;color:var(--muted2);">Clique no cabeçalho para ordenar · Esc para fechar</span>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
