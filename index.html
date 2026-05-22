@@ -1748,6 +1748,7 @@ function onFilterChange(){
   filters.status=document.getElementById('f-status').value;
   filters.modelo=document.getElementById('f-modelo').value;
   update();
+  if(typeof updateModalBtn==='function') updateModalBtn();
 }
 ['f-status','f-modelo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',onFilterChange); });
 // resetFilters definido no seletor de meses
@@ -2985,6 +2986,117 @@ function toggleTheme(){
 
 
 // call aeBuildFilters after RAW loaded
+
+// ── Modal Contratos ───────────────────────────────────────────
+let _modalData = [];
+let _modalSort = {col:'assina', dir:1};
+
+function fmtCur(v){ if(!v&&v!==0)return'—'; if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K'; return'R$ '+v.toFixed(0); }
+
+const STATUS_COLORS = {
+  'Ativo':'rgba(82,199,125,.12)||#52c77d',
+  'Churn':'rgba(255,107,107,.12)||#ff6b6b',
+  'Cancelado':'rgba(246,173,85,.12)||#f6ad55',
+  'Implantando':'rgba(178,148,244,.12)||#b294f4',
+};
+
+function openContratosModal(){
+  const data = applyFiltersCached();
+  _modalData = data.map(r=>({
+    num:    r.num||'—',
+    exec:   r.executivo||'—',
+    escola: r.escola||'—',
+    fat_e:  r.fat_escola||0,
+    fat_k:  r.fat_kedu||0,
+    taxa:   r.taxa,
+    assina: r.assinatura||'',
+    estado: r.estado||'—',
+    status: r.status||'—',
+  }));
+  const fromTo = filters.dateFrom||filters.dateTo
+    ? (filters.dateFrom||'')+(filters.dateTo&&filters.dateTo!==filters.dateFrom?' → '+filters.dateTo:'')
+    : 'Período completo';
+  document.getElementById('modal-title').textContent = 'Contratos do período';
+  document.getElementById('modal-sub').textContent = fromTo+' · '+_modalData.length+' contratos';
+  document.getElementById('modal-search').value = '';
+  _modalSort = {col:'assina', dir:1};
+  renderModalTable(_modalData);
+  document.getElementById('contratos-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeContratosModal(){
+  document.getElementById('contratos-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  const m=document.getElementById('contratos-modal');
+  if(m) m.addEventListener('click', function(e){ if(e.target===this) closeContratosModal(); });
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeContratosModal(); });
+
+function filterModalTable(){
+  const q=document.getElementById('modal-search').value.toLowerCase();
+  const filtered=q?_modalData.filter(r=>r.escola.toLowerCase().includes(q)||r.exec.toLowerCase().includes(q)):_modalData;
+  renderModalTable(filtered);
+}
+
+function sortModal(th, col){
+  if(_modalSort.col===col) _modalSort.dir*=-1;
+  else { _modalSort.col=col; _modalSort.dir=1; }
+  document.querySelectorAll('#modal-table th').forEach(h=>{
+    const base=h.textContent.replace(/ [↑↓↕]$/,'');
+    h.textContent=base+(h.dataset.col===col?(_modalSort.dir===1?' ↑':' ↓'):' ↕');
+    h.style.color=h.dataset.col===col?'var(--accent)':'var(--muted)';
+  });
+  const q=document.getElementById('modal-search').value.toLowerCase();
+  const filtered=q?_modalData.filter(r=>r.escola.toLowerCase().includes(q)||r.exec.toLowerCase().includes(q)):_modalData;
+  renderModalTable(filtered);
+}
+
+function renderModalTable(rows){
+  const col=_modalSort.col, dir=_modalSort.dir;
+  const sorted=[...rows].sort((a,b)=>{
+    let av=a[col],bv=b[col];
+    if(typeof av==='string') return dir*av.localeCompare(bv,'pt-BR');
+    return dir*((av||0)-(bv||0));
+  });
+  const tbody=document.getElementById('modal-tbody');
+  tbody.innerHTML='';
+  const MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  sorted.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.style.cssText='border-bottom:1px solid rgba(255,255,255,0.03);transition:background .1s;';
+    tr.onmouseover=()=>tr.style.background='rgba(78,205,196,0.03)';
+    tr.onmouseout=()=>tr.style.background='';
+    const sc=STATUS_COLORS[r.status]||'rgba(255,255,255,.06)||var(--muted)';
+    const parts=sc.split('||');
+    const bg=parts[0], clr=parts[1]||'var(--muted)';
+    let dateStr=r.assina;
+    if(dateStr&&dateStr.length>=7){const yr=dateStr.slice(0,4),mo=parseInt(dateStr.slice(5,7));dateStr=(MN[mo-1]||mo)+'/'+yr;}
+    const tdS=(val,align,color,size,extra)=>'<td style="padding:8px 12px;text-align:'+(align||'left')+';font-size:'+(size||10)+'px;color:'+(color||'var(--text)')+(extra?';'+extra:'')+'">'+val+'</td>';
+    tr.innerHTML=
+      tdS(r.num,'left','var(--muted2)',9)
+      +tdS(r.exec,'left','var(--text)',10)
+      +tdS(r.escola,'left','var(--text)',10,'max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:table-cell;')
+      +tdS(fmtCur(r.fat_e),'right','var(--muted2)',10)
+      +tdS(fmtCur(r.fat_k),'right','var(--accent)',10,'font-weight:700;')
+      +tdS(fmtPct(r.taxa),'right','var(--muted2)',10)
+      +tdS(dateStr,'left','var(--muted2)',10)
+      +tdS(r.estado,'left','var(--muted2)',10)
+      +'<td style="padding:8px 12px;"><span style="font-size:9px;padding:2px 8px;border-radius:6px;background:'+bg+';color:'+clr+';font-weight:600;white-space:nowrap;">'+r.status+'</span></td>';
+    tbody.appendChild(tr);
+  });
+  document.getElementById('modal-count').textContent=sorted.length+' de '+_modalData.length+' contratos';
+}
+
+function updateModalBtn(){
+  const btn=document.getElementById('btn-contratos-modal');
+  if(!btn) return;
+  const has=filters.dateFrom||filters.dateTo;
+  btn.style.display=has?'flex':'none';
+}
 
 </script>
 
