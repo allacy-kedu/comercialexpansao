@@ -3093,7 +3093,17 @@ function renderModalTable(rows){
       +'<td style="padding:8px 12px;"><span style="font-size:9px;padding:2px 8px;border-radius:6px;background:'+bg+';color:'+clr+';font-weight:600;white-space:nowrap;">'+r.status+'</span></td>';
     tbody.appendChild(tr);
   });
+  // Totals row
+  const totalFatE=sorted.reduce((s,r)=>s+(r.fat_e||0),0);
+  const totalFatK=sorted.reduce((s,r)=>s+(r.fat_k||0),0);
+  const taxaPonderada=totalFatE>0?totalFatK/totalFatE*100:0;
   document.getElementById('modal-count').textContent=sorted.length+' de '+_modalData.length+' contratos';
+  document.getElementById('modal-totals').innerHTML=
+    '<span style="color:var(--muted2);">Fat. Escola: </span><span style="color:var(--text);font-weight:700;">'+fmtCur(totalFatE)+'</span>'
+    +'<span style="color:var(--border2);margin:0 8px;">|</span>'
+    +'<span style="color:var(--muted2);">Fat. Kedu: </span><span style="color:var(--accent);font-weight:700;">'+fmtCur(totalFatK)+'</span>'
+    +'<span style="color:var(--border2);margin:0 8px;">|</span>'
+    +'<span style="color:var(--muted2);">Taxa ponderada: </span><span style="color:var(--text);font-weight:700;">'+taxaPonderada.toFixed(2)+'%</span>';
 }
 
 function updateModalBtn(){
@@ -3138,6 +3148,7 @@ function updateModalBtn(){
     </div>
     <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <span id="modal-count">—</span>
+      <span id="modal-totals" style="display:flex;align-items:center;gap:4px;font-size:10px;flex-wrap:wrap;"></span>
       <span style="font-size:9px;color:var(--muted2);">Clique no cabeçalho para ordenar · Esc para fechar</span>
     </div>
   </div>
