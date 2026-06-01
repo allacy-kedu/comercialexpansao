@@ -2669,14 +2669,24 @@ function buildMelhorMes(){
   }
 
   function tierHtml(ok,isNext,desc,val,falta){
-    const cls=ok?'done':isNext?'next':'locked', icon=ok?'✓':isNext?'→':'·';
-    const d=(isNext&&falta>0)?desc+' · faltam '+fmtR(falta):desc;
-    return `<div class="camp-tier ${cls}"><span class="camp-tier-icon">${icon}</span><span class="camp-tier-desc">${d}</span><span class="camp-tier-val">${val}</span></div>`;
+    const clr=ok?'#00b894':isNext?'#4ECDC4':'#5a6a82';
+    const bg=ok?'rgba(0,184,148,0.07)':isNext?'rgba(78,205,196,0.04)':'rgba(255,255,255,0.02)';
+    const br=ok?'rgba(0,184,148,0.25)':isNext?'rgba(78,205,196,0.15)':'rgba(255,255,255,0.05)';
+    const ic=ok?'✓':isNext?'→':'·';
+    const det=(isNext&&falta>0)?'Faltam '+fmtR(falta):'';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid ${br};background:${bg};margin-bottom:5px;">
+      <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:500;color:${clr};">${desc}</div>
+        ${det?`<div style="font-size:9px;color:#5a6a82;margin-top:2px;">${det}</div>`:''}
+      </div>
+      <div style="font-size:11px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
+    </div>`;
   }
 
   function triSection(realTrim,mT){
     const t130=realTrim>=mT*1.3, t150=realTrim>=mT*1.5;
-    return `<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 0 4px;border-top:1px solid var(--border);margin-top:4px;">Campanha Trimestral</div>`
+    return `<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(99,179,237,0.08);margin-top:4px;">Campanha Trimestral</div>`
       +(!t130?tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim))+tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0)
         :!t150?tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)+tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim))
         :tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)+tierHtml(true,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
@@ -2693,7 +2703,7 @@ function buildMelhorMes(){
     if(mes==='abril'){
       const t1=realAbr>=mA,t2=realTrim>=mA+mM2,t3=realTrim>=mA+mM2+mJ,tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(t1?500:0)+(t2?500:0)+(t3?1000:0)+(tri130?1000:0)+(tri150?2000:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Abril</div>`
+      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Abril</div>`
         +tierHtml(t1,!t1,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))
         +tierHtml(t2,t1&&!t2,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM2-realTrim))
         +tierHtml(t3,t2&&!t3,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM2+mJ-realTrim))
@@ -2707,7 +2717,7 @@ function buildMelhorMes(){
       const tmaijun=tmeta&&realTrim>=mM2+mJ,tabrmaijun=tmaijun&&realTrim>=mA+mM2+mJ;
       const tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(tmeta?1000:0)+(tgap?500:0)+(tmaijun?750:0)+(tabrmaijun?750:0)+(tri130?1000:0)+(tri150?2000:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Maio</div>`
+      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Maio</div>`
         +tierHtml(tmeta,!tmeta,'100% meta maio','R$ 1.000',Math.max(0,mM2-realMai))
         +(naoAbr?tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,gapAbr-sobreMai)):'')
         +tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05','+R$ 750',Math.max(0,mM2+mJ-realTrim))
@@ -2723,22 +2733,63 @@ function buildMelhorMes(){
       const t2Jun=realTrim>=mT;                   // +R$ 500
       const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 1.000 (only if t2 done)
       total=(t1Jun?1000:0)+(t2Jun?500:0)+(t3Jun?1000:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Junho</div>`
+      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Junho</div>`
         +tierHtml(t1Jun,!t1Jun,'100% meta junho ('+fmtR(mJ)+')','R$ 1.000',Math.max(0,mJ-realJun))
         +tierHtml(t2Jun,t1Jun&&!t2Jun,'100% meta trimestre Abr+Mai+Jun ('+fmtR(mT)+')','+R$ 500',Math.max(0,mT-realTrim))
         +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan–Jun ('+fmtR(metaSemEx)+')','+R$ 1.000',Math.max(0,metaSemEx-realSemEx));
     }
 
+    // Progress bars for all 3 horizons
+    const pctFloat = mMes>0?(realM/mMes*100):0;
+    const realTrimC = getReal(e.name,['2026-04','2026-05','2026-06']);
+    const mTrimC = metaTrim(e);
+    const MESES_SEM_C=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'];
+    const metaSemC = MESES_SEM_C.reduce((s,m2)=>s+metaMes(e,m2),0);
+    const realSemC = getReal(e.name,MESES_SEM_C);
+    const pctTrimC = mTrimC>0?(realTrimC/mTrimC*100):0;
+    const pctSemC  = metaSemC>0?(realSemC/metaSemC*100):0;
+    const hoje3=new Date();
+    const mesFechado={'abril':hoje3>new Date(2026,3,30),'maio':hoje3>new Date(2026,4,31),'junho':hoje3>new Date(2026,5,30)}[mes];
+    const bcE=(p,f)=>p>=100?'#00b894':f?'#e17055':'#fdcb6e';
+    const pctMesOk = pctFloat>=100;
+    const pctTrimOk = pctTrimC>=100;
+
     return `<div class="camp-card">
-      <div class="camp-card-head">${avatar(e.name,e.cor,barColor(pct))}
-        <div class="camp-card-info"><div class="camp-card-name">${e.name}</div><div class="camp-card-cargo">${e.cargo} · Meta: ${fmtR(mMes)}</div></div>
-        <div class="camp-card-pct" style="color:${pctColor(pct)}">${pct}%</div>
+      <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
+        \${avatar(e.name,e.cor,bcE(pctFloat,mesFechado&&!pctMesOk))}
+        <div class="camp-card-info" style="flex:1;">
+          <div class="camp-card-name">\${e.name}</div>
+          <div class="camp-card-cargo" style="color:#5a6a82;">\${e.cargo} · Meta \${mes}: \${fmtR(mMes)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">\${mes.charAt(0).toUpperCase()+mes.slice(1)}</div>
+          <div style="font-size:22px;font-weight:700;color:\${bcE(pctFloat,mesFechado&&!pctMesOk)};">\${pctFloat.toFixed(1)}%</div>
+        </div>
       </div>
-      <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pct)}%;background:${barColor(pct)};"></div></div>
-      <div class="camp-tiers">${tiersHtml}</div>
+
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">\${mes.charAt(0).toUpperCase()+mes.slice(1)}.</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctFloat)}%;height:100%;background:\${bcE(pctFloat,mesFechado&&!pctMesOk)};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:\${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">\${pctFloat.toFixed(1)}%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Trim.</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctTrimC)}%;height:100%;background:\${bcE(pctTrimC,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:\${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">\${pctTrimC.toFixed(1)}%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Semestre</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctSemC)}%;height:100%;background:\${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:\${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">\${pctSemC.toFixed(1)}%</div>
+        </div>
+      </div>
+
+      <div class="camp-tiers">\${tiersHtml}</div>
+
       <div class="camp-total">
-        <span class="camp-total-label">Premiação ${mes}</span>
-        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0'}</span>
+        <span class="camp-total-label">Premiação \${mes}</span>
+        <span class="camp-total-val" style="color:\${total>0?'#00b894':'var(--muted)'}">\${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
       </div></div>`;
   }
 
