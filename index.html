@@ -2916,19 +2916,70 @@ function toggleTheme(){
 
     // Totals — with % gap from leader
     totals.innerHTML='';
+    const AE_SW=["#4ECDC4", "#A29BFE", "#FFE66D", "#FF6B6B", "#fd79a8", "#74b9ff", "#00b894", "#e17055", "#fdcb6e", "#55efc4", "#6c5ce7", "#d63031"];
     const dsWithTotal=datasets.map(ds=>({ds,total:ds.data.reduce((s,v)=>s+(v||0),0)})).filter(d=>d.total>0);
     const maxTotal=dsWithTotal.reduce((m,d)=>Math.max(m,d.total),0);
-    dsWithTotal.forEach(({ds,total})=>{
+    dsWithTotal.forEach(({ds,total},pi)=>{
       const p=document.createElement('div');
-      p.style.cssText='display:flex;align-items:center;gap:6px;background:'+hexA(ds.borderColor,.08)+';border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
+      p.style.cssText='border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;font-family:DM Mono,monospace;overflow:hidden;background:'+hexA(ds.borderColor,.06)+';';
       const isLeader=total>=maxTotal;
       const pctHtml=isLeader
         ?'<span style="font-size:9px;color:#00b894;margin-left:2px;">↑ líder</span>'
         :'<span style="font-size:9px;color:#ff7675;margin-left:2px;">↓ '+Math.abs(((total-maxTotal)/maxTotal*100).toFixed(1))+'%</span>';
-      p.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;"></span>'
-        +'<span style="font-size:9px;color:var(--muted2);">'+ds.label+'</span>'
-        +'<span style="font-size:11px;font-weight:700;color:'+ds.borderColor+';">'+fmtV(total)+'</span>'
-        +pctHtml;
+      // Main row
+      const mainRow=document.createElement('div');
+      mainRow.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px 4px 10px;';
+      const dotEl=document.createElement('span');
+      dotEl.style.cssText='width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;';
+      const nameEl=document.createElement('span');
+      nameEl.style.cssText='font-size:9px;color:var(--muted2);';
+      nameEl.textContent=ds.label;
+      const valEl=document.createElement('span');
+      valEl.style.cssText='font-size:11px;font-weight:700;color:'+ds.borderColor+';';
+      valEl.textContent=fmtV(total);
+      const pctSpan=document.createElement('span');
+      pctSpan.innerHTML=pctHtml;
+      // Palette toggle btn
+      const pbtn=document.createElement('button');
+      pbtn.style.cssText='width:22px;height:22px;background:transparent;border:none;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:4px;padding:0;margin-left:2px;transition:.15s;';
+      pbtn.title='Trocar cor';
+      pbtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>';
+      // Swatches row (hidden by default)
+      const swRow=document.createElement('div');
+      swRow.style.cssText='display:none;padding:5px 10px;border-top:1px solid '+hexA(ds.borderColor,.15)+';gap:4px;flex-wrap:wrap;background:rgba(0,0,0,0.12);';
+      AE_SW.forEach(hex=>{
+        const sw=document.createElement('div');
+        sw.style.cssText='width:15px;height:15px;border-radius:50%;cursor:pointer;background:'+hex+';border:2px solid '+(hex===ds.borderColor?'#fff':'transparent')+';transition:.12s;flex-shrink:0;';
+        sw.onmouseover=()=>{if(hex!==ds.borderColor)sw.style.transform='scale(1.2)';};
+        sw.onmouseout=()=>{sw.style.transform='scale(1)';};
+        sw.onclick=()=>{
+          // Update color in aeColorMap
+          aeColorMap[ds._k]=hex;
+          ds.borderColor=hex;
+          ds.pointBackgroundColor=hex;
+          dotEl.style.background=hex; valEl.style.color=hex;
+          p.style.border='1px solid '+hexA(hex,.25); p.style.background=hexA(hex,.06);
+          swRow.style.borderTopColor=hexA(hex,.15);
+          pbtn.style.color=hex;
+          swRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent');
+          sw.style.borderColor='#fff';
+          // Redraw chart with new color
+          if(aeChart){ aeChart.data.datasets.forEach(d=>{if(d._k===ds._k&&d._yr===ds._yr){d.borderColor=hexA(hex,1);d.pointBackgroundColor=hexA(hex,1);}});aeChart.update('none');}
+        };
+        swRow.appendChild(sw);
+      });
+      pbtn.onclick=(e)=>{
+        e.stopPropagation();
+        const isOpen=swRow.style.display==='flex';
+        // close all others
+        totals.querySelectorAll('[data-sw-row]').forEach(r=>r.style.display='none');
+        totals.querySelectorAll('[data-pb]').forEach(b=>b.style.color='var(--muted)');
+        swRow.style.display=isOpen?'none':'flex';
+        pbtn.style.color=isOpen?'var(--muted)':ds.borderColor;
+      };
+      swRow.dataset.swRow='1'; pbtn.dataset.pb='1';
+      mainRow.appendChild(dotEl); mainRow.appendChild(nameEl); mainRow.appendChild(valEl); mainRow.appendChild(pctSpan); mainRow.appendChild(pbtn);
+      p.appendChild(mainRow); p.appendChild(swRow);
       totals.appendChild(p);
     });
     // Grand total pill — only when more than one series
@@ -2948,6 +2999,15 @@ function toggleTheme(){
 
     if(aeChart&&aeChart.data.labels.join()!==labels.join()){aeChart.destroy();aeChart=null;}
     if(aeChart){aeChart.data.labels=labels;aeChart.data.datasets=datasets;aeChart.update('none');return;}
+
+    // Close swatches on outside click
+    document.addEventListener('click', function aeOutsideClick(e){
+      const t=document.getElementById('ae-totals');
+      if(t&&!t.contains(e.target)){
+        t.querySelectorAll('[data-sw-row]').forEach(r=>r.style.display='none');
+        t.querySelectorAll('[data-pb]').forEach(b=>b.style.color='var(--muted)');
+      }
+    });
 
     const canvas=document.getElementById('ae-chart');
     aeChart=new Chart(canvas,{
