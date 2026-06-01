@@ -329,10 +329,11 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div style="margin-bottom:4px;">
         <span id="meta-realizado" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.02em;">—</span>
       </div>
-      <div class="meta-track-labels" style="margin-bottom:7px;">
-        <span class="meta-track-label" id="meta-falta">Falta: —</span>
+      <div class="meta-track-bg" style="margin-bottom:8px;"><div class="meta-track-fill" id="meta-fill" style="width:0%"></div></div>
+      <div id="meta-falta-pill" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;width:fit-content;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e17055" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        <span id="meta-falta" style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;">—</span>
       </div>
-      <div class="meta-track-bg"><div class="meta-track-fill" id="meta-fill" style="width:0%"></div></div>
     </div>
     <div class="meta-pct-wrap">
       <div class="meta-pct" id="meta-pct">—</div>
@@ -359,8 +360,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r1-contratos">—</span>
       </div>
-      <div id="r1-falta" style="display:none;margin-top:8px;padding:4px 10px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;color:#e17055;display:none;align-items:center;gap:5px;">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+      <div id="r1-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
         <span id="r1-falta-val">—</span>
       </div>
     </div>
@@ -382,8 +383,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r2-contratos">—</span>
       </div>
-      <div id="r2-falta" style="display:none;margin-top:8px;padding:4px 10px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:5px;">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+      <div id="r2-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
         <span id="r2-falta-val">—</span>
       </div>
     </div>
@@ -1389,8 +1390,14 @@ function update(){
 
   const falta=meta-fatK2026;
   const faltaEl = document.getElementById('meta-falta');
-  set('meta-falta',falta>0?'Falta: '+fmt(falta):'✓ Meta atingida!');
-  if(faltaEl) faltaEl.style.color = metaColor;
+  const faltaPill = document.getElementById('meta-falta-pill');
+  if(falta>0){
+    if(faltaEl) faltaEl.textContent='Falta '+fmt(falta)+' para a meta';
+    if(faltaPill) faltaPill.style.display='flex';
+  } else {
+    if(faltaEl) faltaEl.textContent='✓ Meta atingida!';
+    if(faltaPill){ faltaPill.style.display='flex'; faltaPill.style.background='rgba(0,184,148,0.08)'; faltaPill.style.borderColor='rgba(0,184,148,0.25)'; if(faltaEl){faltaEl.style.color='#00b894';} const svg=faltaPill.querySelector('svg'); if(svg)svg.style.display='none'; }
+  }
 
   const pctEl = document.getElementById('meta-pct');
   set('meta-pct',meta?pct.toFixed(1)+'%':'—');
