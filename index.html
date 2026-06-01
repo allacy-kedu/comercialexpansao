@@ -2802,39 +2802,84 @@ function buildMelhorMes(){
       // Barra principal baseada na meta de junho (tier 1 — mais imediato)
       const pctBar = pctJun;
 
+      // Bar color helper inline
+      const bc=p=>p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055';
+      // Tier row builder — new visual style
+      const tRow=(done,next,locked,label,detail,val)=>{
+        const st=done?'done':next?'next':'locked';
+        const ic=done?'✓':next?'→':'·';
+        const clr=done?'#00b894':next?'#4ECDC4':'#5a6a82';
+        const bg=done?'rgba(0,184,148,0.07)':next?'rgba(78,205,196,0.04)':'rgba(255,255,255,0.02)';
+        const br=done?'rgba(0,184,148,0.25)':next?'rgba(78,205,196,0.15)':'rgba(255,255,255,0.05)';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid ${br};background:${bg};margin-bottom:6px;">
+          <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:500;color:${clr};">${label}</div>
+            <div style="font-size:9px;color:#5a6a82;margin-top:2px;">${detail}</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
+        </div>`;
+      };
+      const bonusClr = bonusGeral&&t1?'#00b894':bonusGeral&&!t1?'#fdcb6e':'#5a6a82';
+      const bonusBr  = bonusGeral&&t1?'rgba(0,184,148,0.25)':bonusGeral&&!t1?'rgba(253,203,110,0.25)':'rgba(99,179,237,0.1)';
+      const bonusBg  = bonusGeral&&t1?'rgba(0,184,148,0.07)':bonusGeral&&!t1?'rgba(253,203,110,0.04)':'rgba(99,179,237,0.03)';
+      const bonusDesc= bonusGeral&&t1?'Meta geral de junho atingida · você se qualifica':
+                       bonusGeral&&!t1?'Meta geral atingida · mas esta regional não bateu junho':
+                       `Geral Jun: ${fmtR(realGeralJun)} / ${fmtR(metaGeralJun)} · faltam ${fmtR(Math.max(0,metaGeralJun-realGeralJun))}`;
+      const bonusVal = bonusGeral&&t1?'+R$ 1.000 ✓':bonusGeral&&!t1?'+R$ 1.000 ✗':'+R$ 1.000';
+      const pctGeral = Math.min(100,Math.round(realGeralJun/metaGeralJun*100));
+
       const div=document.createElement('div'); div.className='camp-card';
       div.innerHTML=`
-        <div class="camp-card-head" style="align-items:flex-start;">
+        <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
           <div class="camp-card-info">
             <div class="camp-card-name">${c.regional}</div>
-            <div class="camp-card-cargo">${c.coord} · Jun: ${fmtR(realJun)} / ${fmtR(c.metaJun)}</div>
+            <div class="camp-card-cargo" style="color:#5a6a82;">${c.coord}</div>
           </div>
-          <div class="camp-card-pct" style="color:${pctColor(pctJun)}">${pctJun}%<span style="font-size:9px;color:var(--muted);font-weight:400;margin-left:4px;">jun</span></div>
-        </div>
-        <div class="camp-bar-wrap"><div class="camp-bar-fill" style="width:${Math.min(100,pctBar)}%;background:${barColor(pctBar)};"></div></div>
-
-        <div class="camp-tiers">
-          <div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Coordenadores</div>
-          ${tierHtml(t1,!t1,'100% meta junho ('+fmtR(c.metaJun)+')','R$ 1.000',Math.max(0,c.metaJun-realJun))}
-          ${tierHtml(t2,t1&&!t2,'100% meta trimestre Abr+Mai+Jun ('+fmtR(c.metaTrim)+')','+R$ 2.000',Math.max(0,c.metaTrim-realTrim))}
-          ${tierHtml(t3,t2&&!t3,'100% meta semestre Jan→Jun ('+fmtR(c.metaSem)+')','+R$ 1.000',Math.max(0,c.metaSem-realSem))}
-        </div>
-
-        <div style="margin-top:8px;padding:8px 10px;background:rgba(99,179,237,0.04);border-radius:8px;border:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--muted);margin-bottom:4px;">Bônus geral · Meta de junho das <b>duas regionais</b> batida</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div style="font-size:9px;color:var(--muted2);">Geral Jun: ${fmtR(realGeralJun)} / ${fmtR(metaGeralJun)} · ${Math.round(realGeralJun/metaGeralJun*100)}%</div>
-            <div style="font-size:10px;font-weight:700;color:${bonusGeral&&t1?'#00b894':bonusGeral&&!t1?'#fdcb6e':'var(--muted)'};">${bonusGeral&&t1?'+R$ 1.000 ✓':bonusGeral&&!t1?'Meta geral atingida · mas esta regional não bateu junho':'+R$ 1.000 · faltam '+fmtR(Math.max(0,metaGeralJun-realGeralJun))}</div>
+          <div style="text-align:right;">
+            <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">Junho</div>
+            <div style="font-size:22px;font-weight:700;color:${bc(pctJun)};">${pctJun}%</div>
           </div>
         </div>
 
-        <div style="margin-top:6px;padding:6px 10px;background:rgba(99,179,237,0.04);border-radius:8px;border:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--muted);margin-bottom:4px;">Progresso trimestre · ${pctTrim}% &nbsp;|&nbsp; Semestre · ${pctSem}%</div>
-          <div style="display:flex;gap:8px;">
-            <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${barColor(pctTrim)};"></div></div>
-            <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${barColor(pctSem)};"></div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctJun)};width:34px;text-align:right;">${pctJun}%</div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-top:2px;"><span>Trim. Abr–Jun</span><span>Sem. Jan–Jun</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctTrim)};width:34px;text-align:right;">${pctTrim}%</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctSem)};width:34px;text-align:right;">${pctSem}%</div>
+          </div>
+        </div>
+
+        ${tRow(t1,!t1,false,
+          '100% meta de junho',
+          t1?`Meta: ${fmtR(c.metaJun)} · Realizado: ${fmtR(realJun)}`:`Meta: ${fmtR(c.metaJun)} · Realizado: ${fmtR(realJun)} · Faltam ${fmtR(Math.max(0,c.metaJun-realJun))}`,
+          'R$ 1.000')}
+        ${tRow(t2,t1&&!t2,!t1,
+          '100% meta trimestre (Abr–Jun)',
+          t2?`Meta: ${fmtR(c.metaTrim)} · Realizado: ${fmtR(realTrim)}`:`Meta: ${fmtR(c.metaTrim)} · Realizado: ${fmtR(realTrim)} · Faltam ${fmtR(Math.max(0,c.metaTrim-realTrim))}`,
+          '+R$ 2.000')}
+        ${tRow(t3,t2&&!t3,!t2,
+          '100% meta semestre (Jan–Jun)',
+          t3?`Meta: ${fmtR(c.metaSem)} · Realizado: ${fmtR(realSem)}`:`Meta: ${fmtR(c.metaSem)} · Realizado: ${fmtR(realSem)} · Faltam ${fmtR(Math.max(0,c.metaSem-realSem))}`,
+          '+R$ 1.000')}
+
+        <div style="padding:10px 14px;border-radius:10px;border:1px solid ${bonusBr};background:${bonusBg};margin-bottom:6px;">
+          <div style="font-size:9px;color:#5a6a82;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Bônus geral de junho</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:10px;color:${bonusClr};">${bonusDesc}</div>
+            <div style="font-size:11px;font-weight:700;color:${bonusClr};white-space:nowrap;margin-left:10px;">${bonusVal}</div>
+          </div>
+          <div style="height:3px;background:rgba(99,179,237,0.08);border-radius:2px;overflow:hidden;"><div style="width:${pctGeral}%;height:100%;background:${bonusClr};border-radius:2px;"></div></div>
         </div>
 
         <div class="camp-total">
