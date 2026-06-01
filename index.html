@@ -359,6 +359,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r1-contratos">—</span>
       </div>
+      <div id="r1-falta" style="display:none;margin-top:8px;padding:4px 10px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;color:#e17055;display:none;align-items:center;gap:5px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        <span id="r1-falta-val">—</span>
+      </div>
     </div>
     <div class="reg-card">
       <div class="reg-header">
@@ -377,6 +381,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div class="reg-meta-row" style="margin-top:6px">
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r2-contratos">—</span>
+      </div>
+      <div id="r2-falta" style="display:none;margin-top:8px;padding:4px 10px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:5px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        <span id="r2-falta-val">—</span>
       </div>
     </div>
   </div>
@@ -1425,6 +1433,11 @@ function update(){
   set('r2-contratos', ctrR2+' contrato'+(ctrR2!==1?'s':''));
   document.getElementById('r2-fill').style.width=Math.min(pctR2,100)+'%';
   document.getElementById('r2-fill').style.background=regBarColor(pctR2);
+  // Falta para a meta
+  const faltaR1=Math.max(0,(metaR1||0)-realR1), faltaR2=Math.max(0,(metaR2||0)-realR2);
+  const r1f=document.getElementById('r1-falta'), r2f=document.getElementById('r2-falta');
+  if(r1f){r1f.style.display=faltaR1>0?'flex':'none';document.getElementById('r1-falta-val').textContent='Falta '+fmt(faltaR1)+' para a meta';}
+  if(r2f){r2f.style.display=faltaR2>0?'flex':'none';document.getElementById('r2-falta-val').textContent='Falta '+fmt(faltaR2)+' para a meta';}
 
   const fill=document.getElementById('meta-fill');
   fill.style.width=pctD+'%';
