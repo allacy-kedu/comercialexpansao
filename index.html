@@ -2649,8 +2649,8 @@ function buildMelhorMes(){
     {name:'Edivania Nascimento', cargo:'Inside Sales', cor:'#74b9ff'},
     {name:'Gustavo Dias',        cargo:'Closer',       cor:'#fd79a8'},
   ];
-  const R1_NAMES = ['Antônio Cláudio','Bruna Nunes','Larissa Costa','Warly Bernardino'];
-  const R2_NAMES = ['Cinthia Marques','Gustavo Dias'];
+  const R1_NAMES = ['Antônio Cláudio','Bruna Nunes','Emanuel Sobral','Larissa Costa','Tennyson Costa','Warly Bernardino','Tálison Machado'];
+  const R2_NAMES = ['Alexandre Gomes','Cinthia Marques','Edivania Nascimento','Gustavo Dias','Carol Figueiredo'];
 
   const _campMesMap = {4:'abril',5:'maio',6:'junho'};
   let campMesAtivo = _campMesMap[new Date().getMonth()+1] || 'abril';
@@ -2754,12 +2754,15 @@ function buildMelhorMes(){
 
     // Meses dos períodos
     const MESES_SEM=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'];
-    // Helper: soma fat_kedu da regional
+    // Helper: soma fat_kedu da regional — usa liderança do RAW (consistente com painel de meta)
+    const getRegRealByLid=(lideranca,meses)=>RAW.filter(r=>r.lideranca===lideranca&&r.assinatura&&meses.includes(r.assinatura.slice(0,7))).reduce((s,r)=>s+(r.fat_kedu||0),0);
+    // Fallback por nomes (para membros que trocaram de regional)
     const getRegReal=(members,meses)=>members.reduce((s,n)=>s+getReal(n,meses),0);
     // Metas por regional
     const regConf=[
       {
         regional:'Regional 1',
+        lideranca:'Regional 1',
         coord:'Tálison Machado',
         members:R1_NAMES,
         metaJun: METAS_R1['2026-06']||0,
@@ -2768,6 +2771,7 @@ function buildMelhorMes(){
       },
       {
         regional:'Regional 2',
+        lideranca:'Regional 2',
         coord:'Carol Figueiredo',
         members:R2_NAMES,
         metaJun: METAS_R2['2026-06']||0,
@@ -2778,13 +2782,14 @@ function buildMelhorMes(){
 
     // Meta geral junho = soma das duas regionais em junho
     const metaGeralJun = regConf.reduce((s,c)=>s+c.metaJun,0);
-    const realGeralJun = regConf.reduce((s,c)=>s+getRegReal(c.members,['2026-06']),0);
+    const realGeralJun = regConf.reduce((s,c)=>s+getRegRealByLid(c.lideranca,['2026-06']),0);
     const bonusGeral   = realGeralJun >= metaGeralJun; // +R$1.000 para ambos
 
     regConf.forEach(c=>{
-      const realJun  = getRegReal(c.members,['2026-06']);
-      const realTrim = getRegReal(c.members,['2026-04','2026-05','2026-06']);
-      const realSem  = getRegReal(c.members,MESES_SEM);
+      // Use lideranca-based aggregation — matches meta panel exactly
+      const realJun  = getRegRealByLid(c.lideranca,['2026-06']);
+      const realTrim = getRegRealByLid(c.lideranca,['2026-04','2026-05','2026-06']);
+      const realSem  = getRegRealByLid(c.lideranca,MESES_SEM);
 
       const pctJun  = c.metaJun  > 0 ? Math.round(realJun  / c.metaJun  * 100) : 0;
       const pctTrim = c.metaTrim > 0 ? Math.round(realTrim / c.metaTrim * 100) : 0;
