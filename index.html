@@ -2791,9 +2791,9 @@ function buildMelhorMes(){
       const realTrim = getRegRealByLid(c.lideranca,['2026-04','2026-05','2026-06']);
       const realSem  = getRegRealByLid(c.lideranca,MESES_SEM);
 
-      const pctJun  = c.metaJun  > 0 ? Math.round(realJun  / c.metaJun  * 100) : 0;
-      const pctTrim = c.metaTrim > 0 ? Math.round(realTrim / c.metaTrim * 100) : 0;
-      const pctSem  = c.metaSem  > 0 ? Math.round(realSem  / c.metaSem  * 100) : 0;
+      const pctJun  = c.metaJun  > 0 ? (realJun  / c.metaJun  * 100) : 0;
+      const pctTrim = c.metaTrim > 0 ? (realTrim / c.metaTrim * 100) : 0;
+      const pctSem  = c.metaSem  > 0 ? (realSem  / c.metaSem  * 100) : 0;
 
       const t1 = realJun  >= c.metaJun;   // R$ 1.000
       const t2 = realTrim >= c.metaTrim;  // +R$ 2.000
@@ -2807,8 +2807,16 @@ function buildMelhorMes(){
       // Barra principal baseada na meta de junho (tier 1 — mais imediato)
       const pctBar = pctJun;
 
-      // Bar color helper inline
-      const bc=p=>p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055';
+      // Bar color: green=done, yellow=in-progress, red=month closed and not done
+      const hoje2=new Date();
+      const mesJunFechado = hoje2 > new Date(2026,5,30); // after June 30 2026
+      const mesTrimFechado = hoje2 > new Date(2026,5,30);
+      const mesSemFechado = hoje2 > new Date(2026,5,30);
+      const bc=(p,fechado)=>{
+        if(p>=100) return '#00b894';               // green — done
+        if(fechado) return '#e17055';              // red — month closed, not done
+        return '#fdcb6e';                          // yellow — in progress
+      };
       // Tier row builder — new visual style
       const tRow=(done,next,locked,label,detail,val)=>{
         const st=done?'done':next?'next':'locked';
@@ -2843,25 +2851,25 @@ function buildMelhorMes(){
           </div>
           <div style="text-align:right;">
             <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">Junho</div>
-            <div style="font-size:22px;font-weight:700;color:${bc(pctJun)};">${pctJun}%</div>
+            <div style="font-size:22px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};">${pctJun.toFixed(1)}%</div>
           </div>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctJun)};width:34px;text-align:right;">${pctJun}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun,mesJunFechado&&!t1)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};width:42px;text-align:right;">${pctJun.toFixed(1)}%</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctTrim)};width:34px;text-align:right;">${pctTrim}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim,mesTrimFechado&&!t2)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctTrim,mesTrimFechado&&!t2)};width:42px;text-align:right;">${pctTrim.toFixed(1)}%</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctSem)};width:34px;text-align:right;">${pctSem}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem,mesSemFechado&&!t3)};border-radius:3px;"></div></div>
+            <div style="font-size:10px;font-weight:700;color:${bc(pctSem,mesSemFechado&&!t3)};width:42px;text-align:right;">${pctSem.toFixed(1)}%</div>
           </div>
         </div>
 
