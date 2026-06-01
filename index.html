@@ -2631,8 +2631,8 @@ function buildMelhorMes(){
 
 // ── Campanhas ─────────────────────────────────────────────────
 (function(){
-  const META_CLOSER_MES = {'2026-04':267000,'2026-05':341000,'2026-06':341000};
-  const META_IS_MES     = {'2026-04':187000,'2026-05':252000,'2026-06':252000};
+  const META_CLOSER_MES = {'2026-01':143000,'2026-02':115000,'2026-03':200000,'2026-04':267000,'2026-05':341000,'2026-06':341000};
+  const META_IS_MES     = {'2026-01':100000,'2026-02':80000,'2026-03':140000,'2026-04':187000,'2026-05':252000,'2026-06':252000};
   const META_R1_TRIM    = 4672000;
   const META_R2_TRIM    = 3732000;
 
@@ -2655,7 +2655,7 @@ function buildMelhorMes(){
   const _campMesMap = {4:'abril',5:'maio',6:'junho'};
   let campMesAtivo = _campMesMap[new Date().getMonth()+1] || 'abril';
 
-  function fmtR(v){ if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1000){ const k=v/1000; return 'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K'; } return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
+  function fmtR(v){ if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1000) return 'R$ '+Math.round(v).toLocaleString('pt-BR'); return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
   function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
@@ -2721,12 +2721,12 @@ function buildMelhorMes(){
       const realSemEx=getReal(e.name,MESES_SEM_EX);
       const t1Jun=realJun>=mJ;                    // R$ 1.000
       const t2Jun=realTrim>=mT;                   // +R$ 500
-      const t3Jun=realSemEx>=metaSemEx;            // +R$ 1.000
+      const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 1.000 (only if t2 done)
       total=(t1Jun?1000:0)+(t2Jun?500:0)+(t3Jun?1000:0);
       tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px;">Campanha Junho</div>`
         +tierHtml(t1Jun,!t1Jun,'100% meta junho ('+fmtR(mJ)+')','R$ 1.000',Math.max(0,mJ-realJun))
         +tierHtml(t2Jun,t1Jun&&!t2Jun,'100% meta trimestre Abr+Mai+Jun ('+fmtR(mT)+')','+R$ 500',Math.max(0,mT-realTrim))
-        +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan+Jun ('+fmtR(metaSemEx)+')','+R$ 1.000',Math.max(0,metaSemEx-realSemEx));
+        +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan–Jun ('+fmtR(metaSemEx)+')','+R$ 1.000',Math.max(0,metaSemEx-realSemEx));
     }
 
     return `<div class="camp-card">
