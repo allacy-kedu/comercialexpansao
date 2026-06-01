@@ -2756,40 +2756,40 @@ function buildMelhorMes(){
 
     return `<div class="camp-card">
       <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
-        \${avatar(e.name,e.cor,bcE(pctFloat,mesFechado&&!pctMesOk))}
+        ${avatar(e.name,e.cor,bcE(pctFloat,mesFechado&&!pctMesOk))}
         <div class="camp-card-info" style="flex:1;">
-          <div class="camp-card-name">\${e.name}</div>
-          <div class="camp-card-cargo" style="color:#5a6a82;">\${e.cargo} · Meta \${mes}: \${fmtR(mMes)}</div>
+          <div class="camp-card-name">${e.name}</div>
+          <div class="camp-card-cargo" style="color:#5a6a82;">${e.cargo} · Meta ${mes}: ${fmtR(mMes)}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">\${mes.charAt(0).toUpperCase()+mes.slice(1)}</div>
-          <div style="font-size:22px;font-weight:700;color:\${bcE(pctFloat,mesFechado&&!pctMesOk)};">\${pctFloat.toFixed(1)}%</div>
+          <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">${mes.charAt(0).toUpperCase()+mes.slice(1)}</div>
+          <div style="font-size:22px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};">${pctFloat.toFixed(1)}%</div>
         </div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">\${mes.charAt(0).toUpperCase()+mes.slice(1)}.</div>
-          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctFloat)}%;height:100%;background:\${bcE(pctFloat,mesFechado&&!pctMesOk)};border-radius:3px;"></div></div>
-          <div style="font-size:10px;font-weight:700;color:\${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">\${pctFloat.toFixed(1)}%</div>
+          <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">${mes.charAt(0).toUpperCase()+mes.slice(1)}.</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctFloat)}%;height:100%;background:${bcE(pctFloat,mesFechado&&!pctMesOk)};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">${pctFloat.toFixed(1)}%</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Trim.</div>
-          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctTrimC)}%;height:100%;background:\${bcE(pctTrimC,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
-          <div style="font-size:10px;font-weight:700;color:\${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">\${pctTrimC.toFixed(1)}%</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrimC)}%;height:100%;background:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">${pctTrimC.toFixed(1)}%</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Semestre</div>
-          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:\${Math.min(100,pctSemC)}%;height:100%;background:\${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};border-radius:3px;"></div></div>
-          <div style="font-size:10px;font-weight:700;color:\${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">\${pctSemC.toFixed(1)}%</div>
+          <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};border-radius:3px;"></div></div>
+          <div style="font-size:10px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
         </div>
       </div>
 
-      <div class="camp-tiers">\${tiersHtml}</div>
+      <div class="camp-tiers">${tiersHtml}</div>
 
       <div class="camp-total">
-        <span class="camp-total-label">Premiação \${mes}</span>
-        <span class="camp-total-val" style="color:\${total>0?'#00b894':'var(--muted)'}">\${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
+        <span class="camp-total-label">Premiação ${mes}</span>
+        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
       </div></div>`;
   }
 
