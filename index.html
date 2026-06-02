@@ -71,7 +71,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
 
 .regional-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
-.reg-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;}
+.reg-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;;box-sizing:border-box}
 .reg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .reg-title{font-family:'DM Mono',monospace;font-weight:700;font-size:12px;color:var(--fg);letter-spacing:.04em;}
 .reg-pct{font-family:'DM Mono',monospace;font-weight:800;font-size:20px;color:var(--accent);}
@@ -94,7 +94,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 .estado-chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:none;}
 .estado-chart-card.visible{display:block;}
-.ranking-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
+.ranking-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;box-sizing:border-box;}
 .ranking-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
 .ranking-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .ranking-copy-btn{font-size:8px;color:var(--muted);cursor:pointer;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--border);transition:.15s;text-transform:none;}
@@ -107,7 +107,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-col-title{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
 .ranking-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(78,205,196,0.25);}
-.camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
+.camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .camp-tabs{display:flex;gap:6px;margin-bottom:16px;}
 .camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
 .camp-tab.active{border-color:var(--accent);color:var(--accent);}
@@ -162,7 +162,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-fat{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;}
 .ranking-ctr{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
 
-.trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;}
+.trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .trend-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .trend-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
 .trend-sub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;}
@@ -172,7 +172,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .trend-yr-btn:hover{border-color:var(--yr-c,rgba(255,255,255,0.4));color:var(--yr-c,#fff);}
 .trend-yr-meta{--yr-c:#dfe6e9;}
 .trend-canvas-wrap{position:relative;width:100%;height:200px;}
-.meta-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+.meta-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;box-sizing:border-box;}
 .meta-bar-info{flex:0 0 auto;}
 .meta-bar-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;font-family:'DM Mono',monospace;}
 .meta-bar-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--text);margin:3px 0 2px;}
@@ -192,7 +192,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .kpi-section-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .kpi-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 .kpi-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
-.kpi-hero{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+.kpi-hero{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
 .kpi-hero::after{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(ellipse at top right,var(--kpi-c,var(--accent)),transparent 70%);opacity:.04;pointer-events:none;}
 .kpi-hero-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'DM Mono',monospace;font-weight:500;}
@@ -202,19 +202,19 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .kpi-hero-avg-label{font-size:9px;color:var(--muted);}
 .kpi-hero-avg-val{font-size:13px;font-weight:700;}
 .kpi-metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
-.kpi-m{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+.kpi-m{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
 .kpi-m-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-m-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;}
 .kpi-m-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-margem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
-.kpi-mg{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+.kpi-mg{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
 .kpi-mg-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-mg-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:700;line-height:1;margin-bottom:2px;}
 .kpi-mg-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-ops-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;}
-.kpi-ops-main{background:var(--card);border:1px solid rgba(82,199,125,0.18);border-radius:12px;padding:14px 16px;display:flex;gap:14px;animation:fadeUp .4s ease both;}
+.kpi-ops-main{background:var(--card);border:1px solid rgba(82,199,125,0.18);border-radius:12px;padding:14px 16px;display:flex;gap:14px;animation:fadeUp .4s ease both;;box-sizing:border-box}
 .kpi-ops-main-left{flex-shrink:0;}
 .kpi-ops-main-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-ops-main-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:#52c77d;line-height:1;margin-bottom:3px;}
@@ -222,7 +222,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .kpi-ops-status{flex:1;display:flex;flex-direction:column;gap:4px;padding-left:14px;border-left:1px solid var(--border);}
 .kpi-ops-status-row{display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:10px;}
 .kpi-ops-status-label{color:var(--muted);}
-.kpi-ops-sm{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+.kpi-ops-sm{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
 .kpi-ops-sm-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-ops-sm-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;}
@@ -336,7 +336,29 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 <div class="main">
 
-<div class="sec-divider" id="sec-meta"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#fd79a81a;color:#fd79a8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fd79a8;">Meta &amp; Regionais</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento Kedu 2026 · progresso por regional</div></div></div><div style="padding:12px 24px 24px;">
+<div class="estado-chart-card trend-card" id="estado-chart-card" style="display:none;">
+    <div class="trend-header">
+      <div>
+        <div class="trend-title" id="estado-chart-title">Faturamento por Estado</div>
+        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal dos estados selecionados</div>
+      </div>
+      <div class="trend-legend" id="ec-anos">
+        <!-- Botões de ano serão inseridos aqui pelo JS -->
+      </div>
+    </div>
+    <div class="trend-canvas-wrap" style="position:relative;height:220px;margin-top:12px;">
+      <canvas id="estado-chart"></canvas>
+    </div>
+    <!-- Totais anuais -->
+    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
+  </div>
+
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+  </div>
+</div>
+
+<div class="sec-divider" id="sec-meta"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#fd79a81a;color:#fd79a8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fd79a8;">Meta &amp; Regionais</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento Kedu 2026 · progresso por regional</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
     <div class="stitle" style="margin-bottom:0;flex:1;">Meta Faturamento Kedu — 2026</div>
     <button id="btn-share" onclick="exportMeta()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
@@ -425,7 +447,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 </div>
 
-<div class="sec-divider" id="sec-ranking"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#FFE66D1a;color:#FFE66D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#FFE66D;">Ranking &amp; Quartil</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Desempenho individual dos executivos</div></div></div><div style="padding:12px 24px 24px;">
+<div class="sec-divider" id="sec-ranking"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#FFE66D1a;color:#FFE66D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#FFE66D;">Ranking &amp; Quartil</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Desempenho individual dos executivos</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
     <div class="stitle" style="margin-bottom:0;flex:1;">Ranking de Vendas</div>
     <button onclick="exportRanking()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
@@ -495,13 +517,9 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div id="quartil-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;"></div>
   </div>
 
+</div></div>
 
-
-  <!-- Campanhas -->
-  </div>
-</div>
-
-<div class="sec-divider" id="sec-campanha"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#fdcb6e1a;color:#fdcb6e;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fdcb6e;">Campanhas</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Progresso individual · metas e premiações</div></div></div><div style="padding:12px 24px 24px;">
+<div class="sec-divider" id="sec-campanha"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#fdcb6e1a;color:#fdcb6e;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fdcb6e;">Campanhas</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Progresso individual · metas e premiações</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
   <div class="camp-section-wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
@@ -534,7 +552,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 </div>
 
-<div class="sec-divider" id="sec-tendencia"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Tendência</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal do faturamento Kedu</div></div></div><div style="padding:12px 24px 24px;">
+<div class="sec-divider" id="sec-tendencia"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Tendência</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal do faturamento Kedu</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
 
   <div class="trend-card">
     <div class="trend-header">
@@ -603,31 +621,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div id="sim-factor-line" style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.6);text-align:center;margin-top:10px;">—</div>
     </div>
   </div>
-
-  <div class="estado-chart-card trend-card" id="estado-chart-card" style="display:none;">
-    <div class="trend-header">
-      <div>
-        <div class="trend-title" id="estado-chart-title">Faturamento por Estado</div>
-        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal dos estados selecionados</div>
-      </div>
-      <div class="trend-legend" id="ec-anos">
-        <!-- Botões de ano serão inseridos aqui pelo JS -->
-      </div>
-    </div>
-    <div class="trend-canvas-wrap" style="position:relative;height:220px;margin-top:12px;">
-      <canvas id="estado-chart"></canvas>
-    </div>
-    <!-- Totais anuais -->
-    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
-  </div>
+</div>
 
 
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-  </div>
-</div></div>
-
-
-<div class="sec-divider" id="sec-financeiro"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#4ECDC41a;color:#4ECDC4;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4ECDC4;">KPIs Financeiros</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento, taxas, margens e métricas derivadas</div></div></div><div style="padding:12px 24px 24px;">
+<div class="sec-divider" id="sec-financeiro"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#4ECDC41a;color:#4ECDC4;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4ECDC4;">KPIs Financeiros</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento, taxas, margens e métricas derivadas</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
   <!-- FINANCEIRO -->
   <div class="kpi-section">
     <div class="kpi-section-label">Faturamento</div>
@@ -749,7 +746,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 </div>
 
-<div class="sec-divider" id="sec-analise"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Análise de Equipe</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal por regional, cargo ou executivo</div></div></div><div style="padding:12px 24px 24px;">
+<div class="sec-divider" id="sec-analise"><div style="display:flex;align-items:center;gap:10px;padding:14px 24px 0 24px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Análise de Equipe</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal por regional, cargo ou executivo</div></div></div><div style="padding:12px 24px 24px;box-sizing:border-box;overflow:hidden;">
   <div class="stitle" style="margin-top:8px;">Análise de Equipe</div>
 
   <!-- Filtros de Análise -->
