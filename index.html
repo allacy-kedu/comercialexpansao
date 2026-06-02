@@ -66,7 +66,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .active-filters{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-left:auto;}
 .afbadge{display:inline-flex;align-items:center;gap:3px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.18);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-family:'DM Mono',monospace;}
 .afbadge .x{cursor:pointer;opacity:.5;margin-left:2px;}.afbadge .x:hover{opacity:1;}
-.main{padding:22px 28px;max-width:1800px;margin:0 auto;}
+.main{padding:20px 24px 28px;max-width:1800px;margin:0 auto;}
 .stitle{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
 
@@ -255,6 +255,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   #melhor-mes-grid{grid-template-columns:repeat(2,1fr)!important;}
   .filterbar{padding:8px 12px;}
 }
+.sec-divider{border-top:2px solid rgba(255,255,255,0.06);margin:4px 0 0;}
+[data-theme="light"] .sec-divider{border-top-color:rgba(0,0,0,0.08);}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -334,31 +336,16 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 <div class="main">
 
-  <div class="estado-chart-card trend-card" id="estado-chart-card" style="display:none;">
-    <div class="trend-header">
-      <div>
-        <div class="trend-title" id="estado-chart-title">Faturamento por Estado</div>
-        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal dos estados selecionados</div>
-      </div>
-      <div class="trend-legend" id="ec-anos">
-        <!-- Botões de ano serão inseridos aqui pelo JS -->
-      </div>
-    </div>
-    <div class="trend-canvas-wrap" style="position:relative;height:220px;margin-top:12px;">
-      <canvas id="estado-chart"></canvas>
-    </div>
-    <!-- Totais anuais -->
-    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
-  </div>
-
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <div class="stitle" style="margin-bottom:0;">Meta Faturamento Kedu — 2026</div>
+<div class="sec-divider" id="sec-meta"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#fd79a81a;color:#fd79a8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fd79a8;">Meta &amp; Regionais</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento Kedu 2026 · progresso por regional</div></div></div><div style="padding:12px 20px 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+    <div class="stitle" style="margin-bottom:0;flex:1;">Meta Faturamento Kedu — 2026</div>
     <button id="btn-share" onclick="exportMeta()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exportar PNG
     </button>
-  </div>
+    </div>
+  </div></div>
+
   <div id="meta-capture-zone">
   <div class="meta-bar-wrap">
     <div class="meta-bar-info">
@@ -435,12 +422,19 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div><!-- /meta-capture-zone -->
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <div class="stitle" style="margin-bottom:0;">Ranking de Vendas</div>
+  </div>
+</div>
+
+<div class="sec-divider" id="sec-ranking"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#FFE66D1a;color:#FFE66D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#FFE66D;">Ranking &amp; Quartil</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Desempenho individual dos executivos</div></div></div><div style="padding:12px 20px 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+    <div class="stitle" style="margin-bottom:0;flex:1;">Ranking de Vendas</div>
     <button onclick="exportRanking()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exportar PNG
     </button>
-  </div>
+    </div>
+  </div></div>
+
 
   <div class="ranking-card" id="ranking-card-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -501,6 +495,46 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div id="quartil-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;"></div>
   </div>
 
+
+
+  <!-- Campanhas -->
+  </div>
+</div>
+
+<div class="sec-divider" id="sec-campanha"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#fdcb6e1a;color:#fdcb6e;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fdcb6e;">Campanhas</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Progresso individual · metas e premiações</div></div></div><div style="padding:12px 20px 20px;">
+  <div class="camp-section-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
+      <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div class="camp-tabs" style="margin-bottom:0;">
+        <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
+        <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
+      </div>
+      <div class="camp-tabs" style="margin-bottom:0;" id="camp-mes-nav">
+        <button class="camp-tab" onclick="campSetMes('abril',this)">Abril</button>
+        <button class="camp-tab" onclick="campSetMes('maio',this)">Maio</button>
+        <button class="camp-tab" onclick="campSetMes('junho',this)">Junho</button>
+      </div>
+    </div>
+    <div id="camp-tab-exec">
+      <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">—</div>
+      <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
+      <div class="camp-grid" id="camp-grid-abril"></div>
+    </div>
+    <div id="camp-tab-coord" style="display:none;">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
+      <div class="camp-days">▸ encerra 30/06</div>
+      <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
+    </div>
+  </div>
+
+  </div></div>
+
+</div>
+
+<div class="sec-divider" id="sec-tendencia"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Tendência</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal do faturamento Kedu</div></div></div><div style="padding:12px 20px 20px;">
 
   <div class="trend-card">
     <div class="trend-header">
@@ -570,36 +604,30 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     </div>
   </div>
 
-
-  <!-- Campanhas -->
-  <div class="camp-section-wrap">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
-      <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div class="camp-tabs" style="margin-bottom:0;">
-        <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
-        <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
+  <div class="estado-chart-card trend-card" id="estado-chart-card" style="display:none;">
+    <div class="trend-header">
+      <div>
+        <div class="trend-title" id="estado-chart-title">Faturamento por Estado</div>
+        <div class="trend-sub" id="estado-chart-sub">Fat. Kedu mensal dos estados selecionados</div>
       </div>
-      <div class="camp-tabs" style="margin-bottom:0;" id="camp-mes-nav">
-        <button class="camp-tab" onclick="campSetMes('abril',this)">Abril</button>
-        <button class="camp-tab" onclick="campSetMes('maio',this)">Maio</button>
-        <button class="camp-tab" onclick="campSetMes('junho',this)">Junho</button>
+      <div class="trend-legend" id="ec-anos">
+        <!-- Botões de ano serão inseridos aqui pelo JS -->
       </div>
     </div>
-    <div id="camp-tab-exec">
-      <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">—</div>
-      <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
-      <div class="camp-grid" id="camp-grid-abril"></div>
+    <div class="trend-canvas-wrap" style="position:relative;height:220px;margin-top:12px;">
+      <canvas id="estado-chart"></canvas>
     </div>
-    <div id="camp-tab-coord" style="display:none;">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
-      <div class="camp-days">▸ encerra 30/06</div>
-      <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
-    </div>
+    <!-- Totais anuais -->
+    <div id="estado-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;"></div>
   </div>
 
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+  </div>
+</div></div>
+
+
+<div class="sec-divider" id="sec-financeiro"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#4ECDC41a;color:#4ECDC4;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4ECDC4;">KPIs Financeiros</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento, taxas, margens e métricas derivadas</div></div></div><div style="padding:12px 20px 20px;">
   <!-- FINANCEIRO -->
   <div class="kpi-section">
     <div class="kpi-section-label">Faturamento</div>
@@ -717,6 +745,11 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 
 
+  </div></div>
+
+</div>
+
+<div class="sec-divider" id="sec-analise"><div style="display:flex;align-items:center;gap:10px;padding:14px 20px 0 20px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Análise de Equipe</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal por regional, cargo ou executivo</div></div></div><div style="padding:12px 20px 20px;">
   <div class="stitle" style="margin-top:8px;">Análise de Equipe</div>
 
   <!-- Filtros de Análise -->
@@ -767,6 +800,11 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div id="ae-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;"></div>
   </div>
 
+  </div></div>
+
+</div>
+
+</div><!-- /main -->
 
 <div id="loading-bar" class="loading-bar"></div>
 <script>
@@ -1065,7 +1103,7 @@ function getMetaVendedor(nome, ym){
 }
 const METAS_R1 = {'2026-01':772600,'2026-02':617400,'2026-03':1080000,'2026-04':1440000,'2026-05':1616000,'2026-06':1616000,'2026-07':1616000,'2026-08':1616000,'2026-09':1616000,'2026-10':1616000,'2026-11':1616000,'2026-12':1616000};
 const METAS_R2 = {'2026-01':728400,'2026-02':582700,'2026-03':1020000,'2026-04':1360000,'2026-05':1186000,'2026-06':1186000,'2026-07':1186000,'2026-08':1186000,'2026-09':1186000,'2026-10':1186000,'2026-11':1186000,'2026-12':1186000};
-const METAS_GERAL = {'2026-01':1501000,'2026-02':1200100,'2026-03':2100000,'2026-04':2800000,'2026-05':2802000,'2026-06':2802000,'2026-07':2802000,'2026-08':2802000,'2026-09':2802000,'2026-10':2802000,'2026-11':2802000,'2026-12':2802000};
+const METAS_GERAL = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,'2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,'2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
 
 const RAW=[];
 let _filteredCache = null;
@@ -1089,7 +1127,7 @@ function invalidateCache(){
 }
 
 // helpers
-const fmt=v=>{if(v===null||v===undefined||isNaN(v))return'—';if(v>=1e9)return'R$ '+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';}return'R$ '+v.toFixed(0);};
+const fmt=v=>{if(v===null||v===undefined||isNaN(v))return'—';return'R$ '+Math.round(v).toLocaleString('pt-BR');};
 const fmtN=v=>(v!==null&&v!==undefined)?v.toLocaleString('pt-BR'):'—';
 const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—';
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
@@ -1586,7 +1624,7 @@ function rankingAvatar(nome, metaHit){
       ctr[exec] = (ctr[exec]||0) + 1;
     });
 
-    const fmtR = v => v>=1000000?(v/1000000).toFixed(2)+'M':(()=>{const k=v/1000;return(Number.isInteger(k)?k:k.toFixed(1))+'K';})();
+    const fmtR = v => 'R$ '+Math.round(v).toLocaleString('pt-BR');
     const hoje = new Date();
     const mesAtual = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
     const emAndamento = meses.includes(mesAtual);
@@ -1698,7 +1736,7 @@ function rankingAvatar(nome, metaHit){
       buildRows(isSales, metaIS, 'ranking-is');
 
       // Always show meta individual alongside col titles
-      const fmtMeta = v => v>=1e6?(v/1e6).toFixed(2)+'M':(()=>{const k=v/1000;return(Number.isInteger(k)?k:k.toFixed(1))+'K';})();
+      const fmtMeta = v => v>=1e6?Math.round(v).toLocaleString('pt-BR'):(()=>{const k=v/1000;return(Number.isInteger(k)?k:k.toFixed(1))+'K';})();
       const metaCloserLabel = document.getElementById('ranking-meta-closer');
       const metaISLabel     = document.getElementById('ranking-meta-is');
       if(metaCloserLabel) metaCloserLabel.textContent = '· Meta R$ '+fmtMeta(metaCloser);
@@ -1961,7 +1999,7 @@ update();
     const subEl=document.getElementById('trend-forecast-sub');
     if(!subEl)return;
     const total=Object.values(forecast).reduce((s,v)=>s+(v||0),0);
-    const totalFmt=total>=1e6?(total/1e6).toFixed(1)+'M':(total/1000).toFixed(0)+'K';
+    const totalFmt=Math.round(total).toLocaleString('pt-BR');
     const factorPct=((growthFactor-1)*100).toFixed(1);
     subEl.textContent='Projeção anual 2026: R$ '+totalFmt+' · Crescimento vs 2025: '+(growthFactor>=1?'+':'')+factorPct+'%';
   }
@@ -1976,7 +2014,7 @@ update();
     const {forecast,expected,realized,lastRealizedMonth,growthFactor,currentProj,forecastCnt,realizedCnt}=calcForecast(monthly,monthly_cnt);
     updateSubtitle(forecast,growthFactor);
     const datasets=buildDatasets(agg,forecast);
-    const fmtV=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+    const fmtV=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
     if(_chart){_chart.data.datasets=datasets;_chart.update('none');return;}
     canvas.style.height='220px';
     _chart=new Chart(canvas,{
@@ -1992,7 +2030,7 @@ update();
         },
         scales:{
           x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0,autoSkip:false},border:{display:false}},
-          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},border:{display:false}}
+          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?Math.round(v).toLocaleString('pt-BR'):Math.round(v).toLocaleString('pt-BR'))},border:{display:false}}
         }
       }
     });
@@ -2023,7 +2061,7 @@ update();
     title.style.cssText='font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
     title.innerHTML=MONTHS_LONG[mIdx]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
     popup.appendChild(title);
-    const fmtV=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+    const fmtV=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
     [...activeYears].filter(y=>typeof y==='number').sort().forEach(y=>{
       const {agg}=buildMonthly();
       const v=getVal(agg,y,m); if(!v)return;
@@ -2080,14 +2118,14 @@ update();
     const dia=parseInt(document.getElementById('sim-dia').value),fat=parseInt(document.getElementById('sim-fat').value);
     const daysInMonth=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
     document.getElementById('sim-dia-val').textContent='Dia '+dia;
-    document.getElementById('sim-fat-val').textContent=fat>=1e6?'R$ '+(fat/1e6).toFixed(2)+'M':'R$ '+(fat/1000).toFixed(0)+'K';
+    document.getElementById('sim-fat-val').textContent='R$ '+Math.round(fat).toLocaleString('pt-BR');
     _simActive=true; _simOverride={fat,dia};
     if(_chart){_chart.destroy();_chart=null;} drawChart();
     const {agg}=buildMonthly(),monthly={...agg};
     const today=new Date(),currentMonth=today.getMonth()+1,ym=today.getFullYear()+'-'+String(currentMonth).padStart(2,'0');
     monthly[ym]=fat;
     const fc=calcForecast(monthly);
-    const fmtV=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':'R$ '+(v/1000).toFixed(0)+'K';
+    const fmtV=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
     let encerrado=0;
     for(let m=1;m<currentMonth;m++)encerrado+=(fc.realized[m]||0);
     const futuro=Object.entries(fc.forecast).filter(([m])=>parseInt(m)>currentMonth).reduce((s,[,v])=>s+(v||0),0);
@@ -2296,7 +2334,7 @@ function drawEstadoChart(){
               label: function(ctx) {
                 let v = ctx.raw;
                 if(v === null) return null;
-                return ctx.dataset.label + ': R$ ' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : (v/1000).toFixed(0)+'K');
+                return ctx.dataset.label + ': R$ ' + (v>=1e6 ? Math.round(v).toLocaleString('pt-BR') : Math.round(v).toLocaleString('pt-BR'));
               }
             }
           }
@@ -2313,7 +2351,7 @@ function drawEstadoChart(){
   const totalsWrap = document.getElementById('estado-totals');
   if(totalsWrap){
     totalsWrap.innerHTML = '';
-    const fv = v => v>=1e6?(v/1e6).toFixed(2)+'M':(v/1000).toFixed(0)+'K';
+    const fv = v => v>=1e6?Math.round(v).toLocaleString('pt-BR'):Math.round(v).toLocaleString('pt-BR');
     
     anos.forEach((y, i) => {
       const total = Object.values(data[y]).reduce((s,v)=>s+(v||0), 0);
@@ -2608,7 +2646,7 @@ function buildMelhorMes(){
       const sorted = Object.entries(byExec).sort((a,b)=>b[1]-a[1]);
       const [nome, val] = sorted[0];
       const initials = nome.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
-      const fmtVal   = val>=1e6?'R$ '+(val/1e6).toFixed(2)+'M':'R$ '+(val/1000).toFixed(0)+'K';
+      const fmtVal   = 'R$ '+Math.round(val).toLocaleString('pt-BR');
       const nomeAbrev= nome.split(' ').slice(0,2).join(' ');
       item.innerHTML = `
         <div class="melhor-avatar-wrap">
@@ -2655,7 +2693,7 @@ function buildMelhorMes(){
   const _campMesMap = {4:'abril',5:'maio',6:'junho'};
   let campMesAtivo = _campMesMap[new Date().getMonth()+1] || 'abril';
 
-  function fmtR(v){ if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1000) return 'R$ '+Math.round(v).toLocaleString('pt-BR'); return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
+  function fmtR(v){ return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
   function pctColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function barColor(p){ return p>=100?'#00b894':p>=70?'#fdcb6e':'#e17055'; }
   function initials(n){ return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
@@ -2839,7 +2877,7 @@ function buildMelhorMes(){
     ];
 
     // Meta geral junho = soma das duas regionais em junho
-    const metaGeralJun = regConf.reduce((s,c)=>s+c.metaJun,0);
+    const metaGeralJun = METAS_GERAL['2026-06']||0;
     const realGeralJun = regConf.reduce((s,c)=>s+getRegRealByLid(c.lideranca,['2026-06']),0);
     const bonusGeral   = realGeralJun >= metaGeralJun; // +R$1.000 para ambos
 
@@ -3056,7 +3094,7 @@ function toggleTheme(){
     }
     return aeColorMap[k];
   }
-  function fmtV(v){if(!v&&v!==0)return'—';if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M';if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';}return'R$ '+v.toFixed(0);}
+  function fmtV(v){if(!v&&v!==0)return'—';return'R$ '+Math.round(v).toLocaleString('pt-BR');}
 
   function pill(containerId, val, set, colorFn){
     const btn=document.createElement('button');
@@ -3307,7 +3345,7 @@ function toggleTheme(){
             callbacks:{
               label:ctx=>{
                 const v=ctx.raw; if(!v) return null;
-                const fv=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2)+'M':v>=1e3?'R$ '+(v/1e3).toFixed(0)+'K':'R$ '+v.toFixed(0);
+                const fv=v=>v>=1e6?'R$ '+Math.round(v).toLocaleString('pt-BR'):v>=1e3?'R$ '+Math.round(v).toLocaleString('pt-BR'):'R$ '+v.toFixed(0);
                 return ' '+ctx.dataset.label+':  '+fv(v);
               },
               afterLabel:ctx=>{
@@ -3324,7 +3362,7 @@ function toggleTheme(){
         },
         scales:{
           x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},
-          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v)},border:{display:false}}
+          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(Math.round(v).toLocaleString('pt-BR'))},border:{display:false}}
         }
       }
     })
@@ -3349,7 +3387,7 @@ function toggleTheme(){
 let _modalData = [];
 let _modalSort = {col:'assina', dir:1};
 
-function fmtCur(v){ if(!v&&v!==0)return'—'; if(v>=1e6)return'R$ '+(v/1e6).toFixed(2)+'M'; if(v>=1e3){const k=v/1000;return'R$ '+(Number.isInteger(k)?k:k.toFixed(1))+'K';} return'R$ '+v.toFixed(0); }
+function fmtCur(v){ if(!v&&v!==0)return'—'; return'R$ '+Math.round(v).toLocaleString('pt-BR'); }
 
 const STATUS_COLORS = {
   'Ativo':'rgba(82,199,125,.12)||#52c77d',
@@ -3466,6 +3504,18 @@ function updateModalBtn(){
   btn.style.display=has?'flex':'none';
 }
 
+
+// ── Section toggle ──────────────────────────────────────────
+function secToggle(id){
+  const body=document.getElementById('sec-body-'+id);
+  const chev=document.querySelector('#sec-'+id+' .sec-chevron');
+  const navBtn=document.getElementById('nav-'+id);
+  if(!body) return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(chev) chev.classList.toggle('open',!open);
+  if(navBtn) navBtn.classList.toggle('nav-on',!open);
+}
 </script>
 
 <!-- Modal Contratos -->
