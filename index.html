@@ -2732,11 +2732,11 @@ function buildMelhorMes(){
       const t1Jun=realJun>=mJ;                    // R$ 1.000
       const t2Jun=realTrim>=mT;                   // +R$ 500
       const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 1.000 (only if t2 done)
-      total=(t1Jun?1000:0)+(t2Jun?500:0)+(t3Jun?1000:0);
+      total=(t1Jun?1000:0)+(t2Jun?1500:0)+(t3Jun?2500:0);
       tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Junho</div>`
         +tierHtml(t1Jun,!t1Jun,'100% meta junho ('+fmtR(mJ)+')','R$ 1.000',Math.max(0,mJ-realJun))
-        +tierHtml(t2Jun,t1Jun&&!t2Jun,'100% meta trimestre Abr+Mai+Jun ('+fmtR(mT)+')','+R$ 500',Math.max(0,mT-realTrim))
-        +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan–Jun ('+fmtR(metaSemEx)+')','+R$ 1.000',Math.max(0,metaSemEx-realSemEx));
+        +tierHtml(t2Jun,t1Jun&&!t2Jun,'100% meta trimestre Abr+Mai+Jun ('+fmtR(mT)+')','+R$ 1.500',Math.max(0,mT-realTrim))
+        +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan–Jun ('+fmtR(metaSemEx)+')','+R$ 2.500',Math.max(0,metaSemEx-realSemEx));
     }
 
     // Progress bars for all 3 horizons
