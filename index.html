@@ -2703,14 +2703,18 @@ function buildMelhorMes(){
     return `<img src="fotos/${name}.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${borderCor};" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:44px;height:44px;border-radius:50%;flex-shrink:0;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:DM Mono,monospace;color:${cor};background:#1a1f35;border:2px solid ${borderCor};">${ini}</div>`;
   }
 
-  function tierHtml(ok,isNext,desc,val,falta){
+  function tierHtml(ok,isNext,desc,val,falta,fechado){
     const clr=ok?'#00b894':isNext?'#74b9ff':'#5a6a82';
     const bg=ok?'rgba(0,184,148,0.07)':isNext?'rgba(116,185,255,0.06)':'rgba(255,255,255,0.02)';
     const br=ok?'rgba(0,184,148,0.25)':isNext?'rgba(116,185,255,0.25)':'rgba(255,255,255,0.05)';
     const ic=ok?'✓':isNext?'→':'·';
     let det='';
     if(ok) det='';
-    else if(falta>0) det='<span style="color:'+(isNext?'#74b9ff':'#5a6a82')+';">↘ Faltam '+fmtR(falta)+'</span>';
+    else if(falta>0){
+      const fClr=fechado?'#e17055':'#fdcb6e';
+      const fTxt=fechado?'↘ Faltou ':'↘ Faltam ';
+      det='<span style="color:'+fClr+';">'+fTxt+fmtR(falta)+'</span>';
+    }
     return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid ${br};background:${bg};margin-bottom:5px;">
       <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
       <div style="flex:1;">
@@ -2741,9 +2745,9 @@ function buildMelhorMes(){
       const t1=realAbr>=mA,t2=realTrim>=mA+mM2,t3=realTrim>=mA+mM2+mJ,tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(t1?500:0)+(t2?500:0)+(t3?1000:0)+(tri130?1000:0)+(tri150?2000:0);
       tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Abril</div>`
-        +tierHtml(t1,!t1,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))
-        +tierHtml(t2,t1&&!t2,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM2-realTrim))
-        +tierHtml(t3,t2&&!t3,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM2+mJ-realTrim))
+        +tierHtml(t1,!t1,'100% meta abril','R$ 500',Math.max(0,mA-realAbr,mesFechado))
+        +tierHtml(t2,t1&&!t2,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM2-realTrim,mesFechado))
+        +tierHtml(t3,t2&&!t3,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM2+mJ-realTrim,mesFechado))
         +triSection(realTrim,mT);
     } else if(mes==='maio'){
       const naoAbr=realAbr<mA,tmeta=realMai>=mM2;
@@ -2755,10 +2759,10 @@ function buildMelhorMes(){
       const tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(tmeta?1000:0)+(tgap?500:0)+(tmaijun?750:0)+(tabrmaijun?750:0)+(tri130?1000:0)+(tri150?2000:0);
       tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Maio</div>`
-        +tierHtml(tmeta,!tmeta,'100% meta maio','R$ 1.000',Math.max(0,mM2-realMai))
-        +(naoAbr?tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,gapAbr-sobreMai)):'')
-        +tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05','+R$ 750',Math.max(0,mM2+mJ-realTrim))
-        +tierHtml(tabrmaijun,tmaijun&&!tabrmaijun,'100% meta abr+mai+jun até 31/05','+R$ 750',Math.max(0,mA+mM2+mJ-realTrim))
+        +tierHtml(tmeta,!tmeta,'100% meta maio','R$ 1.000',Math.max(0,mM2-realMai,mesFechado))
+        +(naoAbr?tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,gapAbr-sobreMai,mesFechado)):'')
+        +tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05','+R$ 750',Math.max(0,mM2+mJ-realTrim,mesFechado))
+        +tierHtml(tabrmaijun,tmaijun&&!tabrmaijun,'100% meta abr+mai+jun até 31/05','+R$ 750',Math.max(0,mA+mM2+mJ-realTrim,mesFechado))
         +triSection(realTrim,mT);
     } else {
       // ── Campanha Junho ───────────────────────────────────────
