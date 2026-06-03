@@ -153,13 +153,20 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .melhor-name{font-size:9px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;text-align:center;font-family:'DM Mono',monospace;}
 .melhor-val{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
 .ranking-avatar-fallback{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);flex-shrink:0;}
-.ranking-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(99,179,237,0.04);}
+.ranking-row{display:grid;grid-template-columns:28px 44px 1fr 1fr 90px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .ranking-pos{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);width:12px;text-align:right;flex-shrink:0;}
 .ranking-name{font-size:10px;font-family:'DM Mono',monospace;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
-.ranking-bar-wrap{width:44px;height:4px;background:var(--border);border-radius:2px;flex-shrink:0;overflow:hidden;}
+.ranking-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.ranking-bar-track{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
 .ranking-bar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
 .ranking-vals{text-align:right;flex-shrink:0;min-width:52px;}
-.ranking-fat{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;}
+.ranking-fat{font-size:11px;font-family:'DM Mono',monospace;font-weight:700;text-align:right;}
+.ranking-vals{display:flex;flex-direction:column;align-items:flex-end;}
+.ranking-name-block{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.ranking-name-main{font-size:11px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ranking-bar-hint{font-size:8px;margin-top:1px;}
+.ranking-bar-pct{font-size:9px;font-weight:700;white-space:nowrap;}
+.ranking-bar-row{display:flex;align-items:center;gap:6px;}
 .ranking-ctr{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
 
 .trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
@@ -462,10 +469,19 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="ranking-title" style="margin-bottom:0;">Ranking de Vendas &nbsp;<span id="ranking-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
       <div style="display:flex;gap:6px;">
-        <button id="ranking-view-cargo" onclick="setRankingView('cargo')" style="background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--accent);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;font-weight:700;letter-spacing:.04em;">Cargo</button>
-        <button id="ranking-view-regional" onclick="setRankingView('regional')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Regional</button>
-        <button id="ranking-view-geral" onclick="setRankingView('geral')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Geral</button>
-        <button id="ranking-view-melhor" onclick="setRankingView('melhor')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:3px 8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;letter-spacing:.04em;">Melhor do Mês</button>
+        <div style="position:relative;display:inline-block;">
+          <button id="ranking-view-dropdown-btn" onclick="toggleRankingDropdown()" style="background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:#4ECDC4;padding:5px 12px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;border-radius:8px;display:inline-flex;align-items:center;gap:6px;letter-spacing:.04em;font-weight:600;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+            <svg id="ranking-view-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span id="ranking-view-label">Cargo</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="ranking-view-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#141627;border:1px solid rgba(78,205,196,0.2);border-radius:10px;overflow:hidden;z-index:200;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+            <button onclick="setRankingView('cargo')" data-view="cargo" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cargo</button>
+            <button onclick="setRankingView('regional')" data-view="regional" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Regional</button>
+            <button onclick="setRankingView('geral')" data-view="geral" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Geral</button>
+            <button onclick="setRankingView('melhor')" data-view="melhor" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Melhor do Mês</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="ranking-cols" id="ranking-cols">
@@ -1394,7 +1410,36 @@ function renderQuartil(){
   });
 }
 
+function toggleRankingDropdown(){
+  const m=document.getElementById('ranking-view-menu');
+  if(m) m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const dd=document.getElementById('ranking-view-menu');
+  const btn=document.getElementById('ranking-view-dropdown-btn');
+  if(dd&&btn&&!btn.contains(e.target)&&!dd.contains(e.target)) dd.style.display='none';
+});
 function setRankingView(view){
+  // Update dropdown label and icon
+  const lbl=document.getElementById('ranking-view-label');
+  const ico=document.getElementById('ranking-view-icon');
+  const labels={'cargo':'Cargo','regional':'Regional','geral':'Geral','melhor':'Melhor do Mês'};
+  const icons={
+    'cargo':'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    'regional':'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    'geral':'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    'melhor':'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  };
+  if(lbl) lbl.textContent=labels[view]||view;
+  if(ico) ico.innerHTML=icons[view]||'';
+  // Close dropdown
+  const menu=document.getElementById('ranking-view-menu');
+  if(menu) menu.style.display='none';
+  // Highlight active item
+  document.querySelectorAll('#ranking-view-menu button[data-view]').forEach(b=>{
+    b.style.color=b.dataset.view===view?'#4ECDC4':'var(--fg)';
+    b.style.fontWeight=b.dataset.view===view?'700':'400';
+  });
   rankingView = view;
   const btnCargo = document.getElementById('ranking-view-cargo');
   const btnReg   = document.getElementById('ranking-view-regional');
@@ -1626,11 +1671,13 @@ function rankingAvatar(nome, metaHit){
     const mesAtual = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
     const emAndamento = meses.includes(mesAtual);
 
-    const barColor = pct => {
-      if(pct>=100) return 'var(--green)';
-      if(emAndamento) return '#FFE66D';
-      return '#e17055';
+    const rankClr = pct => pct>=100?'#00b894':emAndamento?'#fdcb6e':'#e17055';
+    const faltaStr = (v, meta) => {
+      const diff = Math.max(0, meta - v);
+      if(diff === 0) return '';
+      return emAndamento ? '↘ Faltam R$ '+Math.round(diff).toLocaleString('pt-BR') : '↘ Faltou R$ '+Math.round(diff).toLocaleString('pt-BR');
     };
+    const barColor = pct => rankClr(pct);
 
     function buildRows(members, meta, containerId){
       const sorted = [...members].sort((a,b)=>(fat[b]||0)-(fat[a]||0));
@@ -1644,14 +1691,22 @@ function rankingAvatar(nome, metaHit){
         const bw = meta>0?Math.min((v/meta)*100,100):0;
         const row = document.createElement('div');
         row.className = 'ranking-row';
+        const clr = rankClr(pct);
+        const hint = pct>=100 ? '<span style="color:#00b894;">✓ Meta batida</span>' : (faltaStr(v,meta)?'<span style="color:'+clr+';">'+faltaStr(v,meta)+'</span>':'');
         row.innerHTML =
           '<span class="ranking-pos">'+(i+1)+'</span>'+
           rankingAvatar(nome, pct>=100)+
-          '<span class="ranking-name" title="'+nome+'">'+nome.split(' ').slice(0,2).join(' ')+(pct>=100?' 👑':'')+'</span>'+
-          '<div class="ranking-bar-wrap"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+barColor(pct)+'"></div></div>'+
+          '<div class="ranking-name-block">'+
+            '<span class="ranking-name-main" title="'+nome+'">'+nome.split(' ').slice(0,2).join(' ')+(pct>=100?' 👑':'')+'</span>'+
+            '<span class="ranking-ctr">'+TEAM[nome].cargo.replace('Coordenador Comercial','Coord.').replace('Coordenadora Comercial','Coord.')+' · '+ctr[nome]+' ctr</span>'+
+          '</div>'+
+          '<div class="ranking-bar-wrap">'+
+            '<div class="ranking-bar-row"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+clr+'"></div></div><span class="ranking-bar-pct" style="color:'+clr+'">'+pct.toFixed(0)+'%</span></div>'+
+            '<div class="ranking-bar-hint">'+hint+'</div>'+
+          '</div>'+
           '<div class="ranking-vals">'+
-            '<div class="ranking-fat" style="color:'+barColor(pct)+'">R$ '+fmtR(v)+'</div>'+
-            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'%</div>'+
+            '<div class="ranking-fat" style="color:'+clr+'">'+fmtR(v)+'</div>'+
+            '<div class="ranking-ctr">meta '+fmtR(meta)+'</div>'+
           '</div>';
         el.appendChild(row);
       });
@@ -1675,14 +1730,22 @@ function rankingAvatar(nome, metaHit){
         const bw  = metaIndividual>0?Math.min((v/metaIndividual)*100,100):0;
         const row = document.createElement('div');
         row.className = 'ranking-row';
+        const clr2 = rankClr(pct);
+        const hint2 = pct>=100 ? '<span style="color:#00b894;">✓ Meta batida</span>' : (faltaStr(v,metaIndividual)?'<span style="color:'+clr2+';">'+faltaStr(v,metaIndividual)+'</span>':'');
         row.innerHTML =
           '<span class="ranking-pos">'+(i+1)+'</span>'+
           rankingAvatar(nome, pct>=100)+
-          '<span class="ranking-name" title="'+nome+'">'+nome.split(' ').slice(0,2).join(' ')+(pct>=100?' 👑':'')+'</span>'+
-          '<div class="ranking-bar-wrap"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+barColor(pct)+'"></div></div>'+
+          '<div class="ranking-name-block">'+
+            '<span class="ranking-name-main" title="'+nome+'">'+nome.split(' ').slice(0,2).join(' ')+(pct>=100?' 👑':'')+'</span>'+
+            '<span class="ranking-ctr">'+TEAM[nome].cargo.replace('Coordenador Comercial','Coord.').replace('Coordenadora Comercial','Coord.')+' · '+ctr[nome]+' ctr</span>'+
+          '</div>'+
+          '<div class="ranking-bar-wrap">'+
+            '<div class="ranking-bar-row"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:'+bw+'%;background:'+clr2+'"></div></div><span class="ranking-bar-pct" style="color:'+clr2+'">'+pct.toFixed(0)+'%</span></div>'+
+            '<div class="ranking-bar-hint">'+hint2+'</div>'+
+          '</div>'+
           '<div class="ranking-vals">'+
-            '<div class="ranking-fat" style="color:'+barColor(pct)+'">R$ '+fmtR(v)+'</div>'+
-            '<div class="ranking-ctr">'+ctr[nome]+' ctr · '+pct.toFixed(0)+'%</div>'+
+            '<div class="ranking-fat" style="color:'+clr2+'">'+fmtR(v)+'</div>'+
+            '<div class="ranking-ctr">meta '+fmtR(metaIndividual)+'</div>'+
           '</div>';
         el.appendChild(row);
       });
