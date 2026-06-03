@@ -2840,7 +2840,7 @@ function buildMelhorMes(){
 
       <div class="camp-total">
         <span class="camp-total-label">Premiação ${mes}</span>
-        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0 · próx: R$ 1.000'}</span>
+        <span class="camp-total-val" style="color:${total>0?'#00b894':'var(--muted)'}">${total>0?fmtR(total)+' ✓':'R$ 0'}</span>
       </div></div>`;
   }
 
@@ -2952,62 +2952,75 @@ function buildMelhorMes(){
       const pctGeral = Math.min(100,Math.round(realGeralJun/metaGeralJun*100));
 
       const div=document.createElement('div'); div.className='camp-card';
+      // Avatar iniciais
+      const initials=c.coord.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const avatarColor=bc(pctJun,mesJunFechado&&!t1);
       div.innerHTML=`
         <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
-          <div class="camp-card-info">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(78,205,196,0.1);border:2px solid ${avatarColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${avatarColor};flex-shrink:0;">${initials}</div>
+          <div class="camp-card-info" style="flex:1;margin-left:10px;">
             <div class="camp-card-name">${c.regional}</div>
-            <div class="camp-card-cargo" style="color:#5a6a82;">${c.coord}</div>
+            <div class="camp-card-cargo" style="color:#5a6a82;">${c.coord} · Meta Jun: ${fmtR(c.metaJun)}</div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">Junho</div>
-            <div style="font-size:22px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};">${pctJun.toFixed(1)}%</div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun,mesJunFechado&&!t1)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};width:42px;text-align:right;">${pctJun.toFixed(1)}%</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim,mesTrimFechado&&!t2)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctTrim,mesTrimFechado&&!t2)};width:42px;text-align:right;">${pctTrim.toFixed(1)}%</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem,mesSemFechado&&!t3)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bc(pctSem,mesSemFechado&&!t3)};width:42px;text-align:right;">${pctSem.toFixed(1)}%</div>
+          <div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0;">
+            <div style="text-align:right;">
+              <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">Junho</div>
+              <div style="font-size:22px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};">${pctJun.toFixed(1)}%</div>
+            </div>
+            <button onclick="downloadCampCard(this)" title="Baixar card" style="margin-top:2px;width:28px;height:28px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:#4ECDC4;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.16)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
           </div>
         </div>
 
-        ${tRow(t1,!t1,false,
-          '100% meta de junho',
-          t1?`Meta: ${fmtR(c.metaJun)} · Realizado: ${fmtR(realJun)}`:`Meta: ${fmtR(c.metaJun)} · Realizado: ${fmtR(realJun)} · Faltam ${fmtR(Math.max(0,c.metaJun-realJun))}`,
-          'R$ 1.000')}
-        ${tRow(t2,t1&&!t2,!t1,
-          '100% meta trimestre (Abr–Jun)',
-          t2?`Meta: ${fmtR(c.metaTrim)} · Realizado: ${fmtR(realTrim)}`:`Meta: ${fmtR(c.metaTrim)} · Realizado: ${fmtR(realTrim)} · Faltam ${fmtR(Math.max(0,c.metaTrim-realTrim))}`,
-          '+R$ 2.000')}
-        ${tRow(t3,t2&&!t3,!t2,
-          '100% meta semestre (Jan–Jun)',
-          t3?`Meta: ${fmtR(c.metaSem)} · Realizado: ${fmtR(realSem)}`:`Meta: ${fmtR(c.metaSem)} · Realizado: ${fmtR(realSem)} · Faltam ${fmtR(Math.max(0,c.metaSem-realSem))}`,
-          '+R$ 1.000')}
-
-        <div style="padding:10px 14px;border-radius:10px;border:1px solid ${bonusBr};background:${bonusBg};margin-bottom:6px;">
-          <div style="font-size:9px;color:#5a6a82;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Bônus geral de junho</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div style="font-size:10px;color:${bonusClr};">${bonusDesc}</div>
-            <div style="font-size:11px;font-weight:700;color:${bonusClr};white-space:nowrap;margin-left:10px;">${bonusVal}</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
+              <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun,mesJunFechado&&!t1)};border-radius:3px;"></div></div>
+              <div style="font-size:10px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};width:42px;text-align:right;">${pctJun.toFixed(1)}%</div>
+            </div>
+            ${t1?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaJun-realJun>0?`<div style="font-size:8px;color:#fdcb6e;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaJun-realJun))}</div>`:'')}
           </div>
-          <div style="height:3px;background:rgba(99,179,237,0.08);border-radius:2px;overflow:hidden;"><div style="width:${pctGeral}%;height:100%;background:${bonusClr};border-radius:2px;"></div></div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
+              <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim,mesTrimFechado&&!t2)};border-radius:3px;"></div></div>
+              <div style="font-size:10px;font-weight:700;color:${bc(pctTrim,mesTrimFechado&&!t2)};width:42px;text-align:right;">${pctTrim.toFixed(1)}%</div>
+            </div>
+            ${t2?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaTrim-realTrim>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaTrim-realTrim))}</div>`:'')}
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
+              <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem,mesSemFechado&&!t3)};border-radius:3px;"></div></div>
+              <div style="font-size:10px;font-weight:700;color:${bc(pctSem,mesSemFechado&&!t3)};width:42px;text-align:right;">${pctSem.toFixed(1)}%</div>
+            </div>
+            ${t3?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaSem-realSem>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaSem-realSem))}</div>`:'')}
+          </div>
+        </div>
+
+        <div class="camp-tiers">
+          ${tierHtml(t1,!t1,'100% meta de junho ('+fmtR(c.metaJun)+')','R$ 1.000',Math.max(0,c.metaJun-realJun))}
+          ${tierHtml(t2,t1&&!t2,'100% meta trimestre Abr–Jun ('+fmtR(c.metaTrim)+')','+R$ 2.000',Math.max(0,c.metaTrim-realTrim))}
+          ${tierHtml(t3,t2&&!t3,'100% meta semestre Jan–Jun ('+fmtR(c.metaSem)+')','+R$ 1.000',Math.max(0,c.metaSem-realSem))}
+          <div style="padding:9px 12px;border-radius:9px;border:1px solid ${bonusBr};background:${bonusBg};margin-bottom:5px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-size:13px;color:${bonusClr};width:18px;text-align:center;flex-shrink:0;">${bonusGeral&&t1?'✓':bonusGeral&&!t1?'✗':'·'}</div>
+              <div style="flex:1;">
+                <div style="font-size:11px;font-weight:500;color:${bonusClr};">Bônus geral de junho</div>
+                <div style="font-size:9px;color:#5a6a82;margin-top:2px;">${bonusDesc}</div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:${bonusClr};white-space:nowrap;">${bonusVal}</div>
+            </div>
+            <div style="height:3px;background:rgba(99,179,237,0.08);border-radius:2px;overflow:hidden;margin-top:8px;"><div style="width:${pctGeral}%;height:100%;background:${bonusClr};border-radius:2px;"></div></div>
+          </div>
         </div>
 
         <div class="camp-total">
           <span class="camp-total-label">Premiação total</span>
           <span class="camp-total-val" style="color:${premTotal>0?'#00b894':'var(--muted)'}">
-            ${premTotal>0?fmtR(premTotal)+' ✓':'R$ 0 · próx: R$ 1.000'}
+            ${premTotal>0?fmtR(premTotal)+' ✓':'R$ 0'}
           </span>
         </div>`;
       el.appendChild(div);
