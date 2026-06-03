@@ -2704,13 +2704,13 @@ function buildMelhorMes(){
   }
 
   function tierHtml(ok,isNext,desc,val,falta){
-    const clr=ok?'#00b894':isNext?'#4ECDC4':'#5a6a82';
-    const bg=ok?'rgba(0,184,148,0.07)':isNext?'rgba(78,205,196,0.04)':'rgba(255,255,255,0.02)';
-    const br=ok?'rgba(0,184,148,0.25)':isNext?'rgba(78,205,196,0.15)':'rgba(255,255,255,0.05)';
+    const clr=ok?'#00b894':isNext?'#74b9ff':'#5a6a82';
+    const bg=ok?'rgba(0,184,148,0.07)':isNext?'rgba(116,185,255,0.06)':'rgba(255,255,255,0.02)';
+    const br=ok?'rgba(0,184,148,0.25)':isNext?'rgba(116,185,255,0.25)':'rgba(255,255,255,0.05)';
     const ic=ok?'✓':isNext?'→':'·';
     let det='';
     if(ok) det='';
-    else if(falta>0) det='<span style="color:'+(isNext?'#fdcb6e':'#5a6a82')+';">↘ Faltam '+fmtR(falta)+'</span>';
+    else if(falta>0) det='<span style="color:'+(isNext?'#74b9ff':'#5a6a82')+';">↘ Faltam '+fmtR(falta)+'</span>';
     return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid ${br};background:${bg};margin-bottom:5px;">
       <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
       <div style="flex:1;">
