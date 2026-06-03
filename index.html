@@ -6,7 +6,7 @@
 <title>kedu · Comercial Expansão 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08090f;--bg2:#0d0f1a;--card:#111320;--card2:#161929;--border:rgba(99,179,237,0.08);--border2:rgba(99,179,237,0.18);--accent:#4ECDC4;--accent2:#FF6B6B;--accent3:#FFE66D;--accent4:#A29BFE;--text:#e8edf5;--muted:#5a6a82;--muted2:#8394aa;--green:#52c77d;--red:#ff6b6b;--orange:#f6ad55;--purple:#b794f4;--pill-h:34px;}
+:root{--bg:#08090f;--bg2:#0d0f1a;--card:#111320;--card2:#161929;--border:rgba(99,179,237,0.08);--border2:rgba(99,179,237,0.18);--accent:#4ECDC4;--accent2:#FF6B6B;--accent3:#FFE66D;--accent4:#A29BFE;--text:#e8edf5;--muted:#5a6a82;--muted2:#8394aa;--green:#52c77d;--red:#ff6b6b;--orange:#f6ad55;--purple:#b794f4;--pill-h:36px;}
 [data-theme="light"]{
   --bg:#f0f4f8;--bg2:#e2e8f0;--card:#ffffff;--card2:#f7fafc;
   --border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.18);
@@ -28,66 +28,66 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .header{background:rgba(13,15,26,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .hlogo{display:flex;align-items:center;gap:12px;}
 .hmark{width:90px;height:26px;display:flex;align-items:center;justify-content:center;}
-.htitle{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.04em;}
-.hsub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px;}
-.header-nav-btn{height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;}
+.htitle{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;letter-spacing:.04em;}
+.hsub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px;}
+.header-nav-btn{height:32px;padding:0 14px;background:transparent;border:1px solid rgba(99,179,237,0.18);color:var(--muted);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;letter-spacing:.04em;}
 .header-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 .loading-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent4));z-index:9999;transition:width .3s ease;width:0;}
 .loading-bar.active{animation:loadpulse 1.2s ease-in-out infinite;}
 @keyframes loadpulse{0%{width:0;opacity:1}70%{width:90%;opacity:1}100%{width:100%;opacity:0}}
 .header-nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,0.08);}
-.hbadge{background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;}
+.hbadge{background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:13px;font-family:'DM Mono',monospace;}
 .filterbar{background:rgba(13,15,26,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:8px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:65px;z-index:190;}
 [data-theme="light"] .filterbar{background:rgba(240,244,248,0.95);}
 .fb-group{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:5px 10px;}
 [data-theme="light"] .fb-group{background:rgba(0,0,0,0.02);}
-.fb-group-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;font-family:'DM Mono',monospace;}
-.fb-group select,.fb-group input[type=month]{height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;min-width:100px;color-scheme:dark;}
+.fb-group-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;font-family:'DM Mono',monospace;}
+.fb-group select,.fb-group input[type=month]{height:28px;padding:0 22px 0 8px;background:var(--card);border:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;min-width:100px;color-scheme:dark;}
 [data-theme="light"] .fb-group select,[data-theme="light"] .fb-group input[type=month]{background:var(--card);color-scheme:light;}
 .fb-group input[type=month]{background-image:none;padding-right:8px;min-width:110px;color-scheme:dark;}
 [data-theme="light"] .fb-group input[type=month]{color-scheme:light;}
-.fb-date-sep{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
-.fb-yr-sel{height:26px;padding:0 18px 0 6px;background:var(--card);border:none;color:var(--text);color-scheme:dark;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0l3.5 4 3.5-4z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 3px center;}
+.fb-date-sep{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;}
+.fb-yr-sel{height:26px;padding:0 18px 0 6px;background:var(--card);border:none;color:var(--text);color-scheme:dark;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0l3.5 4 3.5-4z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 3px center;}
 .fb-months{display:flex;gap:3px;flex-wrap:wrap;}
-.fb-m-btn{height:24px;min-width:30px;padding:0 6px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:9px;font-family:'DM Mono',monospace;cursor:pointer;transition:.15s;white-space:nowrap;}
+.fb-m-btn{height:24px;min-width:30px;padding:0 6px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:.15s;white-space:nowrap;}
 .fb-m-btn:hover{border-color:rgba(78,205,196,0.4);color:var(--accent);}
 .fb-m-btn.sel{background:rgba(78,205,196,0.15);border-color:var(--accent);color:var(--accent);font-weight:700;}
 .fb-m-btn.in-range{background:rgba(78,205,196,0.06);border-color:rgba(78,205,196,0.2);color:rgba(78,205,196,0.7);}
-.fb-range-lbl{font-size:9px;color:var(--muted);white-space:nowrap;font-family:'DM Mono',monospace;min-width:80px;}
-.filter-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace;}
+.fb-range-lbl{font-size:11px;color:var(--muted);white-space:nowrap;font-family:'DM Mono',monospace;min-width:80px;}
+.filter-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace;}
 .fdiv{width:1px;height:24px;background:var(--border);margin:0 4px;}
-select,input[type=month]{height:var(--pill-h);padding:0 28px 0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:120px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .2s;}
+select,input[type=month]{height:var(--pill-h);padding:0 28px 0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:120px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a82'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .2s;}
 select:focus,input[type=month]:focus{border-color:var(--accent);}
 input[type=month]{background-image:none;padding-right:10px;min-width:130px;color-scheme:dark;}
 .date-range{display:flex;align-items:center;gap:6px;}
-.date-sep{font-size:11px;color:var(--muted);}
-.btn-reset{height:var(--pill-h);padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;}
+.date-sep{font-size:13px;color:var(--muted);}
+.btn-reset{height:var(--pill-h);padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s;}
 .btn-reset:hover{background:rgba(255,107,107,0.14);}
 .active-filters{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-left:auto;}
-.afbadge{display:inline-flex;align-items:center;gap:3px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.18);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-family:'DM Mono',monospace;}
+.afbadge{display:inline-flex;align-items:center;gap:3px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.18);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:12px;font-family:'DM Mono',monospace;}
 .afbadge .x{cursor:pointer;opacity:.5;margin-left:2px;}.afbadge .x:hover{opacity:1;}
 .main{padding:0;max-width:1800px;margin:0 auto;}
-.stitle{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.stitle{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
 
 .regional-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
 .reg-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;;box-sizing:border-box}
 .reg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.reg-title{font-family:'DM Mono',monospace;font-weight:700;font-size:12px;color:var(--fg);letter-spacing:.04em;}
+.reg-title{font-family:'DM Mono',monospace;font-weight:700;font-size:13px;color:var(--fg);letter-spacing:.04em;}
 .reg-pct{font-family:'DM Mono',monospace;font-weight:800;font-size:20px;color:var(--accent);}
 .reg-meta-row{display:flex;justify-content:space-between;margin-bottom:4px;}
-.reg-meta-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;}
-.reg-meta-val{font-size:12px;font-family:'DM Mono',monospace;color:var(--fg2);}
+.reg-meta-label{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;}
+.reg-meta-val{font-size:13px;font-family:'DM Mono',monospace;color:var(--fg2);}
 .reg-track-bg{background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin:8px 0 4px;}
 .reg-track-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent4));transition:width .6s ease;}
 @media(max-width:600px){.regional-grid{grid-template-columns:1fr;}}
 
 
 .multisel-wrap{position:relative;}
-.multisel-btn{height:var(--pill-h);padding:0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:space-between;transition:border-color .2s;}
+.multisel-btn{height:var(--pill-h);padding:0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:space-between;transition:border-color .2s;}
 .multisel-btn:hover{border-color:var(--accent);}
 .multisel-drop{position:absolute;top:calc(100% + 4px);left:0;min-width:180px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:6px;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-height:260px;overflow-y:auto;}
-.multisel-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-family:'DM Mono',monospace;color:var(--text);transition:background .15s;}
+.multisel-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--text);transition:background .15s;}
 .multisel-item:hover{background:rgba(78,205,196,0.08);}
 .multisel-item input[type=checkbox]{accent-color:var(--accent);width:12px;height:12px;cursor:pointer;}
 .multisel-item.checked{color:var(--accent);}
@@ -95,29 +95,29 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .estado-chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:none;}
 .estado-chart-card.visible{display:block;}
 .ranking-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;box-sizing:border-box;}
-.ranking-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+.ranking-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
 .ranking-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.ranking-copy-btn{font-size:8px;color:var(--muted);cursor:pointer;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--border);transition:.15s;text-transform:none;}
+.ranking-copy-btn{font-size:11px;color:var(--muted);cursor:pointer;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--border);transition:.15s;text-transform:none;}
 .ranking-copy-btn:hover{color:var(--accent);border-color:var(--accent);}
-.quartil-col-title{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid;}
+.quartil-col-title{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid;}
 .quartil-member{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(99,179,237,0.04);}
-.quartil-name{font-size:10px;font-family:'DM Mono',monospace;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.quartil-ctr{font-size:9px;font-family:'DM Mono',monospace;text-align:right;flex-shrink:0;}
+.quartil-name{font-size:12px;font-family:'DM Mono',monospace;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.quartil-ctr{font-size:11px;font-family:'DM Mono',monospace;text-align:right;flex-shrink:0;}
 @media(max-width:700px){#quartil-grid{grid-template-columns:1fr 1fr!important;}}
-.ranking-col-title{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.ranking-col-title{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
 .ranking-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(78,205,196,0.25);}
 .camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .camp-tabs{display:flex;gap:6px;margin-bottom:16px;}
-.camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
+.camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
 .camp-tab.active{border-color:var(--accent);color:var(--accent);}
 .camp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .camp-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
 .camp-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.camp-av-fallback{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;}
+.camp-av-fallback{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;}
 .camp-card-info{flex:1;min-width:0;}
-.camp-card-name{font-size:11px;font-weight:700;color:var(--text);}
-.camp-card-cargo{font-size:9px;color:var(--muted);margin-top:1px;}
+.camp-card-name{font-size:13px;font-weight:700;color:var(--text);}
+.camp-card-cargo{font-size:11px;color:var(--muted);margin-top:1px;}
 .camp-card-pct{font-size:15px;font-weight:700;margin-left:auto;flex-shrink:0;}
 .camp-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;}
 .camp-bar-fill{height:100%;border-radius:2px;}
@@ -126,122 +126,122 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .camp-tier.done{background:rgba(0,184,148,0.08);border-color:rgba(0,184,148,0.2);}
 .camp-tier.next{background:rgba(116,185,255,0.06);border-color:rgba(116,185,255,0.2);}
 .camp-tier.locked{opacity:.35;}
-.camp-tier-icon{font-size:10px;width:14px;color:var(--muted);}
+.camp-tier-icon{font-size:12px;width:14px;color:var(--muted);}
 .camp-tier.done .camp-tier-icon{color:#00b894;}
 .camp-tier.next .camp-tier-icon{color:#74b9ff;}
-.camp-tier-desc{flex:1;font-size:9px;color:var(--muted2);}
+.camp-tier-desc{flex:1;font-size:11px;color:var(--muted2);}
 .camp-tier.done .camp-tier-desc{color:#00b894;}
 .camp-tier.next .camp-tier-desc{color:#74b9ff;}
-.camp-tier-val{font-size:9px;font-weight:700;color:var(--text);}
+.camp-tier-val{font-size:11px;font-weight:700;color:var(--text);}
 .camp-tier.done .camp-tier-val{color:#00b894;}
 .camp-tier.next .camp-tier-val{color:#74b9ff;}
 .camp-total{display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
-.camp-total-label{font-size:9px;color:var(--muted);}
-.camp-total-val{font-size:11px;font-weight:700;}
-.camp-days{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);background:rgba(99,179,237,0.06);padding:2px 8px;border-radius:10px;margin-bottom:12px;}
+.camp-total-label{font-size:11px;color:var(--muted);}
+.camp-total-val{font-size:13px;font-weight:700;}
+.camp-days{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);background:rgba(99,179,237,0.06);padding:2px 8px;border-radius:10px;margin-bottom:12px;}
 .camp-exec-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-.camp-pill{font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);}
+.camp-pill{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);}
 .camp-pill.done{border-color:rgba(0,184,148,0.3);color:#00b894;background:rgba(0,184,148,0.06);}
 .melhor-avatar-wrap{position:relative;flex-shrink:0;}
 .melhor-avatar-ring{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);padding:2.5px;display:flex;align-items:center;justify-content:center;}
 .melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
-.melhor-avatar-fallback{width:100%;height:100%;border-radius:50%;background:#1a1f35;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#FFD700;}
-.melhor-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);font-size:8px;font-weight:800;color:#111320;}
+.melhor-avatar-fallback{width:100%;height:100%;border-radius:50%;background:#1a1f35;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:#FFD700;}
+.melhor-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);font-size:11px;font-weight:800;color:#111320;}
 .melhor-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .melhor-empty{width:56px;height:56px;border-radius:50%;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;}
-.melhor-label{font-size:8px;color:#FFD700;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'DM Mono',monospace;}
-.melhor-name{font-size:9px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;text-align:center;font-family:'DM Mono',monospace;}
-.melhor-val{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
-.ranking-avatar-fallback{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);flex-shrink:0;}
-.ranking-row{display:grid;grid-template-columns:28px 44px 1fr 1fr 90px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.ranking-pos{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);width:12px;text-align:right;flex-shrink:0;}
-.ranking-name{font-size:10px;font-family:'DM Mono',monospace;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.melhor-label{font-size:11px;color:#FFD700;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'DM Mono',monospace;}
+.melhor-name{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;text-align:center;font-family:'DM Mono',monospace;}
+.melhor-val{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+.ranking-avatar-fallback{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);flex-shrink:0;}
+.ranking-row{display:grid;grid-template-columns:28px 44px 1fr 1fr 100px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.ranking-pos{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);width:12px;text-align:right;flex-shrink:0;}
+.ranking-name{font-size:12px;font-family:'DM Mono',monospace;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .ranking-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
 .ranking-bar-track{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
 .ranking-bar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
 .ranking-vals{text-align:right;flex-shrink:0;min-width:52px;}
-.ranking-fat{font-size:11px;font-family:'DM Mono',monospace;font-weight:700;text-align:right;}
+.ranking-fat{font-size:13px;font-family:'DM Mono',monospace;font-weight:700;text-align:right;}
 .ranking-vals{display:flex;flex-direction:column;align-items:flex-end;}
 .ranking-name-block{display:flex;flex-direction:column;gap:2px;min-width:0;}
-.ranking-name-main{font-size:11px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ranking-bar-hint{font-size:8px;margin-top:1px;}
-.ranking-bar-pct{font-size:9px;font-weight:700;white-space:nowrap;}
+.ranking-name-main{font-size:13px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ranking-bar-hint{font-size:11px;margin-top:1px;}
+.ranking-bar-pct{font-size:11px;font-weight:700;white-space:nowrap;}
 .ranking-bar-row{display:flex;align-items:center;gap:6px;}
-.ranking-ctr{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
+.ranking-ctr{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);}
 
 .trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .trend-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-.trend-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
-.trend-sub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;}
+.trend-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
+.trend-sub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;}
 .trend-legend{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-.trend-yr-btn{height:24px;padding:0 10px;border-radius:6px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;cursor:pointer;border:1px solid var(--yr-c,rgba(255,255,255,0.15));background:transparent;color:var(--muted);transition:all .18s;letter-spacing:.04em;}
+.trend-yr-btn{height:24px;padding:0 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:600;cursor:pointer;border:1px solid var(--yr-c,rgba(255,255,255,0.15));background:transparent;color:var(--muted);transition:all .18s;letter-spacing:.04em;}
 .trend-yr-btn.active{background:color-mix(in srgb,var(--yr-c,#fff) 15%,transparent);color:var(--yr-c,#fff);border-color:var(--yr-c,rgba(255,255,255,0.3));}
 .trend-yr-btn:hover{border-color:var(--yr-c,rgba(255,255,255,0.4));color:var(--yr-c,#fff);}
 .trend-yr-meta{--yr-c:#dfe6e9;}
 .trend-canvas-wrap{position:relative;width:100%;height:200px;}
 .meta-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;box-sizing:border-box;}
 .meta-bar-info{flex:0 0 auto;}
-.meta-bar-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;font-family:'DM Mono',monospace;}
+.meta-bar-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;font-family:'DM Mono',monospace;}
 .meta-bar-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--text);margin:3px 0 2px;}
-.meta-bar-sub{font-size:10px;color:var(--muted2);}
+.meta-bar-sub{font-size:12px;color:var(--muted2);}
 .meta-bar-track{flex:1;min-width:200px;}
 .meta-track-labels{display:flex;justify-content:space-between;margin-bottom:7px;}
-.meta-track-label{font-size:10px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.meta-track-label{font-size:12px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .meta-track-bg{height:10px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden;}
 .meta-track-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--accent4));transition:width 1.2s cubic-bezier(.4,0,.2,1);}
 .meta-pct-wrap{text-align:right;flex:0 0 auto;}
 .meta-pct{font-family:'DM Mono',monospace;font-size:30px;font-weight:800;color:var(--accent);}
-.meta-pct-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
+.meta-pct-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
 .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px;}
 .kpi-grid-2{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
 /* KPI hierarchy redesign */
 .kpi-section{margin-bottom:20px;}
-.kpi-section-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.kpi-section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .kpi-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 .kpi-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
 .kpi-hero{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
 .kpi-hero::after{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(ellipse at top right,var(--kpi-c,var(--accent)),transparent 70%);opacity:.04;pointer-events:none;}
-.kpi-hero-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'DM Mono',monospace;font-weight:500;}
+.kpi-hero-label{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-hero-val{font-family:'DM Mono',monospace;font-size:32px;font-weight:700;line-height:1;margin-bottom:4px;}
-.kpi-hero-sub{font-size:10px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-hero-sub{font-size:12px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-hero-avg{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;}
-.kpi-hero-avg-label{font-size:9px;color:var(--muted);}
-.kpi-hero-avg-val{font-size:13px;font-weight:700;}
+.kpi-hero-avg-label{font-size:11px;color:var(--muted);}
+.kpi-hero-avg-val{font-size:14px;font-weight:700;}
 .kpi-metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
-.kpi-m{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
+.kpi-m{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
-.kpi-m-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
+.kpi-m-label{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-m-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;}
-.kpi-m-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-m-sub{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-margem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
 .kpi-mg{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
-.kpi-mg-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-family:'DM Mono',monospace;font-weight:500;}
+.kpi-mg-label{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-mg-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:700;line-height:1;margin-bottom:2px;}
-.kpi-mg-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-mg-sub{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-ops-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;}
 .kpi-ops-main{background:var(--card);border:1px solid rgba(82,199,125,0.18);border-radius:12px;padding:14px 16px;display:flex;gap:14px;animation:fadeUp .4s ease both;;box-sizing:border-box}
 .kpi-ops-main-left{flex-shrink:0;}
-.kpi-ops-main-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
+.kpi-ops-main-label{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-ops-main-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:#52c77d;line-height:1;margin-bottom:3px;}
-.kpi-ops-main-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-ops-main-sub{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;}
 .kpi-ops-status{flex:1;display:flex;flex-direction:column;gap:4px;padding-left:14px;border-left:1px solid var(--border);}
-.kpi-ops-status-row{display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:10px;}
+.kpi-ops-status-row{display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:12px;}
 .kpi-ops-status-label{color:var(--muted);}
 .kpi-ops-sm{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;;box-sizing:border-box}
 
-.kpi-ops-sm-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;font-family:'DM Mono',monospace;font-weight:500;}
+.kpi-ops-sm-label{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-family:'DM Mono',monospace;font-weight:500;}
 .kpi-ops-sm-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;}
-.kpi-ops-sm-sub{font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-ops-sm-sub{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;}
 @media(max-width:900px){.kpi-hero-grid{grid-template-columns:1fr;}.kpi-metrics-grid{grid-template-columns:1fr 1fr;}.kpi-margem-grid{grid-template-columns:1fr 1fr;}.kpi-ops-grid{grid-template-columns:1fr 1fr;}.kpi-ops-main{grid-column:span 2;}}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 14px;position:relative;overflow:hidden;transition:transform .15s,border-color .15s;animation:fadeUp .4s ease both;}
 .kpi:hover{transform:translateY(-2px);border-color:var(--border2);}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-c,var(--accent));}
 .kpi::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(ellipse at top right,var(--kpi-c,var(--accent)),transparent 70%);opacity:.04;pointer-events:none;}
-.kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px;font-family:'DM Mono',monospace;}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px;font-family:'DM Mono',monospace;}
 .kpi-value{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;}
-.kpi-sub{font-size:10px;color:var(--muted2);font-family:'DM Mono',monospace;}
+.kpi-sub{font-size:12px;color:var(--muted2);font-family:'DM Mono',monospace;}
 
 .kpi:nth-child(1){animation-delay:.04s;}.kpi:nth-child(2){animation-delay:.08s;}.kpi:nth-child(3){animation-delay:.12s;}.kpi:nth-child(4){animation-delay:.16s;}.kpi:nth-child(5){animation-delay:.2s;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -283,7 +283,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
     <div class="hbadge" id="hcount">— contratos</div>
     <button id="theme-btn" onclick="toggleTheme()" title="Alternar tema"
-      style="height:32px;width:32px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-size:14px;"
+      style="height:32px;width:32px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-size:15px;"
       onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
       onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">
       <span id="theme-icon">☀</span>
@@ -323,7 +323,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   <div class="fb-group">
     <span class="fb-group-label">Localização</span>
     <div class="multisel-wrap" id="estado-wrap" style="position:relative;">
-      <button class="multisel-btn" id="estado-btn" onclick="toggleEstadoDrop(event)" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;min-width:120px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+      <button class="multisel-btn" id="estado-btn" onclick="toggleEstadoDrop(event)" style="height:28px;padding:0 22px 0 8px;background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;min-width:120px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
         <span id="estado-label">Estado (todos)</span>
         <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
       </button>
@@ -334,7 +334,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   <div class="fdiv"></div>
 
   <button class="btn-reset" onclick="resetFilters()">↺ Limpar</button>
-  <button id="btn-contratos-modal" onclick="openContratosModal()" style="display:none;height:28px;padding:0 12px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;align-items:center;gap:5px;transition:.15s;">
+  <button id="btn-contratos-modal" onclick="openContratosModal()" style="display:none;height:28px;padding:0 12px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;align-items:center;gap:5px;transition:.15s;">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Ver contratos
   </button>
@@ -365,10 +365,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 </div>
 
-<div class="sec-divider" id="sec-meta"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#fd79a81a;color:#fd79a8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fd79a8;">Meta &amp; Regionais</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento Kedu 2026 · progresso por regional</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-meta"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#fd79a81a;color:#fd79a8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fd79a8;">Meta &amp; Regionais</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Faturamento Kedu 2026 · progresso por regional</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
     <div class="stitle" style="margin-bottom:0;flex:1;">Meta Faturamento Kedu — 2026</div>
-    <button id="btn-share" onclick="exportMeta()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+    <button id="btn-share" onclick="exportMeta()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exportar PNG
     </button>
@@ -384,12 +384,12 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     </div>
     <div class="meta-bar-track">
       <div style="margin-bottom:4px;">
-        <span id="meta-realizado" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.02em;">—</span>
+        <span id="meta-realizado" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;letter-spacing:.02em;">—</span>
       </div>
       <div class="meta-track-bg" style="margin-bottom:8px;"><div class="meta-track-fill" id="meta-fill" style="width:0%"></div></div>
       <div id="meta-falta-pill" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;width:fit-content;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e17055" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        <span id="meta-falta" style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;">—</span>
+        <span id="meta-falta" style="font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;">—</span>
       </div>
     </div>
     <div class="meta-pct-wrap">
@@ -417,7 +417,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r1-contratos">—</span>
       </div>
-      <div id="r1-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
+      <div id="r1-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
         <span id="r1-falta-val">—</span>
       </div>
@@ -440,7 +440,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <span class="reg-meta-label">Contratos</span>
         <span class="reg-meta-val" id="r2-contratos">—</span>
       </div>
-      <div id="r2-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
+      <div id="r2-falta" style="display:none;margin-top:8px;padding:5px 12px;background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.25);border-radius:8px;font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:#e17055;align-items:center;gap:6px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
         <span id="r2-falta-val">—</span>
       </div>
@@ -454,10 +454,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 </div>
 
-<div class="sec-divider" id="sec-ranking"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#FFE66D1a;color:#FFE66D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#FFE66D;">Ranking &amp; Quartil</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Desempenho individual dos executivos</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-ranking"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#FFE66D1a;color:#FFE66D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#FFE66D;">Ranking &amp; Quartil</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Desempenho individual dos executivos</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
     <div class="stitle" style="margin-bottom:0;flex:1;">Ranking de Vendas</div>
-    <button onclick="exportRanking()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+    <button onclick="exportRanking()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exportar PNG
     </button>
@@ -470,16 +470,16 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div class="ranking-title" style="margin-bottom:0;">Ranking de Vendas &nbsp;<span id="ranking-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
       <div style="display:flex;gap:6px;">
         <div style="position:relative;display:inline-block;">
-          <button id="ranking-view-dropdown-btn" onclick="toggleRankingDropdown()" style="background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:#4ECDC4;padding:5px 12px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;border-radius:8px;display:inline-flex;align-items:center;gap:6px;letter-spacing:.04em;font-weight:600;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+          <button id="ranking-view-dropdown-btn" onclick="toggleRankingDropdown()" style="background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:#4ECDC4;padding:5px 12px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;border-radius:8px;display:inline-flex;align-items:center;gap:6px;letter-spacing:.04em;font-weight:600;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
             <svg id="ranking-view-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span id="ranking-view-label">Cargo</span>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div id="ranking-view-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#141627;border:1px solid rgba(78,205,196,0.2);border-radius:10px;overflow:hidden;z-index:200;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-            <button onclick="setRankingView('cargo')" data-view="cargo" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cargo</button>
-            <button onclick="setRankingView('regional')" data-view="regional" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Regional</button>
-            <button onclick="setRankingView('geral')" data-view="geral" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Geral</button>
-            <button onclick="setRankingView('melhor')" data-view="melhor" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Melhor do Mês</button>
+            <button onclick="setRankingView('cargo')" data-view="cargo" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cargo</button>
+            <button onclick="setRankingView('regional')" data-view="regional" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Regional</button>
+            <button onclick="setRankingView('geral')" data-view="geral" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Geral</button>
+            <button onclick="setRankingView('melhor')" data-view="melhor" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Melhor do Mês</button>
           </div>
         </div>
       </div>
@@ -487,14 +487,14 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     <div class="ranking-cols" id="ranking-cols">
       <div id="ranking-col-closers">
         <div class="ranking-col-title" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>Closers <span id="ranking-meta-closer" style="font-size:8px;color:var(--muted);font-weight:400;margin-left:4px;"></span></span>
+          <span>Closers <span id="ranking-meta-closer" style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;"></span></span>
           <span id="copy-btn-closers" class="ranking-copy-btn" onclick="copyRankingNames('ranking-closers',this)">⎘ copiar</span>
         </div>
         <div id="ranking-closers"></div>
       </div>
       <div id="ranking-col-is">
         <div class="ranking-col-title" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>Inside Sales <span id="ranking-meta-is" style="font-size:8px;color:var(--muted);font-weight:400;margin-left:4px;"></span></span>
+          <span>Inside Sales <span id="ranking-meta-is" style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;"></span></span>
           <span id="copy-btn-is" class="ranking-copy-btn" onclick="copyRankingNames('ranking-is',this)">⎘ copiar</span>
         </div>
         <div id="ranking-is"></div>
@@ -524,7 +524,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:4px;">
     <div class="stitle" style="margin-bottom:0;">Quartil de Vendas <span id="quartil-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
-    <button onclick="exportQuartil()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
+    <button onclick="exportQuartil()" style="height:28px;padding:0 14px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.15)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exportar PNG
     </button>
@@ -535,11 +535,11 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 </div></div>
 
-<div class="sec-divider" id="sec-campanha"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#fdcb6e1a;color:#fdcb6e;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fdcb6e;">Campanhas</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Progresso individual · metas e premiações</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-campanha"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#fdcb6e1a;color:#fdcb6e;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fdcb6e;">Campanhas</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Progresso individual · metas e premiações</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
   <div class="camp-section-wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Campanhas</div>
-      <div style="font-size:9px;color:var(--muted);">Abr · Mai · Jun 2026</div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);">Campanhas</div>
+      <div style="font-size:11px;color:var(--muted);">Abr · Mai · Jun 2026</div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div class="camp-tabs" style="margin-bottom:0;">
@@ -553,12 +553,12 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       </div>
     </div>
     <div id="camp-tab-exec">
-      <div id="camp-mes-titulo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">—</div>
+      <div id="camp-mes-titulo" style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">—</div>
       <div class="camp-days" id="camp-days-abr">▸ encerra 30/04</div>
       <div class="camp-grid" id="camp-grid-abril"></div>
     </div>
     <div id="camp-tab-coord" style="display:none;">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
       <div class="camp-days">▸ encerra 30/06</div>
       <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
     </div>
@@ -568,7 +568,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 </div>
 
-<div class="sec-divider" id="sec-tendencia"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Tendência</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal do faturamento Kedu</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-tendencia"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A29BFE;">Tendência</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Evolução mensal do faturamento Kedu</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
 
   <div class="trend-card">
     <div class="trend-header">
@@ -592,55 +592,55 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
     <!-- Simulador de Previsão -->
     <div id="sim-toggle" onclick="toggleSim()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;margin-top:12px;border-top:1px solid rgba(99,179,237,0.08);user-select:none;">
-      <span style="font-size:10px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);letter-spacing:.08em;text-transform:uppercase;">Simulador de Previsão</span>
-      <span id="sim-arrow" style="font-size:10px;color:rgba(90,106,130,0.6);margin-left:auto;transition:.2s;">▼</span>
+      <span style="font-size:12px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);letter-spacing:.05em;text-transform:uppercase;">Simulador de Previsão</span>
+      <span id="sim-arrow" style="font-size:12px;color:rgba(90,106,130,0.6);margin-left:auto;transition:.2s;">▼</span>
     </div>
     <div id="sim-panel" style="display:none;padding:16px 20px 20px;border-top:1px solid rgba(99,179,237,0.06);">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;">
         <div>
-          <div style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Dia atual do mês</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Dia atual do mês</div>
           <input type="range" id="sim-dia" min="1" max="31" value="15" oninput="onSimChange()" style="width:100%;accent-color:#74b9ff;">
           <div style="display:flex;justify-content:space-between;margin-top:4px;">
-            <span style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">Dia 1</span>
-            <span id="sim-dia-val" style="font-size:12px;font-family:DM Mono,monospace;color:#74b9ff;font-weight:600;">Dia 15</span>
-            <span style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">Dia 31</span>
+            <span style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">Dia 1</span>
+            <span id="sim-dia-val" style="font-size:13px;font-family:DM Mono,monospace;color:#74b9ff;font-weight:600;">Dia 15</span>
+            <span style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">Dia 31</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Realizado no mês atual (R$)</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Realizado no mês atual (R$)</div>
           <input type="range" id="sim-fat" min="0" max="5000000" step="50000" value="0" oninput="onSimChange()" style="width:100%;accent-color:#74b9ff;">
           <div style="display:flex;justify-content:space-between;margin-top:4px;">
-            <span style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">R$ 0</span>
-            <span id="sim-fat-val" style="font-size:12px;font-family:DM Mono,monospace;color:#74b9ff;font-weight:600;">—</span>
-            <span style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">R$ 5M</span>
+            <span style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">R$ 0</span>
+            <span id="sim-fat-val" style="font-size:13px;font-family:DM Mono,monospace;color:#74b9ff;font-weight:600;">—</span>
+            <span style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.5);">R$ 5M</span>
           </div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
         <div style="background:rgba(116,185,255,0.05);border:1px solid rgba(116,185,255,0.12);border-radius:10px;padding:10px;">
-          <div style="font-size:8px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Meses encerrados</div>
-          <div id="sim-r-encerrado" style="font-size:14px;font-family:DM Mono,monospace;color:#e8edf5;margin-top:4px;font-weight:600;">—</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Meses encerrados</div>
+          <div id="sim-r-encerrado" style="font-size:15px;font-family:DM Mono,monospace;color:#e8edf5;margin-top:4px;font-weight:600;">—</div>
         </div>
         <div style="background:rgba(116,185,255,0.05);border:1px solid rgba(116,185,255,0.12);border-radius:10px;padding:10px;">
-          <div style="font-size:8px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Mês atual projetado</div>
-          <div id="sim-r-atual" style="font-size:14px;font-family:DM Mono,monospace;color:#74b9ff;margin-top:4px;font-weight:600;">—</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Mês atual projetado</div>
+          <div id="sim-r-atual" style="font-size:15px;font-family:DM Mono,monospace;color:#74b9ff;margin-top:4px;font-weight:600;">—</div>
         </div>
         <div style="background:rgba(116,185,255,0.05);border:1px solid rgba(116,185,255,0.12);border-radius:10px;padding:10px;">
-          <div style="font-size:8px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Meses futuros</div>
-          <div id="sim-r-futuro" style="font-size:14px;font-family:DM Mono,monospace;color:#e8edf5;margin-top:4px;font-weight:600;">—</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Meses futuros</div>
+          <div id="sim-r-futuro" style="font-size:15px;font-family:DM Mono,monospace;color:#e8edf5;margin-top:4px;font-weight:600;">—</div>
         </div>
         <div style="background:rgba(0,184,148,0.06);border:1px solid rgba(0,184,148,0.18);border-radius:10px;padding:10px;">
-          <div style="font-size:8px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Total 2026</div>
-          <div id="sim-r-total" style="font-size:14px;font-family:DM Mono,monospace;color:#00b894;margin-top:4px;font-weight:600;">—</div>
+          <div style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);text-transform:uppercase;letter-spacing:.06em;">Total 2026</div>
+          <div id="sim-r-total" style="font-size:15px;font-family:DM Mono,monospace;color:#00b894;margin-top:4px;font-weight:600;">—</div>
         </div>
       </div>
-      <div id="sim-factor-line" style="font-size:9px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.6);text-align:center;margin-top:10px;">—</div>
+      <div id="sim-factor-line" style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.6);text-align:center;margin-top:10px;">—</div>
     </div>
   </div>
 </div>
 
 
-<div class="sec-divider" id="sec-financeiro"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#4ECDC41a;color:#4ECDC4;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4ECDC4;">KPIs Financeiros</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Faturamento, taxas, margens e métricas derivadas</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-financeiro"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#4ECDC41a;color:#4ECDC4;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#4ECDC4;">KPIs Financeiros</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Faturamento, taxas, margens e métricas derivadas</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
   <!-- FINANCEIRO -->
   <div class="kpi-section">
     <div class="kpi-section-label">Faturamento</div>
@@ -718,7 +718,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
           <div class="kpi-ops-main-label">Contratos Ativos</div>
           <div class="kpi-ops-main-val" id="kpi-ativo">—</div>
           <div class="kpi-ops-main-sub" id="kpi-ativo-sub">—</div>
-          <div style="margin-top:8px;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;">Total: <span id="kpi-contratos" style="color:var(--text);font-weight:700;">—</span></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Total: <span id="kpi-contratos" style="color:var(--text);font-weight:700;">—</span></div>
         </div>
         <div class="kpi-ops-status">
           <div class="kpi-ops-status-row">
@@ -762,35 +762,35 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
 </div>
 
-<div class="sec-divider" id="sec-analise"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A29BFE;">Análise de Equipe</div><div style="font-size:9px;color:#5a6a82;margin-top:1px;">Evolução mensal por regional, cargo ou executivo</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
+<div class="sec-divider" id="sec-analise"><div style="display:flex;align-items:center;gap:10px;padding:14px 32px 0 32px;"><div style="width:28px;height:28px;border-radius:8px;background:#A29BFE1a;color:#A29BFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A29BFE;">Análise de Equipe</div><div style="font-size:11px;color:#5a6a82;margin-top:1px;">Evolução mensal por regional, cargo ou executivo</div></div></div><div style="padding:16px 32px 32px;box-sizing:border-box;">
   <div class="stitle" style="margin-top:8px;">Análise de Equipe</div>
 
   <!-- Filtros de Análise -->
   <div class="trend-card" id="ae-panel" style="margin-bottom:14px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);">Filtros</div>
-      <button onclick="aeReset()" style="height:26px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);">Filtros</div>
+      <button onclick="aeReset()" style="height:26px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
       <div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Anos</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Anos</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-anos"></div>
       </div>
       <div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Meses</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Meses</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-meses"></div>
       </div>
       <div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Regional / Liderança</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Regional / Liderança</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-regionais"></div>
       </div>
       <div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Cargo</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Cargo</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-cargos"></div>
       </div>
     </div>
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;">Executivos</div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Executivos</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px 8px;" id="ae-executivos"></div>
     </div>
   </div>
@@ -803,7 +803,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <div class="trend-sub" id="ae-chart-sub">Selecione filtros acima para visualizar</div>
       </div>
     </div>
-    <div id="ae-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;gap:8px;">
+    <div id="ae-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;gap:8px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Selecione ao menos um filtro de equipe para ver o gráfico
     </div>
@@ -969,7 +969,7 @@ function buildEstadoDrop(){
     
     hdr.innerHTML =
       '<input type="checkbox" id="'+id+'" '+(isRegionSelected?'checked':'')+' style="accent-color:var(--accent);width:12px;height:12px;cursor:pointer;">'+
-      '<label for="'+id+'" style="font-size:9px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;cursor:pointer;">'+regiao+'</label>'+
+      '<label for="'+id+'" style="font-size:11px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap;cursor:pointer;">'+regiao+'</label>'+
       '<div style="flex:1;height:1px;background:var(--border);pointer-events:none;"></div>';
     
     hdr.querySelector('input').addEventListener('change', e=>{
@@ -1001,7 +1001,7 @@ function buildEstadoDrop(){
     
     hdr.innerHTML =
       '<input type="checkbox" id="'+id+'" '+(isExtrasSelected?'checked':'')+' style="accent-color:var(--accent);width:12px;height:12px;cursor:pointer;">'+
-      '<label for="'+id+'" style="font-size:9px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap;cursor:pointer;">Outros</label>'+
+      '<label for="'+id+'" style="font-size:11px;font-family:DM Mono,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap;cursor:pointer;">Outros</label>'+
       '<div style="flex:1;height:1px;background:var(--border);pointer-events:none;"></div>';
     
     hdr.querySelector('input').addEventListener('change', e=>{
@@ -1386,7 +1386,7 @@ function renderQuartil(){
         'style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid '+color+';display:block;" '+
         'onerror="this.style.display=&apos;none&apos;;this.nextElementSibling.style.display=&apos;flex&apos;" '+
         'alt="'+nome+'">'+
-        '<span style="width:28px;height:28px;border-radius:50%;background:'+color+'22;border:2px solid '+color+';display:none;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:DM Mono,monospace;color:'+color+';">'+initials+'</span>';
+        '<span style="width:28px;height:28px;border-radius:50%;background:'+color+'22;border:2px solid '+color+';display:none;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:DM Mono,monospace;color:'+color+';">'+initials+'</span>';
       row.appendChild(avatarWrap);
 
       // Name
@@ -2116,9 +2116,9 @@ update();
     const m=mIdx+1;
     const popup=document.createElement('div');
     popup.id='trend-popup'; popup.dataset.month=String(mIdx);
-    popup.style.cssText='position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:10px;color:#e8edf5;z-index:9999;min-width:210px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
+    popup.style.cssText='position:fixed;background:#161929;border:1px solid rgba(99,179,237,0.25);border-radius:12px;padding:12px 16px;font-family:DM Mono,monospace;font-size:12px;color:#e8edf5;z-index:9999;min-width:210px;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
     const title=document.createElement('div');
-    title.style.cssText='font-size:12px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
+    title.style.cssText='font-size:13px;font-weight:700;margin-bottom:10px;border-bottom:1px solid rgba(99,179,237,0.1);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;';
     title.innerHTML=MONTHS_LONG[mIdx]+'<span style="cursor:pointer;color:#5a6a82;font-size:16px;line-height:1;" id="popup-close">×</span>';
     popup.appendChild(title);
     const fmtV=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
@@ -2126,19 +2126,19 @@ update();
       const {agg}=buildMonthly();
       const v=getVal(agg,y,m); if(!v)return;
       const ym=y+'-'+String(m).padStart(2,'0');
-      const ctrTxt=cnt[ym]?'<br><span style="color:#8394aa;font-size:9px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
+      const ctrTxt=cnt[ym]?'<br><span style="color:#8394aa;font-size:11px;">'+cnt[ym]+' contrato'+(cnt[ym]!==1?'s':'')+'</span>':'';
       const yLabel=(y===2026&&m===new Date().getMonth()+1)?'2026 (proj.)':String(y);
       const row=document.createElement('div');
       row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
-      row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+COLORS[y]+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">'+yLabel+'</span></span><span style="font-weight:700;color:'+COLORS[y]+';text-align:right;">'+fmtV(v)+ctrTxt+'</span>';
+      row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+COLORS[y]+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+yLabel+'</span></span><span style="font-weight:700;color:'+COLORS[y]+';text-align:right;">'+fmtV(v)+ctrTxt+'</span>';
       popup.appendChild(row);
     });
     if(activeYears.has('forecast')&&forecast[m]){
       const row=document.createElement('div');
       row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px;';
       const cntProj=forecastCnt[m];
-      const ctrTxt=cntProj?'<br><span style="color:#8394aa;font-size:9px;">~'+Math.round(cntProj)+' contrato'+(Math.round(cntProj)!==1?'s':'')+'</span>':'';
-      row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+FC_COLOR+';background:rgba(8,9,15,0.7);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">PREVISÃO</span></span><span style="font-weight:700;color:'+FC_COLOR+';text-align:right;">'+fmtV(forecast[m])+ctrTxt+'</span>';
+      const ctrTxt=cntProj?'<br><span style="color:#8394aa;font-size:11px;">~'+Math.round(cntProj)+' contrato'+(Math.round(cntProj)!==1?'s':'')+'</span>':'';
+      row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+FC_COLOR+';background:rgba(8,9,15,0.7);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">PREVISÃO</span></span><span style="font-weight:700;color:'+FC_COLOR+';text-align:right;">'+fmtV(forecast[m])+ctrTxt+'</span>';
       popup.appendChild(row);
     }
     if(activeYears.has('meta')){
@@ -2146,7 +2146,7 @@ update();
       if(mv){
         const row=document.createElement('div');
         row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:4px;';
-        row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:9px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">'+fmtV(mv)+'</span>';
+        row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">'+fmtV(mv)+'</span>';
         popup.appendChild(row);
       }
     }
@@ -2430,7 +2430,7 @@ function drawEstadoChart(){
           const pIcon = isUp ? '↑' : isDown ? '↓' : '';
           const pSign = isUp ? '+' : '';
           
-          pctHtml = `<span style="font-size:9px;font-weight:700;color:${pColor};margin-left:4px;padding-left:6px;border-left:1px solid var(--border2);">${pSign}${diff.toFixed(1)}% ${pIcon}</span>`;
+          pctHtml = `<span style="font-size:11px;font-weight:700;color:${pColor};margin-left:4px;padding-left:6px;border-left:1px solid var(--border2);">${pSign}${diff.toFixed(1)}% ${pIcon}</span>`;
         }
       }
 
@@ -2439,8 +2439,8 @@ function drawEstadoChart(){
       pill.style.cssText = 'display:flex;align-items:center;gap:6px;background:'+color+'18;border:1px solid '+color+'44;border-radius:8px;padding:4px 10px;font-family:DM Mono,monospace;';
       pill.innerHTML =
         '<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0;display:inline-block;"></span>'+
-        '<span style="font-size:9px;color:#8394aa;">'+y+'</span>'+
-        '<span style="font-size:11px;font-weight:700;color:'+color+';">R$ '+fv(total)+'</span>' +
+        '<span style="font-size:11px;color:#8394aa;">'+y+'</span>'+
+        '<span style="font-size:13px;font-weight:700;color:'+color+';">R$ '+fv(total)+'</span>' +
         pctHtml; // Injeta a porcentagem dinâmica
         
       totalsWrap.appendChild(pill);
@@ -2763,7 +2763,7 @@ function buildMelhorMes(){
 
   function avatar(name,cor,progCor){
     const borderCor=progCor||cor, ini=initials(name);
-    return `<img src="fotos/${name}.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${borderCor};" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:44px;height:44px;border-radius:50%;flex-shrink:0;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:DM Mono,monospace;color:${cor};background:#1a1f35;border:2px solid ${borderCor};">${ini}</div>`;
+    return `<img src="fotos/${name}.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${borderCor};" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:44px;height:44px;border-radius:50%;flex-shrink:0;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:DM Mono,monospace;color:${cor};background:#1a1f35;border:2px solid ${borderCor};">${ini}</div>`;
   }
 
   function tierHtml(ok,isNext,desc,val,falta){
@@ -2775,18 +2775,18 @@ function buildMelhorMes(){
     if(ok) det='';
     else if(falta>0) det='<span style="color:#fdcb6e;">↘ Faltam '+fmtR(falta)+'</span>';
     return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid ${br};background:${bg};margin-bottom:5px;">
-      <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
+      <div style="font-size:14px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
       <div style="flex:1;">
-        <div style="font-size:11px;font-weight:500;color:${clr};">${desc}</div>
-        ${det?`<div style="font-size:9px;margin-top:2px;">${det}</div>`:''}
+        <div style="font-size:13px;font-weight:500;color:${clr};">${desc}</div>
+        ${det?`<div style="font-size:11px;margin-top:2px;">${det}</div>`:''}
       </div>
-      <div style="font-size:11px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
+      <div style="font-size:13px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
     </div>`;
   }
 
   function triSection(realTrim,mT){
     const t130=realTrim>=mT*1.3, t150=realTrim>=mT*1.5;
-    return `<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(99,179,237,0.08);margin-top:4px;">Campanha Trimestral</div>`
+    return `<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(99,179,237,0.08);margin-top:4px;">Campanha Trimestral</div>`
       +(!t130?tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim))+tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0)
         :!t150?tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)+tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim))
         :tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)+tierHtml(true,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0));
@@ -2803,7 +2803,7 @@ function buildMelhorMes(){
     if(mes==='abril'){
       const t1=realAbr>=mA,t2=realTrim>=mA+mM2,t3=realTrim>=mA+mM2+mJ,tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(t1?500:0)+(t2?500:0)+(t3?1000:0)+(tri130?1000:0)+(tri150?2000:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Abril</div>`
+      tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Abril</div>`
         +tierHtml(t1,!t1,'100% meta abril','R$ 500',Math.max(0,mA-realAbr))
         +tierHtml(t2,t1&&!t2,'100% meta abr+mai até 30/04','+R$ 500',Math.max(0,mA+mM2-realTrim))
         +tierHtml(t3,t2&&!t3,'100% meta abr+mai+jun até 30/04','+R$ 1.000',Math.max(0,mA+mM2+mJ-realTrim))
@@ -2817,7 +2817,7 @@ function buildMelhorMes(){
       const tmaijun=tmeta&&realTrim>=mM2+mJ,tabrmaijun=tmaijun&&realTrim>=mA+mM2+mJ;
       const tri130=realTrim>=mT*1.3,tri150=realTrim>=mT*1.5;
       total=(tmeta?1000:0)+(tgap?500:0)+(tmaijun?750:0)+(tabrmaijun?750:0)+(tri130?1000:0)+(tri150?2000:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Maio</div>`
+      tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Maio</div>`
         +tierHtml(tmeta,!tmeta,'100% meta maio','R$ 1.000',Math.max(0,mM2-realMai))
         +(naoAbr?tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,gapAbr-sobreMai)):'')
         +tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05','+R$ 750',Math.max(0,mM2+mJ-realTrim))
@@ -2833,7 +2833,7 @@ function buildMelhorMes(){
       const t2Jun=realTrim>=mT;                   // +R$ 500
       const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 1.000 (only if t2 done)
       total=(t1Jun?1000:0)+(t2Jun?1500:0)+(t3Jun?2500:0);
-      tiersHtml=`<div style="font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Junho</div>`
+      tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Junho</div>`
         +tierHtml(t1Jun,!t1Jun,'100% meta junho ('+fmtR(mJ)+')','R$ 1.000',Math.max(0,mJ-realJun))
         +tierHtml(t2Jun,t1Jun&&!t2Jun,'100% meta trimestre Abr+Mai+Jun ('+fmtR(mT)+')','+R$ 1.500',Math.max(0,mT-realTrim))
         +tierHtml(t3Jun,t2Jun&&!t3Jun,'100% meta semestre Jan–Jun ('+fmtR(metaSemEx)+')','+R$ 2.500',Math.max(0,metaSemEx-realSemEx));
@@ -2863,7 +2863,7 @@ function buildMelhorMes(){
         </div>
         <div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0;">
           <div style="text-align:right;">
-            <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">${mes.charAt(0).toUpperCase()+mes.slice(1)}</div>
+            <div style="font-size:11px;color:#5a6a82;margin-bottom:2px;">${mes.charAt(0).toUpperCase()+mes.slice(1)}</div>
             <div style="font-size:22px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};">${pctFloat.toFixed(1)}%</div>
           </div>
           <button onclick="downloadCampCard(this)" title="Baixar card" style="margin-top:2px;width:28px;height:28px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:#4ECDC4;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.16)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
@@ -2875,27 +2875,27 @@ function buildMelhorMes(){
       <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">${mes.charAt(0).toUpperCase()+mes.slice(1)}.</div>
+            <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">${mes.charAt(0).toUpperCase()+mes.slice(1)}.</div>
             <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctFloat)}%;height:100%;background:${bcE(pctFloat,mesFechado&&!pctMesOk)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">${pctFloat.toFixed(1)}%</div>
+            <div style="font-size:12px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">${pctFloat.toFixed(1)}%</div>
           </div>
-          ${pctMesOk?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mMes-realM>0?`<div style="font-size:8px;color:#fdcb6e;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mMes-realM))}</div>`:'')}
+          ${pctMesOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mMes-realM>0?`<div style="font-size:11px;color:#fdcb6e;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mMes-realM))}</div>`:'')}
         </div>
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Trim.</div>
+            <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">Trim.</div>
             <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrimC)}%;height:100%;background:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">${pctTrimC.toFixed(1)}%</div>
+            <div style="font-size:12px;font-weight:700;color:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">${pctTrimC.toFixed(1)}%</div>
           </div>
-          ${pctTrimOk?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mTrimC-realTrimC>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mTrimC-realTrimC))}</div>`:'')}
+          ${pctTrimOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mTrimC-realTrimC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mTrimC-realTrimC))}</div>`:'')}
         </div>
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:9px;color:#5a6a82;width:54px;flex-shrink:0;">Semestre</div>
+            <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">Semestre</div>
             <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};border-radius:3px;"></div></div>
-            <div style="font-size:10px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
+            <div style="font-size:12px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
           </div>
-          ${pctSemC>=100?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(metaSemC-realSemC>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,metaSemC-realSemC))}</div>`:'')}
+          ${pctSemC>=100?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(metaSemC-realSemC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,metaSemC-realSemC))}</div>`:'')}
         </div>
       </div>
 
@@ -2910,7 +2910,7 @@ function buildMelhorMes(){
   function buildExec(){
     const el=document.getElementById('camp-grid-abril'); if(!el) return;
     const r1=CAMP_R1.filter(e=>TEAM[e.name]), r2=CAMP_R2.filter(e=>TEAM[e.name]);
-    const rh=l=>`<div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;grid-column:1/-1;">${l}</div>`;
+    const rh=l=>`<div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;grid-column:1/-1;">${l}</div>`;
     el.innerHTML=rh('Regional 1')+r1.map(e=>campCard(e,campMesAtivo)).join('')+rh('Regional 2')+r2.map(e=>campCard(e,campMesAtivo)).join('');
     const titulos={'abril':'Campanha de Abril · metas antecipadas','maio':'Campanha de Maio · metas mensais','junho':'Campanha de Junho · metas mensais'};
     const enc={'abril':'▸ encerra 30/04','maio':'▸ encerra 31/05','junho':'▸ encerra 30/06'};
@@ -2997,12 +2997,12 @@ function buildMelhorMes(){
         const bg=done?'rgba(0,184,148,0.07)':next?'rgba(78,205,196,0.04)':'rgba(255,255,255,0.02)';
         const br=done?'rgba(0,184,148,0.25)':next?'rgba(78,205,196,0.15)':'rgba(255,255,255,0.05)';
         return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid ${br};background:${bg};margin-bottom:6px;">
-          <div style="font-size:13px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
+          <div style="font-size:14px;color:${clr};width:18px;text-align:center;flex-shrink:0;">${ic}</div>
           <div style="flex:1;">
-            <div style="font-size:11px;font-weight:500;color:${clr};">${label}</div>
-            <div style="font-size:9px;color:#5a6a82;margin-top:2px;">${detail}</div>
+            <div style="font-size:13px;font-weight:500;color:${clr};">${label}</div>
+            <div style="font-size:11px;color:#5a6a82;margin-top:2px;">${detail}</div>
           </div>
-          <div style="font-size:12px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
+          <div style="font-size:13px;font-weight:700;color:${clr};white-space:nowrap;">${val}</div>
         </div>`;
       };
       const bonusClr = bonusGeral&&t1?'#00b894':bonusGeral&&!t1?'#fdcb6e':'#5a6a82';
@@ -3026,7 +3026,7 @@ function buildMelhorMes(){
           </div>
           <div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0;">
             <div style="text-align:right;">
-              <div style="font-size:9px;color:#5a6a82;margin-bottom:2px;">Junho</div>
+              <div style="font-size:11px;color:#5a6a82;margin-bottom:2px;">Junho</div>
               <div style="font-size:22px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};">${pctJun.toFixed(1)}%</div>
             </div>
             <button onclick="downloadCampCard(this)" title="Baixar card" style="margin-top:2px;width:28px;height:28px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:#4ECDC4;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.16)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
@@ -3038,27 +3038,27 @@ function buildMelhorMes(){
         <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">
           <div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
+              <div style="font-size:11px;color:#5a6a82;width:56px;flex-shrink:0;">Jun</div>
               <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctJun)}%;height:100%;background:${bc(pctJun,mesJunFechado&&!t1)};border-radius:3px;"></div></div>
-              <div style="font-size:10px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};width:42px;text-align:right;">${pctJun.toFixed(1)}%</div>
+              <div style="font-size:12px;font-weight:700;color:${bc(pctJun,mesJunFechado&&!t1)};width:42px;text-align:right;">${pctJun.toFixed(1)}%</div>
             </div>
-            ${t1?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaJun-realJun>0?`<div style="font-size:8px;color:#fdcb6e;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaJun-realJun))}</div>`:'')}
+            ${t1?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaJun-realJun>0?`<div style="font-size:11px;color:#fdcb6e;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaJun-realJun))}</div>`:'')}
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
+              <div style="font-size:11px;color:#5a6a82;width:56px;flex-shrink:0;">Trim.</div>
               <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrim)}%;height:100%;background:${bc(pctTrim,mesTrimFechado&&!t2)};border-radius:3px;"></div></div>
-              <div style="font-size:10px;font-weight:700;color:${bc(pctTrim,mesTrimFechado&&!t2)};width:42px;text-align:right;">${pctTrim.toFixed(1)}%</div>
+              <div style="font-size:12px;font-weight:700;color:${bc(pctTrim,mesTrimFechado&&!t2)};width:42px;text-align:right;">${pctTrim.toFixed(1)}%</div>
             </div>
-            ${t2?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaTrim-realTrim>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaTrim-realTrim))}</div>`:'')}
+            ${t2?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaTrim-realTrim>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaTrim-realTrim))}</div>`:'')}
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div style="font-size:9px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
+              <div style="font-size:11px;color:#5a6a82;width:56px;flex-shrink:0;">Semestre</div>
               <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSem)}%;height:100%;background:${bc(pctSem,mesSemFechado&&!t3)};border-radius:3px;"></div></div>
-              <div style="font-size:10px;font-weight:700;color:${bc(pctSem,mesSemFechado&&!t3)};width:42px;text-align:right;">${pctSem.toFixed(1)}%</div>
+              <div style="font-size:12px;font-weight:700;color:${bc(pctSem,mesSemFechado&&!t3)};width:42px;text-align:right;">${pctSem.toFixed(1)}%</div>
             </div>
-            ${t3?'<div style="font-size:8px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaSem-realSem>0?`<div style="font-size:8px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaSem-realSem))}</div>`:'')}
+            ${t3?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:64px;">✓ Meta batida</div>':(c.metaSem-realSem>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:64px;">↘ Faltam ${fmtR(Math.max(0,c.metaSem-realSem))}</div>`:'')}
           </div>
         </div>
 
@@ -3068,12 +3068,12 @@ function buildMelhorMes(){
           ${tierHtml(t3,t2&&!t3,'100% meta semestre Jan–Jun ('+fmtR(c.metaSem)+')','+R$ 1.000',Math.max(0,c.metaSem-realSem))}
           <div style="padding:9px 12px;border-radius:9px;border:1px solid ${bonusBr};background:${bonusBg};margin-bottom:5px;">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="font-size:13px;color:${bonusClr};width:18px;text-align:center;flex-shrink:0;">${bonusGeral&&t1?'✓':bonusGeral&&!t1?'✗':'·'}</div>
+              <div style="font-size:14px;color:${bonusClr};width:18px;text-align:center;flex-shrink:0;">${bonusGeral&&t1?'✓':bonusGeral&&!t1?'✗':'·'}</div>
               <div style="flex:1;">
-                <div style="font-size:11px;font-weight:500;color:${bonusClr};">Bônus geral de junho</div>
-                <div style="font-size:9px;color:#5a6a82;margin-top:2px;">${bonusDesc}</div>
+                <div style="font-size:13px;font-weight:500;color:${bonusClr};">Bônus geral de junho</div>
+                <div style="font-size:11px;color:#5a6a82;margin-top:2px;">${bonusDesc}</div>
               </div>
-              <div style="font-size:11px;font-weight:700;color:${bonusClr};white-space:nowrap;">${bonusVal}</div>
+              <div style="font-size:13px;font-weight:700;color:${bonusClr};white-space:nowrap;">${bonusVal}</div>
             </div>
             <div style="height:3px;background:rgba(99,179,237,0.08);border-radius:2px;overflow:hidden;margin-top:8px;"><div style="width:${pctGeral}%;height:100%;background:${bonusClr};border-radius:2px;"></div></div>
           </div>
@@ -3186,7 +3186,7 @@ function toggleTheme(){
 
   function pill(containerId, val, set, colorFn){
     const btn=document.createElement('button');
-    btn.style.cssText='padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;white-space:nowrap;';
+    btn.style.cssText='padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;white-space:nowrap;';
     btn.textContent=val;
     const applyStyle=()=>{
       const on=set.has(val);
@@ -3222,7 +3222,7 @@ function toggleTheme(){
     const am=document.getElementById('ae-meses'); am.innerHTML='';
     MONTHS_SHORT.forEach((m,i)=>{
       const btn=document.createElement('button');
-      btn.style.cssText='padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;';
+      btn.style.cssText='padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;';
       btn.textContent=m;
       const n=i+1;
       const apply=()=>{const on=aeMeses.has(n);btn.style.background=on?'rgba(78,205,196,0.12)':'transparent';btn.style.borderColor=on?'var(--accent)':'var(--border2)';btn.style.color=on?'var(--accent)':'var(--muted)';btn.style.fontWeight=on?'700':'400';};
@@ -3326,18 +3326,18 @@ function toggleTheme(){
       p.style.cssText='border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;font-family:DM Mono,monospace;overflow:hidden;background:'+hexA(ds.borderColor,.06)+';';
       const isLeader=total>=maxTotal;
       const pctHtml=isLeader
-        ?'<span style="font-size:9px;color:#00b894;margin-left:2px;">↑ líder</span>'
-        :'<span style="font-size:9px;color:#ff7675;margin-left:2px;">↓ '+Math.abs(((total-maxTotal)/maxTotal*100).toFixed(1))+'%</span>';
+        ?'<span style="font-size:11px;color:#00b894;margin-left:2px;">↑ líder</span>'
+        :'<span style="font-size:11px;color:#ff7675;margin-left:2px;">↓ '+Math.abs(((total-maxTotal)/maxTotal*100).toFixed(1))+'%</span>';
       // Main row
       const mainRow=document.createElement('div');
       mainRow.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px 4px 10px;';
       const dotEl=document.createElement('span');
       dotEl.style.cssText='width:8px;height:8px;border-radius:50%;background:'+ds.borderColor+';flex-shrink:0;display:inline-block;';
       const nameEl=document.createElement('span');
-      nameEl.style.cssText='font-size:9px;color:var(--muted2);';
+      nameEl.style.cssText='font-size:11px;color:var(--muted2);';
       nameEl.textContent=ds.label;
       const valEl=document.createElement('span');
-      valEl.style.cssText='font-size:11px;font-weight:700;color:'+ds.borderColor+';';
+      valEl.style.cssText='font-size:13px;font-weight:700;color:'+ds.borderColor+';';
       valEl.textContent=fmtV(total);
       const pctSpan=document.createElement('span');
       pctSpan.innerHTML=pctHtml;
@@ -3392,8 +3392,8 @@ function toggleTheme(){
       totals.appendChild(sep);
       const gt=document.createElement('div');
       gt.style.cssText='display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:4px 12px;font-family:DM Mono,monospace;';
-      gt.innerHTML='<span style="font-size:9px;color:var(--muted);">Total consolidado</span>'
-        +'<span style="font-size:12px;font-weight:700;color:var(--text);">'+fmtV(grandTotal)+'</span>';
+      gt.innerHTML='<span style="font-size:11px;color:var(--muted);">Total consolidado</span>'
+        +'<span style="font-size:13px;font-weight:700;color:var(--text);">'+fmtV(grandTotal)+'</span>';
       totals.appendChild(gt);
     }
 
@@ -3569,7 +3569,7 @@ function renderModalTable(rows){
       +tdS(fmtPct(r.taxa),'right','var(--muted2)',10)
       +tdS(dateStr,'left','var(--muted2)',10)
       +tdS(r.estado,'left','var(--muted2)',10)
-      +'<td style="padding:8px 12px;"><span style="font-size:9px;padding:2px 8px;border-radius:6px;background:'+bg+';color:'+clr+';font-weight:600;white-space:nowrap;">'+r.status+'</span></td>';
+      +'<td style="padding:8px 12px;"><span style="font-size:11px;padding:2px 8px;border-radius:6px;background:'+bg+';color:'+clr+';font-weight:600;white-space:nowrap;">'+r.status+'</span></td>';
     tbody.appendChild(tr);
   });
   // Totals row
@@ -3636,11 +3636,11 @@ function secToggle(id){
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:1200px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
       <div>
-        <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text);" id="modal-title">Contratos</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="modal-sub">—</div>
+        <div style="font-size:14px;font-weight:700;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text);" id="modal-title">Contratos</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="modal-sub">—</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <input id="modal-search" type="text" placeholder="Buscar escola ou executivo..." oninput="filterModalTable()" style="height:30px;padding:0 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;outline:none;width:240px;">
+        <input id="modal-search" type="text" placeholder="Buscar escola ou executivo..." oninput="filterModalTable()" style="height:30px;padding:0 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;outline:none;width:240px;">
         <button onclick="closeContratosModal()" style="width:30px;height:30px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
       </div>
     </div>
@@ -3648,24 +3648,24 @@ function secToggle(id){
       <table id="modal-table" style="width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;">
         <thead>
           <tr style="position:sticky;top:0;background:var(--card);z-index:1;">
-            <th data-col="num"    onclick="sortModal(this,'num')"    style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Nº ↕</th>
-            <th data-col="exec"   onclick="sortModal(this,'exec')"   style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Executivo ↕</th>
-            <th data-col="escola" onclick="sortModal(this,'escola')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Escola ↕</th>
-            <th data-col="fat_e"  onclick="sortModal(this,'fat_e')"  style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Escola ↕</th>
-            <th data-col="fat_k"  onclick="sortModal(this,'fat_k')"  style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Kedu ↕</th>
-            <th data-col="taxa"   onclick="sortModal(this,'taxa')"   style="padding:10px 12px;text-align:right;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Taxa ↕</th>
-            <th data-col="assina" onclick="sortModal(this,'assina')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Assinatura ↕</th>
-            <th data-col="estado" onclick="sortModal(this,'estado')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Estado ↕</th>
-            <th data-col="status" onclick="sortModal(this,'status')" style="padding:10px 12px;text-align:left;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Status ↕</th>
+            <th data-col="num"    onclick="sortModal(this,'num')"    style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Nº ↕</th>
+            <th data-col="exec"   onclick="sortModal(this,'exec')"   style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Executivo ↕</th>
+            <th data-col="escola" onclick="sortModal(this,'escola')" style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Escola ↕</th>
+            <th data-col="fat_e"  onclick="sortModal(this,'fat_e')"  style="padding:10px 12px;text-align:right;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Escola ↕</th>
+            <th data-col="fat_k"  onclick="sortModal(this,'fat_k')"  style="padding:10px 12px;text-align:right;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Fat. Kedu ↕</th>
+            <th data-col="taxa"   onclick="sortModal(this,'taxa')"   style="padding:10px 12px;text-align:right;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Taxa ↕</th>
+            <th data-col="assina" onclick="sortModal(this,'assina')" style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Assinatura ↕</th>
+            <th data-col="estado" onclick="sortModal(this,'estado')" style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Estado ↕</th>
+            <th data-col="status" onclick="sortModal(this,'status')" style="padding:10px 12px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;">Status ↕</th>
           </tr>
         </thead>
         <tbody id="modal-tbody"></tbody>
       </table>
     </div>
-    <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+    <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <span id="modal-count">—</span>
-      <span id="modal-totals" style="display:flex;align-items:center;gap:4px;font-size:10px;flex-wrap:wrap;"></span>
-      <span style="font-size:9px;color:var(--muted2);">Clique no cabeçalho para ordenar · Esc para fechar</span>
+      <span id="modal-totals" style="display:flex;align-items:center;gap:4px;font-size:12px;flex-wrap:wrap;"></span>
+      <span style="font-size:11px;color:var(--muted2);">Clique no cabeçalho para ordenar · Esc para fechar</span>
     </div>
   </div>
 </div>
