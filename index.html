@@ -1244,9 +1244,9 @@ function copyRankingNames(containerId, btn){
   const rows = el.querySelectorAll('.ranking-row');
   const names = [];
   rows.forEach((row, i) => {
-    const nameEl = row.querySelector('.ranking-name');
+    // Try new class first, fallback to old
+    const nameEl = row.querySelector('.ranking-name-main') || row.querySelector('.ranking-name');
     if(nameEl){
-      // strip crown emoji
       const name = nameEl.textContent.replace('👑','').trim();
       names.push((i+1)+'. '+name);
     }
