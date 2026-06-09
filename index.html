@@ -2061,7 +2061,7 @@ update();
     const total=Object.values(forecast).reduce((s,v)=>s+(v||0),0);
     const totalFmt=Math.round(total).toLocaleString('pt-BR');
     const factorPct=((growthFactor-1)*100).toFixed(1);
-    subEl.textContent='Projeção anual 2026: R$ '+totalFmt+' · Crescimento vs 2025: '+(growthFactor>=1?'+':'')+factorPct+'%';
+    subEl.textContent='';
   }
 
   function drawChart(){
