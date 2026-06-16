@@ -1483,7 +1483,7 @@ function update(){
   const somaAH_og=comMgOG.reduce((s,r)=>s+(r.garantido||0),0);
   const somaAI_og=comMgOG.reduce((s,r)=>s+(r.margem_rs||0),0);
   const mgOG=somaAH_og>0?somaAI_og/somaAH_og:null;
-  const ativos=data.filter(r=>r.status==='Ativo').length;
+  const ativos=new Set(data.filter(r=>r.status==='Ativo'&&r.num).map(r=>r.num)).size;
 
   const escolas = data.reduce((s,r)=>s+(r.unidades||1),0);
   const estados=new Set(data.map(r=>r.estado).filter(Boolean)).size;
@@ -1599,9 +1599,11 @@ function update(){
   set('kpi-spread',spM!==null?fmtPct(spM):'—');set('kpi-spread-sub',comSp.length+' contratos c/ spread');
 
   // kpis operacional
-  const cAtivo     = data.filter(r=>r.status==='Ativo').length;
-  const cImplant   = data.filter(r=>r.status==='Implantando').length;
-  const cInativo   = data.filter(r=>r.status==='Inativo').length;
+  // Count unique contract numbers per status (avoid multi-school contracts counting multiple times)
+  const uniqueByStatus = s => new Set(data.filter(r=>r.status===s&&r.num).map(r=>r.num)).size;
+  const cAtivo     = uniqueByStatus('Ativo');
+  const cImplant   = uniqueByStatus('Implantando');
+  const cInativo   = uniqueByStatus('Inativo');
 
 
   const pctStr = n => uniqueContratos(data) ? ((n/uniqueContratos(data))*100).toFixed(1)+'% do total' : '—';
