@@ -1601,6 +1601,7 @@ function update(){
   // kpis operacional
   const cAtivo     = data.filter(r=>r.status==='Ativo').length;
   const cImplant   = data.filter(r=>r.status==='Implantando').length;
+  const cInativo   = data.filter(r=>r.status==='Inativo').length;
 
 
   const pctStr = n => uniqueContratos(data) ? ((n/uniqueContratos(data))*100).toFixed(1)+'% do total' : '—';
@@ -1610,6 +1611,7 @@ function update(){
   set('kpi-ativo',fmtN(cAtivo));set('kpi-ativo-sub',pctStr(cAtivo));
   set('kpi-implantando',fmtN(cImplant));set('kpi-implantando-sub',pctStr(cImplant));
   set('kpi-implantando2',fmtN(cImplant));
+  set('kpi-inativo',fmtN(cInativo));set('kpi-inativo-sub',pctStr(cInativo));
 
 
 
