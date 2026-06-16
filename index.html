@@ -726,16 +726,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
             <span id="kpi-implantando" style="color:#74b9ff;font-weight:700;">—</span>
           </div>
           <div class="kpi-ops-status-row">
-            <span class="kpi-ops-status-label">Churn</span>
-            <span id="kpi-churn" style="color:#ff6b6b;font-weight:700;">—</span>
-          </div>
-          <div class="kpi-ops-status-row">
-            <span class="kpi-ops-status-label">Cancelado</span>
-            <span id="kpi-cancelado" style="color:#fd79a8;font-weight:700;">—</span>
-          </div>
-          <div class="kpi-ops-status-row">
-            <span class="kpi-ops-status-label">Descred.</span>
-            <span id="kpi-descredenciamento" style="color:#b2bec3;font-weight:700;">—</span>
+            <span class="kpi-ops-status-label">Inativo</span>
+            <span id="kpi-inativo" style="color:#ff6b6b;font-weight:700;">—</span>
           </div>
         </div>
       </div>
@@ -1492,7 +1484,7 @@ function update(){
   const somaAI_og=comMgOG.reduce((s,r)=>s+(r.margem_rs||0),0);
   const mgOG=somaAH_og>0?somaAI_og/somaAH_og:null;
   const ativos=data.filter(r=>r.status==='Ativo').length;
-  const churns=data.filter(r=>r.status==='Churn').length;
+
   const escolas = data.reduce((s,r)=>s+(r.unidades||1),0);
   const estados=new Set(data.map(r=>r.estado).filter(Boolean)).size;
   const cidades=new Set(data.map(r=>r.cidade).filter(Boolean)).size;
@@ -1609,8 +1601,8 @@ function update(){
   // kpis operacional
   const cAtivo     = data.filter(r=>r.status==='Ativo').length;
   const cImplant   = data.filter(r=>r.status==='Implantando').length;
-  const cCancelado = data.filter(r=>r.status==='Cancelado').length;
-  const cDescred   = data.filter(r=>r.status==='Descredenciamento').length;
+
+
   const pctStr = n => uniqueContratos(data) ? ((n/uniqueContratos(data))*100).toFixed(1)+'% do total' : '—';
   const nContratos=uniqueContratos(data);set('kpi-contratos',fmtN(nContratos));set('kpi-contratos-sub',ativos+' ativos · '+(nContratos-ativos)+' outros');
   set('kpi-escolas',fmtN(escolas));set('kpi-escolas-sub',estados+' estados · '+cidades+' cidades');
@@ -1618,9 +1610,9 @@ function update(){
   set('kpi-ativo',fmtN(cAtivo));set('kpi-ativo-sub',pctStr(cAtivo));
   set('kpi-implantando',fmtN(cImplant));set('kpi-implantando-sub',pctStr(cImplant));
   set('kpi-implantando2',fmtN(cImplant));
-  set('kpi-churn',fmtN(churns));set('kpi-churn-sub',pctStr(churns));
-  set('kpi-cancelado',fmtN(cCancelado));set('kpi-cancelado-sub',pctStr(cCancelado));
-  set('kpi-descredenciamento',fmtN(cDescred));set('kpi-descredenciamento-sub',pctStr(cDescred));
+
+
+
   set('kpi-margem',mgM!==null?fmtPct(mgM):'—');set('kpi-margem-sub',comMg.length+' contratos');
   set('kpi-margem-og0',mgM!==null?fmtPct(mgM):'—');set('kpi-margem-og0-sub',comMg.length+' contratos');
   set('kpi-margem-gp',mgGP!==null?fmtPct(mgGP):'—');set('kpi-margem-gp-sub',comMgGP.length+' contratos Garantia Prevista');
@@ -3479,8 +3471,7 @@ function fmtCur(v){ if(!v&&v!==0)return'—'; return'R$ '+Math.round(v).toLocale
 
 const STATUS_COLORS = {
   'Ativo':'rgba(82,199,125,.12)||#52c77d',
-  'Churn':'rgba(255,107,107,.12)||#ff6b6b',
-  'Cancelado':'rgba(246,173,85,.12)||#f6ad55',
+  'Inativo':'rgba(255,107,107,.12)||#ff6b6b',
   'Implantando':'rgba(178,148,244,.12)||#b294f4',
 };
 
