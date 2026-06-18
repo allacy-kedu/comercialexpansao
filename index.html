@@ -2837,9 +2837,17 @@ function buildMelhorMes(){
 
     // Progress bars for all 3 horizons
     const pctFloat = mMes>0?(realM/mMes*100):0;
-    const realTrimC = getReal(e.name,['2026-04','2026-05','2026-06']);
+    // Escopar Trim e Semestre ao mês da campanha visualizada
+    // Abril → só até Abr; Maio → até Mai; Junho → até Jun
+    const MESES_ATÉ = {
+      'abril':  {trim:['2026-04'],             sem:['2026-01','2026-02','2026-03','2026-04']},
+      'maio':   {trim:['2026-04','2026-05'],   sem:['2026-01','2026-02','2026-03','2026-04','2026-05']},
+      'junho':  {trim:['2026-04','2026-05','2026-06'], sem:['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06']},
+    };
+    const mesesEscopo = MESES_ATÉ[mes] || MESES_ATÉ['junho'];
+    const realTrimC = getReal(e.name, mesesEscopo.trim);
     const mTrimC = metaTrim(e);
-    const MESES_SEM_C=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'];
+    const MESES_SEM_C = mesesEscopo.sem;
     const metaSemC = MESES_SEM_C.reduce((s,m2)=>s+metaMes(e,m2),0);
     const realSemC = getReal(e.name,MESES_SEM_C);
     const pctTrimC = mTrimC>0?(realTrimC/mTrimC*100):0;
