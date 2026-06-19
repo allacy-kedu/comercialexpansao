@@ -264,6 +264,21 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 }
 .sec-divider{border-top:2px solid rgba(255,255,255,0.06);margin:4px 0 0;}
 [data-theme="light"] .sec-divider{border-top-color:rgba(0,0,0,0.08);}
+/* Atualização Visual - Harmonização de Cards */
+.kpi, .kpi-hero, .kpi-m, .kpi-mg, .kpi-ops-sm, .kpi-ops-main, .reg-card, .camp-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.kpi-grid, .kpi-metrics-grid, .kpi-margem-grid, .kpi-ops-grid, .kpi-hero-grid, .regional-grid {
+    align-items: stretch;
+}
+.kpi-hero-avg, .reg-meta-row, .camp-total {
+    margin-top: auto;
+    padding-top: 12px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2488,29 +2503,23 @@ function parseCSVFull(csv){
 function parseCSVtoRAW(csv){
   const rows = parseCSVFull(csv);
   if(rows.length < 2) return [];
-  // skip header row (index 0)
   const result = [];
   for(let i=1; i<rows.length; i++){
     const c = rows[i];
     if(!c||!c[0]||!c[4]) continue;
-    // Clean Nº — may be "1ª" or "1"
     const num = parseInt(String(c[0]).replace(/\D/g,''));
     if(isNaN(num)||num===0) continue;
-    // Parse number: handles "R$ 2.360.000,00", "2360000", "2360000.5"
     const n = v => {
       if(!v) return null;
       let s = String(v).replace(/R\$\s*/g,'').trim();
-      // Brazilian format: has dots as thousands and comma as decimal
       if(s.includes(',') && (s.includes('.') || s.match(/,\d{2}$/))){
         s = s.replace(/\./g,'').replace(',','.');
       } else {
-        // Already a plain number or dot-decimal
         s = s.replace(/,/g,'');
       }
       const f = parseFloat(s);
       return isNaN(f) ? null : f;
     };
-    // Parse percentage: "10,00%" → 0.10 or "0.1" → 0.1
     const pct = v => {
       if(!v) return null;
       const s0 = String(v).trim();
@@ -2519,7 +2528,6 @@ function parseCSVtoRAW(csv){
       if(s.includes(',')) s = s.replace(/\./g,'').replace(',','.');
       const f = parseFloat(s);
       if(isNaN(f)) return null;
-      // If had % sign always divide by 100; otherwise if abs > 1 divide by 100
       return (hasPct || Math.abs(f) > 1) ? f/100 : f;
     };
     const d = v => { const s=String(v||'').trim(); return s&&s!=='-'&&s!=='0'?s:null; };
@@ -2527,7 +2535,6 @@ function parseCSVtoRAW(csv){
       if(!v) return null;
       const s=String(v).trim();
       if(!s||s==='-') return null;
-      // DD/MM/YYYY
       if(s.includes('/')){
         const p=s.split('/');
         if(p.length===3){
@@ -2535,9 +2542,7 @@ function parseCSVtoRAW(csv){
           return yyyy.padStart(4,'0')+'-'+mm.padStart(2,'0')+'-'+dd.padStart(2,'0');
         }
       }
-      // YYYY-MM-DD already
       if(s.match(/^\d{4}-\d{2}-\d{2}/)) return s.slice(0,10);
-      // Google Sheets serial date number (days since 1899-12-30)
       const serial = parseFloat(s);
       if(!isNaN(serial) && serial > 40000){
         const d = new Date((serial - 25569) * 86400 * 1000);
@@ -2545,26 +2550,37 @@ function parseCSVtoRAW(csv){
       }
       return null;
     };
+    const executivo = d(c[1]);
+    // AJUSTE: Mapeamento de Regionais Legadas
+    let lideranca = d(c[2]);
+    if(executivo && typeof TEAM !== 'undefined' && TEAM[executivo]){
+      lideranca = TEAM[executivo].regional === 'R1' ? 'Regional 1' : 'Regional 2';
+    }
     result.push({
       num,
-      executivo:    d(c[1]),
-      lideranca:    d(c[2]),
-      cargo:        d(c[3]),
-      escola:       d(c[4]),
-      fat_escola:   n(c[7]),
-      fat_kedu:     n(c[8]),
-      taxa:         pct(c[9]),
-      alunos:       n(c[10]),
-      ticket_medio: n(c[11]),
-      spread:       pct(c[13]),
-      margem:       pct(c[14]),
-      modelo:       d(c[15]),
-      status:       d(c[17]),
-      cidade:       d(c[19]),
-      estado:       d(c[20]),
-      assinatura:   dt(c[24]),
-      confessional: String(c[32]||'').trim().toUpperCase()==='TRUE'?1:0,
-      unidades:     parseInt(c[6])||1,
+      executivo:              executivo,
+      lideranca:              lideranca,
+      cargo:                  d(c[3]),
+      escola:                 d(c[4]),
+      // AJUSTE: Mapeamento Base para Auditorias
+      fat_escola:             n(c[7]),
+      fat_kedu:               n(c[8]),
+      taxa:                   pct(c[9]),
+      alunos:                 n(c[10]),
+      ticket_medio:           n(c[11]),
+      inadimplencia_prevista: pct(c[12]),
+      spread:                 pct(c[13]),
+      margem:                 pct(c[14]),
+      modelo:                 d(c[15]),
+      status:                 d(c[17]),
+      cidade:                 d(c[19]),
+      estado:                 d(c[20]),
+      assinatura:             dt(c[24]),
+      confessional:           String(c[32]||'').trim().toUpperCase()==='TRUE'?1:0,
+      // AJUSTE: Correção do KPI de Margens
+      garantido:              n(c[33]),
+      margem_rs:              n(c[34]),
+      unidades:               parseInt(c[6])||1,
     });
   }
   return result;
