@@ -303,6 +303,29 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 /* Override old padding for content panel context */
 .meta-bar-wrap,.ranking-card,.trend-card,.ranking-card,.camp-section-wrap{margin-bottom:16px;}
 .kpi-section{margin-bottom:20px;}
+
+/* ── AE filter dropdowns ─────────────────────────────────────── */
+.ae-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ae-drop-wrap{position:relative;flex-shrink:0;}
+.ae-drop-btn{height:32px;padding:0 10px 0 12px;background:var(--card2);border:1px solid var(--border2);border-radius:9px;color:var(--muted2);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s;user-select:none;}
+.ae-drop-btn:hover{border-color:var(--accent);color:var(--text);}
+.ae-drop-btn.has-sel{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,.08);}
+.ae-drop-btn .ae-count{background:var(--accent);color:var(--bg);font-size:10px;font-weight:700;border-radius:10px;padding:0 5px;height:16px;line-height:16px;display:inline-block;min-width:16px;text-align:center;}
+.ae-chevron{transition:transform .18s;opacity:.5;flex-shrink:0;}
+.ae-drop-btn.open .ae-chevron{transform:rotate(180deg);}
+.ae-drop-list{position:absolute;top:calc(100% + 5px);left:0;min-width:170px;background:var(--card2);border:1px solid var(--border2);border-radius:11px;padding:6px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,0.45);max-height:260px;overflow-y:auto;}
+.ae-drop-list.ae-list-wide{min-width:340px;display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.ae-drop-list-header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 7px;border-bottom:1px solid var(--border);margin-bottom:4px;grid-column:1/-1;}
+.ae-drop-list-header span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace;}
+.ae-drop-list-header button{background:none;border:none;color:var(--accent);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;padding:0;}
+.ae-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--text);transition:background .12s;white-space:nowrap;}
+.ae-item:hover{background:rgba(78,205,196,.07);}
+.ae-item.checked{color:var(--accent);}
+.ae-item input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:pointer;flex-shrink:0;}
+.ae-item .ae-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ae-reset-btn{height:32px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:9px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:.15s;white-space:nowrap;margin-left:auto;}
+.ae-reset-btn:hover{background:rgba(255,107,107,0.14);}
+[data-theme="light"] .ae-drop-list{box-shadow:0 8px 24px rgba(0,0,0,0.12);}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -817,31 +840,64 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 
   <!-- Filtros de Análise -->
   <div class="trend-card" id="ae-panel" style="margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);">Filtros</div>
-      <button onclick="aeReset()" style="height:26px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
-      <div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Anos</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-anos"></div>
+    <div class="ae-filter-row">
+
+      <div class="ae-drop-wrap" id="ae-wrap-anos">
+        <button class="ae-drop-btn" id="ae-btn-anos" onclick="aeToggleDrop(event,'anos')">
+          <span id="ae-lbl-anos">Anos</span>
+          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ae-drop-list" id="ae-list-anos" style="display:none;">
+          <div class="ae-drop-list-header"><span>Anos</span><button onclick="aeClearDrop('anos')">limpar</button></div>
+          <div id="ae-anos"></div>
+        </div>
       </div>
-      <div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Meses</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-meses"></div>
+
+      <div class="ae-drop-wrap" id="ae-wrap-meses">
+        <button class="ae-drop-btn" id="ae-btn-meses" onclick="aeToggleDrop(event,'meses')">
+          <span id="ae-lbl-meses">Meses</span>
+          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ae-drop-list" id="ae-list-meses" style="display:none;">
+          <div class="ae-drop-list-header"><span>Meses</span><button onclick="aeClearDrop('meses')">limpar</button></div>
+          <div id="ae-meses"></div>
+        </div>
       </div>
-      <div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Regional / Liderança</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-regionais"></div>
+
+      <div class="ae-drop-wrap" id="ae-wrap-regionais">
+        <button class="ae-drop-btn" id="ae-btn-regionais" onclick="aeToggleDrop(event,'regionais')">
+          <span id="ae-lbl-regionais">Regional</span>
+          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ae-drop-list" id="ae-list-regionais" style="display:none;">
+          <div class="ae-drop-list-header"><span>Regional / Liderança</span><button onclick="aeClearDrop('regionais')">limpar</button></div>
+          <div id="ae-regionais"></div>
+        </div>
       </div>
-      <div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Cargo</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;" id="ae-cargos"></div>
+
+      <div class="ae-drop-wrap" id="ae-wrap-cargos">
+        <button class="ae-drop-btn" id="ae-btn-cargos" onclick="aeToggleDrop(event,'cargos')">
+          <span id="ae-lbl-cargos">Cargo</span>
+          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ae-drop-list" id="ae-list-cargos" style="display:none;">
+          <div class="ae-drop-list-header"><span>Cargo</span><button onclick="aeClearDrop('cargos')">limpar</button></div>
+          <div id="ae-cargos"></div>
+        </div>
       </div>
-    </div>
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Executivos</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px 8px;" id="ae-executivos"></div>
+
+      <div class="ae-drop-wrap" id="ae-wrap-executivos">
+        <button class="ae-drop-btn" id="ae-btn-executivos" onclick="aeToggleDrop(event,'executivos')">
+          <span id="ae-lbl-executivos">Executivos</span>
+          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ae-drop-list ae-list-wide" id="ae-list-executivos" style="display:none;">
+          <div class="ae-drop-list-header"><span>Executivos</span><button onclick="aeClearDrop('executivos')">limpar</button></div>
+          <div id="ae-executivos" style="display:contents;"></div>
+        </div>
+      </div>
+
+      <button onclick="aeReset()" class="ae-reset-btn">↺ Limpar tudo</button>
     </div>
   </div>
 
@@ -3244,70 +3300,123 @@ function toggleTheme(){
   }
   function fmtV(v){if(!v&&v!==0)return'—';return'R$ '+Math.round(v).toLocaleString('pt-BR');}
 
-  function pill(containerId, val, set, colorFn){
-    const btn=document.createElement('button');
-    btn.style.cssText='padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;white-space:nowrap;';
-    btn.textContent=val;
-    const applyStyle=()=>{
-      const on=set.has(val);
-      const c=colorFn?colorFn(val):'var(--accent)';
-      btn.style.background=on?hexA(c,.12):'transparent';
-      btn.style.borderColor=on?c:'var(--border2)';
-      btn.style.color=on?c:'var(--muted)';
-      btn.style.fontWeight=on?'700':'400';
-    };
-    applyStyle();
-    btn.onclick=()=>{
-      if(set.has(val)){
-        set.delete(val);
-        // release color only if not a KEY_COLORS entry
-        if(!KEY_COLORS[val]) delete aeColorMap[val];
-      } else {
-        set.add(val);
-        aeKeyColor(val); // assign color immediately on select
-      }
-      applyStyle();aeRedraw();
-    };
-    document.getElementById(containerId).appendChild(btn);
+  // ── AE dropdown helpers ──────────────────────────────────────
+  function aeUpdateBtn(id, set, baseLabel){
+    const btn = document.getElementById('ae-btn-'+id);
+    const lbl = document.getElementById('ae-lbl-'+id);
+    if(!btn||!lbl) return;
+    const n = set.size;
+    if(n===0){
+      lbl.innerHTML = baseLabel;
+      btn.classList.remove('has-sel');
+    } else {
+      lbl.innerHTML = baseLabel+' <span class="ae-count">'+n+'</span>';
+      btn.classList.add('has-sel');
+    }
   }
+
+  function aeBuildDrop(containerId, values, set, colorFn, btnId, baseLabel){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    el.innerHTML = '';
+    values.forEach(val=>{
+      const item = document.createElement('div');
+      item.className = 'ae-item' + (set.has(val)?' checked':'');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = set.has(val);
+      const dotOrSwatch = document.createElement('span');
+      if(colorFn){
+        dotOrSwatch.className = 'ae-dot';
+        dotOrSwatch.style.background = colorFn(val);
+      }
+      const txt = document.createElement('span');
+      txt.textContent = val;
+      item.appendChild(cb);
+      if(colorFn) item.appendChild(dotOrSwatch);
+      item.appendChild(txt);
+      item.onclick = (e)=>{
+        e.stopPropagation();
+        if(set.has(val)){
+          set.delete(val);
+          if(!KEY_COLORS[val]) delete aeColorMap[val];
+          item.classList.remove('checked'); cb.checked=false;
+        } else {
+          set.add(val);
+          aeKeyColor(val);
+          item.classList.add('checked'); cb.checked=true;
+        }
+        aeUpdateBtn(btnId, set, baseLabel);
+        aeRedraw();
+      };
+      el.appendChild(item);
+    });
+    aeUpdateBtn(btnId, set, baseLabel);
+  }
+
+  window.aeToggleDrop=function(e, id){
+    e.stopPropagation();
+    const list = document.getElementById('ae-list-'+id);
+    const btn  = document.getElementById('ae-btn-'+id);
+    if(!list) return;
+    const isOpen = list.style.display !== 'none';
+    // close all
+    ['anos','meses','regionais','cargos','executivos'].forEach(k=>{
+      const l=document.getElementById('ae-list-'+k), b=document.getElementById('ae-btn-'+k);
+      if(l){l.style.display='none';} if(b) b.classList.remove('open');
+    });
+    if(!isOpen){list.style.display=''; btn.classList.add('open');}
+  };
+
+  window.aeClearDrop=function(id){
+    const map={'anos':aeAnos,'meses':aeMeses,'regionais':aeRegs,'cargos':aeCargos,'executivos':aeExecs};
+    const labels={'anos':'Anos','meses':'Meses','regionais':'Regional','cargos':'Cargo','executivos':'Executivos'};
+    const set=map[id]; if(!set) return;
+    // release color map for cleared items
+    if(id==='executivos'||id==='regionais'||id==='cargos')
+      [...set].forEach(v=>{if(!KEY_COLORS[v]) delete aeColorMap[v];});
+    set.clear();
+    // rebuild checkboxes state
+    const el=document.getElementById('ae-'+id);
+    if(el) el.querySelectorAll('.ae-item').forEach(i=>{i.classList.remove('checked');const cb=i.querySelector('input[type=checkbox]');if(cb)cb.checked=false;});
+    aeUpdateBtn(id, set, labels[id]);
+    aeRedraw();
+  };
+
+  // close dropdowns on outside click
+  document.addEventListener('click', function(){
+    ['anos','meses','regionais','cargos','executivos'].forEach(k=>{
+      const l=document.getElementById('ae-list-'+k), b=document.getElementById('ae-btn-'+k);
+      if(l){l.style.display='none';} if(b) b.classList.remove('open');
+    });
+  });
 
   window.aeBuildFilters=function(){
     // Anos
     const anos=[...new Set(RAW.map(r=>r.assinatura&&parseInt(r.assinatura.slice(0,4))).filter(Boolean))].sort();
     const ae=document.getElementById('ae-anos'); if(!ae) return;
-    ae.innerHTML='';
-    anos.forEach(yr=>pill('ae-anos',yr,aeAnos,v=>YR_COLORS[v]||'#fff'));
+    aeBuildDrop('ae-anos', anos, aeAnos, v=>YR_COLORS[v]||'#aaa', 'anos', 'Anos');
 
     // Meses
-    const am=document.getElementById('ae-meses'); am.innerHTML='';
-    MONTHS_SHORT.forEach((m,i)=>{
-      const btn=document.createElement('button');
-      btn.style.cssText='padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-family:DM Mono,monospace;cursor:pointer;transition:.15s;';
-      btn.textContent=m;
-      const n=i+1;
-      const apply=()=>{const on=aeMeses.has(n);btn.style.background=on?'rgba(78,205,196,0.12)':'transparent';btn.style.borderColor=on?'var(--accent)':'var(--border2)';btn.style.color=on?'var(--accent)':'var(--muted)';btn.style.fontWeight=on?'700':'400';};
-      apply();
-      btn.onclick=()=>{aeMeses.has(n)?aeMeses.delete(n):aeMeses.add(n);apply();aeRedraw();};
-      am.appendChild(btn);
-    });
+    aeBuildDrop('ae-meses', MONTHS_SHORT.map((_,i)=>i+1), aeMeses, null, 'meses', 'Meses');
+    // Override textContent for months to show short names
+    const mesEl=document.getElementById('ae-meses');
+    if(mesEl) mesEl.querySelectorAll('.ae-item span:last-child').forEach((s,i)=>{s.textContent=MONTHS_SHORT[i];});
 
     // Regionais
     const regs=[...new Set(RAW.map(r=>r.lideranca).filter(Boolean))];
     const pri=['Regional 1','Regional 2'];
     const sorted=[...pri.filter(v=>regs.includes(v)),...regs.filter(v=>!pri.includes(v)).sort()];
-    const ar=document.getElementById('ae-regionais'); ar.innerHTML='';
-    sorted.forEach(r=>pill('ae-regionais',r,aeRegs));
+    aeBuildDrop('ae-regionais', sorted, aeRegs, null, 'regionais', 'Regional');
 
     // Cargos
     const cargosSet=new Set();
     RAW.forEach(r=>{const rc=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;if(rc&&rc!=='Coordenador Comercial'&&rc!=='Coordenadora Comercial')cargosSet.add(rc);});
-    const ac=document.getElementById('ae-cargos'); ac.innerHTML='';
-    [...cargosSet].sort().forEach(c=>pill('ae-cargos',c,aeCargos));
+    aeBuildDrop('ae-cargos', [...cargosSet].sort(), aeCargos, null, 'cargos', 'Cargo');
 
     // Executivos
     const execs=[...new Set(RAW.map(r=>r.executivo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-    const ax=document.getElementById('ae-executivos'); ax.innerHTML='';
-    execs.forEach(e=>pill('ae-executivos',e,aeExecs));
+    aeBuildDrop('ae-executivos', execs, aeExecs, null, 'executivos', 'Executivos');
   };
 
   function aeAgg(){
@@ -3518,9 +3627,13 @@ function toggleTheme(){
 
   window.aeReset=function(){
     aeAnos=new Set([2026]); aeMeses.clear(); aeRegs.clear(); aeCargos.clear(); aeExecs.clear();
-    // clear color assignments so fresh selections get clean colors
     Object.keys(aeColorMap).forEach(k=>delete aeColorMap[k]);
     aeColorIdx=0;
+    // close all dropdowns
+    ['anos','meses','regionais','cargos','executivos'].forEach(k=>{
+      const l=document.getElementById('ae-list-'+k),b=document.getElementById('ae-btn-'+k);
+      if(l)l.style.display='none'; if(b)b.classList.remove('open');
+    });
     aeBuildFilters();
     aeRedraw();
   };
