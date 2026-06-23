@@ -172,7 +172,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .trend-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .trend-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
-.trend-sub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;}
+.trend-sub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;}#trend-forecast-sub{margin-top:6px;line-height:1.2;}
 .trend-legend{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .trend-yr-btn{height:24px;padding:0 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:600;cursor:pointer;border:1px solid var(--yr-c,rgba(255,255,255,0.15));background:transparent;color:var(--muted);transition:all .18s;letter-spacing:.04em;}
 .trend-yr-btn.active{background:color-mix(in srgb,var(--yr-c,#fff) 15%,transparent);color:var(--yr-c,#fff);border-color:var(--yr-c,rgba(255,255,255,0.3));}
@@ -689,7 +689,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
           <div id="sim-r-total" style="font-size:15px;font-family:DM Mono,monospace;color:#00b894;margin-top:4px;font-weight:600;">—</div>
         </div>
       </div>
-      <div id="sim-factor-line" style="font-size:11px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.6);text-align:center;margin-top:10px;">—</div>
+
     </div>
   </div>
   </section>
@@ -2109,10 +2109,10 @@ update();
   function updateSubtitle(forecast,growthFactor){
     const subEl=document.getElementById('trend-forecast-sub');
     if(!subEl)return;
-    const total=Object.values(forecast).reduce((s,v)=>s+(v||0),0);
-    const totalFmt=Math.round(total).toLocaleString('pt-BR');
     const factorPct=((growthFactor-1)*100).toFixed(1);
-    subEl.textContent='';
+    const sign=growthFactor>=1?'+':'';
+    const clr=growthFactor>=1?'#52c77d':'#FFE66D';
+    subEl.innerHTML='<span style="color:'+clr+';font-weight:700;font-size:13px;letter-spacing:.04em;">Fator de crescimento vs 2025: '+sign+factorPct+'%</span>';
   }
 
   function drawChart(){
@@ -2244,7 +2244,7 @@ update();
     document.getElementById('sim-r-atual').textContent=fmtV(fc.currentProj||fat);
     document.getElementById('sim-r-futuro').textContent=fmtV(futuro);
     document.getElementById('sim-r-total').textContent=fmtV(encerrado+(fc.currentProj||fat)+futuro);
-    document.getElementById('sim-factor-line').textContent='Fator de crescimento vs 2025: '+(fc.growthFactor>=1?'+':'')+((fc.growthFactor-1)*100).toFixed(1)+'%  ·  Projeção do mês: '+fmtV(fc.currentProj||fat)+' ('+dia+'/'+daysInMonth+' dias)';
+    // growth factor shown in chart subtitle (trend-forecast-sub)
   };
 
   window.exportTrend=function(){
