@@ -336,6 +336,29 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ae-reset-btn{height:32px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:9px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:.15s;white-space:nowrap;margin-left:auto;}
 .ae-reset-btn:hover{background:rgba(255,107,107,0.14);}
 [data-theme="light"] .ae-drop-list{box-shadow:0 8px 24px rgba(0,0,0,0.12);}
+
+/* ── Meta Batida cards ───────────────────────────────────────── */
+.mb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:900px){.mb-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.mb-grid{grid-template-columns:1fr;}}
+.mb-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;}
+.mb-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.3);}
+.mb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--mb-clr,#52c77d);}
+.mb-crown{position:absolute;top:10px;left:12px;font-size:13px;color:#FFE66D;opacity:.9;}
+.mb-badge{position:absolute;top:10px;right:10px;background:rgba(255,230,109,.12);color:#c9a800;border:1px solid rgba(255,230,109,.3);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:700;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:4px;}
+[data-theme="light"] .mb-badge{background:rgba(160,110,0,.08);color:#7a5c00;border-color:rgba(160,110,0,.2);}
+.mb-av{width:62px;height:62px;border-radius:50%;position:relative;margin-bottom:10px;flex-shrink:0;}
+.mb-av::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2.5px solid var(--mb-clr,#52c77d);}
+.mb-av-ini{width:62px;height:62px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:'DM Mono',monospace;background:var(--bg2);}
+.mb-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;font-family:'DM Mono',monospace;line-height:1.2;}
+.mb-cargo{font-size:10px;color:var(--muted);margin-bottom:14px;letter-spacing:.07em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.mb-pct{font-size:38px;font-weight:700;line-height:1;color:var(--mb-clr);font-family:'DM Mono',monospace;margin-bottom:3px;}
+.mb-pct-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;font-family:'DM Mono',monospace;}
+.mb-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.mb-bar-fill{height:100%;border-radius:2px;background:var(--mb-clr);}
+.mb-footer{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;width:100%;padding-top:9px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;}
+.mb-footer strong{color:var(--text);font-weight:700;}
+.mb-empty{text-align:center;padding:40px 20px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -662,6 +685,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div class="camp-tabs" style="margin-bottom:0;">
         <button class="camp-tab active" onclick="campShowTab('exec',this)">Executivos</button>
         <button class="camp-tab" onclick="campShowTab('coord',this)">Coordenadores</button>
+        <button class="camp-tab" onclick="campShowTab('meta',this)" id="camp-tab-meta-btn">🏆 Meta Batida</button>
       </div>
       <div class="camp-tabs" style="margin-bottom:0;" id="camp-mes-nav">
         <button class="camp-tab" onclick="campSetMes('abril',this)">Abril</button>
@@ -678,6 +702,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Campanha Trimestral · Coordenadores</div>
       <div class="camp-days">▸ encerra 30/06</div>
       <div style="display:flex;flex-direction:column;gap:12px;" id="camp-grid-coord"></div>
+    </div>
+    <div id="camp-tab-meta" style="display:none;">
+      <div id="mb-mes-label" style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">—</div>
+      <div class="mb-grid" id="mb-grid"></div>
     </div>
   </div>
   </section>
@@ -3335,6 +3363,62 @@ function buildMelhorMes(){
     });
   }
 
+
+  // ── Meta Batida cards ─────────────────────────────────────────
+  function mbColor(e){
+    if(e.cargo==='Coordenador Comercial'||e.cargo==='Coordenadora Comercial') return '#FFE66D';
+    if(e.cargo==='Inside Sales') return '#74b9ff';
+    return '#52c77d';
+  }
+
+  window.buildMetaBatida = function(mes){
+    const grid=document.getElementById('mb-grid');
+    const lbl=document.getElementById('mb-mes-label');
+    if(!grid) return;
+    const mesLabel={'abril':'Abril 2026','maio':'Maio 2026','junho':'Junho 2026'}[mes]||mes;
+    if(lbl) lbl.textContent='Metas batidas · '+mesLabel;
+    const M={'abril':'2026-04','maio':'2026-05','junho':'2026-06'}[mes];
+    const todos=[...CAMP_R1,...CAMP_R2,
+      {name:'Tálison Machado', cargo:'Coordenador Comercial'},
+      {name:'Carol Figueiredo',cargo:'Coordenadora Comercial'},
+    ];
+    const batidos=todos.map(e=>{
+      const realM=getReal(e.name,[M]);
+      const mMes=e.cargo==='Coordenador Comercial'||e.cargo==='Coordenadora Comercial'
+        ? (['2026-04','2026-05','2026-06'].reduce((s,m)=>s+metaMes({cargo:'Closer'},m),0)*2)
+        : metaMes(e,M);
+      const pct=mMes>0?Math.round(realM/mMes*100):0;
+      return {...e,realM,mMes,pct};
+    }).filter(e=>e.pct>=100).sort((a,b)=>b.pct-a.pct);
+
+    if(!batidos.length){
+      grid.innerHTML='<div class="mb-empty" style="grid-column:1/-1;">Nenhuma meta batida em '+mesLabel+' ainda.</div>';
+      return;
+    }
+    grid.innerHTML=batidos.map(e=>{
+      const clr=mbColor(e);
+      const ini=initials(e.name);
+      const crown=e.pct>=120?'<div class="mb-crown">&#x1F451;</div>':'';
+      const barW=Math.min(e.pct,100);
+      const fmtK=v=>v>=1e6?(v/1e6).toFixed(1)+'M':'R$ '+(v/1000).toFixed(0)+'k';
+      const nomeShort=e.name.split(' ').slice(0,2).join(' ');
+      return '<div class="mb-card" style="--mb-clr:'+clr+';">'+
+        crown+
+        '<div class="mb-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Meta batida</div>'+
+        '<div class="mb-av">'+
+          '<img src="fotos/'+e.name+'.jpg" style="width:62px;height:62px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" alt="">'+
+          '<div class="mb-av-ini" style="color:'+clr+';">'+ini+'</div>'+
+        '</div>'+
+        '<div class="mb-name">'+nomeShort+'</div>'+
+        '<div class="mb-cargo">'+e.cargo+'</div>'+
+        '<div class="mb-pct">'+e.pct+'%</div>'+
+        '<div class="mb-pct-sub">da meta alcançado</div>'+
+        '<div class="mb-bar"><div class="mb-bar-fill" style="width:'+barW+'%;"></div></div>'+
+        '<div class="mb-footer"><span>Fat. <strong>'+fmtK(e.realM)+'</strong></span><span>Meta <strong>'+fmtK(e.mMes)+'</strong></span></div>'+
+      '</div>';
+    }).join('');
+  };
+
   window.buildCampanhas=function(){
     // Ativa mês correto
     document.querySelectorAll('#camp-mes-nav .camp-tab').forEach(btn=>{
@@ -3353,17 +3437,22 @@ function buildMelhorMes(){
 
   window.campSetMes=function(mes,btn){
     campMesAtivo=mes;
-    // Só remove active dos botões de mês dentro de #camp-mes-nav
     document.querySelectorAll('#camp-mes-nav .camp-tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     buildExec();
+    const metaPanel=document.getElementById('camp-tab-meta');
+    if(metaPanel&&metaPanel.style.display!=='none') window.buildMetaBatida(mes);
   };
 
   window.campShowTab=function(tab,btn){
     document.getElementById('camp-tab-exec').style.display=tab==='exec'?'block':'none';
     document.getElementById('camp-tab-coord').style.display=tab==='coord'?'block':'none';
-    // Só remove active dos botões de seção (exec/coord), não dos de mês
-    ['exec','coord'].forEach(t=>{
+    const metaEl=document.getElementById('camp-tab-meta');
+    if(metaEl) metaEl.style.display=tab==='meta'?'block':'none';
+    const mesNav=document.getElementById('camp-mes-nav');
+    if(mesNav) mesNav.style.display=(tab==='exec'||tab==='meta')?'':'none';
+    if(tab==='meta') window.buildMetaBatida(campMesAtivo);
+    ['exec','coord','meta'].forEach(t=>{
       const b=document.querySelector('[onclick*="campShowTab(\''+t+'\'"]');
       if(b) b.classList.remove('active');
     });
