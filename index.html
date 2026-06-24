@@ -280,6 +280,16 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     padding-top: 12px;
 }
 
+
+/* ── Ranking view pills ──────────────────────────────────────── */
+.rv-pill{display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:none;cursor:pointer;padding:3px 2px;min-width:44px;}
+.rv-pill-circle{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted);background:transparent;transition:.18s;}
+.rv-pill-label{font-size:9.5px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;transition:.18s;white-space:nowrap;}
+.rv-pill:hover .rv-pill-circle{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,.08);}
+.rv-pill:hover .rv-pill-label{color:var(--accent);}
+.rv-pill.active .rv-pill-circle{border-color:var(--accent);background:var(--accent);color:var(--bg);}
+.rv-pill.active .rv-pill-label{color:var(--accent);font-weight:700;}
+[data-theme="light"] .rv-pill.active .rv-pill-circle{color:#fff;}
 /* ── Single-panel remix ──────────────────────────────────────── */
 .app-shell{display:flex;height:calc(100vh - 122px);overflow:hidden;}
 .sidebar{width:68px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px;padding:10px 8px;overflow-y:auto;scroll-behavior:smooth;}
@@ -394,6 +404,32 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 
   <div class="fdiv"></div>
+
+  <!-- Regional — visível só com 2026 -->
+  <div class="fb-group fb-2026-only" id="fb-group-regional" style="display:none;">
+    <span class="fb-group-label">Regional</span>
+    <div style="position:relative;">
+      <button class="multisel-btn" id="fb-reg-btn" onclick="fbToggleDrop(event,'reg')" style="min-width:118px;height:28px;font-size:12px;padding:0 8px;">
+        <span id="fb-reg-label">Regional (todos)</span>
+        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
+      </button>
+      <div class="multisel-drop" id="fb-reg-drop" style="display:none;min-width:150px;"></div>
+    </div>
+  </div>
+
+  <!-- Executivo — visível só com 2026 -->
+  <div class="fb-group fb-2026-only" id="fb-group-exec" style="display:none;">
+    <span class="fb-group-label">Executivo</span>
+    <div style="position:relative;">
+      <button class="multisel-btn" id="fb-exec-btn" onclick="fbToggleDrop(event,'exec')" style="min-width:148px;height:28px;font-size:12px;padding:0 8px;">
+        <span id="fb-exec-label">Executivo (todos)</span>
+        <svg width="8" height="5" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#5a6a82"/></svg>
+      </button>
+      <div class="multisel-drop" id="fb-exec-drop" style="display:none;min-width:200px;max-height:280px;overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <div class="fdiv fb-2026-only" style="display:none;"></div>
 
   <button class="btn-reset" onclick="resetFilters()">↺ Limpar</button>
   <button id="btn-contratos-modal" onclick="openContratosModal()" style="display:none;height:28px;padding:0 12px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:var(--accent);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;align-items:center;gap:5px;transition:.15s;">
@@ -540,22 +576,25 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <button onclick="exportRanking()" class="sec-export"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar PNG</button>
     </div>
       <div class="ranking-card" id="ranking-card-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div class="ranking-title" style="margin-bottom:0;">Ranking de Vendas &nbsp;<span id="ranking-period-label" style="font-weight:700;letter-spacing:.04em;">—</span></div>
-      <div style="display:flex;gap:6px;">
-        <div style="position:relative;display:inline-block;">
-          <button id="ranking-view-dropdown-btn" onclick="toggleRankingDropdown()" style="background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.25);color:#4ECDC4;padding:5px 12px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;border-radius:8px;display:inline-flex;align-items:center;gap:6px;letter-spacing:.04em;font-weight:600;transition:.2s;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.08)'">
-            <svg id="ranking-view-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span id="ranking-view-label">Cargo</span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div id="ranking-view-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#141627;border:1px solid rgba(78,205,196,0.2);border-radius:10px;overflow:hidden;z-index:200;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-            <button onclick="setRankingView('cargo')" data-view="cargo" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cargo</button>
-            <button onclick="setRankingView('regional')" data-view="regional" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Regional</button>
-            <button onclick="setRankingView('geral')" data-view="geral" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Geral</button>
-            <button onclick="setRankingView('melhor')" data-view="melhor" style="width:100%;background:transparent;border:none;color:var(--fg);padding:9px 14px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;transition:.15s;" onmouseover="this.style.background='rgba(78,205,196,0.08)'" onmouseout="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Melhor do Mês</button>
-          </div>
-        </div>
+      <div style="display:flex;gap:6px;align-items:flex-end;">
+        <button class="rv-pill active" onclick="setRankingView('cargo')" data-view="cargo" title="Por Cargo">
+          <div class="rv-pill-circle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="rv-pill-label">Cargo</div>
+        </button>
+        <button class="rv-pill" onclick="setRankingView('regional')" data-view="regional" title="Por Regional">
+          <div class="rv-pill-circle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="rv-pill-label">Regional</div>
+        </button>
+        <button class="rv-pill" onclick="setRankingView('geral')" data-view="geral" title="Geral">
+          <div class="rv-pill-circle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="rv-pill-label">Geral</div>
+        </button>
+        <button class="rv-pill" onclick="setRankingView('melhor')" data-view="melhor" title="Melhor do Mês">
+          <div class="rv-pill-circle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div class="rv-pill-label">Mês</div>
+        </button>
       </div>
     </div>
     <div class="ranking-cols" id="ranking-cols">
@@ -1271,8 +1310,18 @@ function applyFilters(){
   return RAW.filter(r=>{
     if(filters.status&&r.status!==filters.status)return false;
     if(filters.modelo&&r.modelo!==filters.modelo)return false;
-    if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado))return false;    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
+    if(filters.estados&&filters.estados.length>0&&!filters.estados.includes(r.estado))return false;
+    if(r.assinatura){const ym=r.assinatura.slice(0,7);if(filters.dateFrom&&ym<filters.dateFrom)return false;if(filters.dateTo&&ym>filters.dateTo)return false;}
     else if(filters.dateFrom||filters.dateTo)return false;
+    if(filters.fbRegs&&filters.fbRegs.length>0){
+      const exec=r.executivo;
+      if(!exec||!TEAM[exec])return false;
+      const regLbl=TEAM[exec].regional==='R1'?'Regional 1':'Regional 2';
+      if(!filters.fbRegs.includes(regLbl))return false;
+    }
+    if(filters.fbExecs&&filters.fbExecs.length>0){
+      if(!r.executivo||!filters.fbExecs.includes(r.executivo))return false;
+    }
     return true;
   });
 }
@@ -1514,51 +1563,14 @@ function renderQuartil(){
   });
 }
 
-function toggleRankingDropdown(){
-  const m=document.getElementById('ranking-view-menu');
-  if(m) m.style.display=m.style.display==='none'?'block':'none';
-}
-document.addEventListener('click',function(e){
-  const dd=document.getElementById('ranking-view-menu');
-  const btn=document.getElementById('ranking-view-dropdown-btn');
-  if(dd&&btn&&!btn.contains(e.target)&&!dd.contains(e.target)) dd.style.display='none';
-});
 function setRankingView(view){
-  // Update dropdown label and icon
-  const lbl=document.getElementById('ranking-view-label');
-  const ico=document.getElementById('ranking-view-icon');
-  const labels={'cargo':'Cargo','regional':'Regional','geral':'Geral','melhor':'Melhor do Mês'};
-  const icons={
-    'cargo':'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-    'regional':'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-    'geral':'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-    'melhor':'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
-  };
-  if(lbl) lbl.textContent=labels[view]||view;
-  if(ico) ico.innerHTML=icons[view]||'';
-  // Close dropdown
-  const menu=document.getElementById('ranking-view-menu');
-  if(menu) menu.style.display='none';
-  // Highlight active item
-  document.querySelectorAll('#ranking-view-menu button[data-view]').forEach(b=>{
-    b.style.color=b.dataset.view===view?'#4ECDC4':'var(--fg)';
-    b.style.fontWeight=b.dataset.view===view?'700':'400';
+  // Update circle pills active state
+  document.querySelectorAll('.rv-pill[data-view]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===view);
   });
   rankingView = view;
-  const btnCargo = document.getElementById('ranking-view-cargo');
-  const btnReg   = document.getElementById('ranking-view-regional');
-  const btnGeral = document.getElementById('ranking-view-geral');
-  [['cargo',btnCargo],['regional',btnReg],['geral',btnGeral]].forEach(([v,btn])=>{
-    if(!btn) return;
-    const active = view===v;
-    btn.style.borderBottom = active ? '2px solid var(--accent)' : '2px solid transparent';
-    btn.style.color        = active ? 'var(--accent)' : 'var(--muted)';
-    btn.style.fontWeight   = active ? '700' : '400';
-  });
   const colsMelhor = document.getElementById('ranking-cols-melhor');
   if(colsMelhor) colsMelhor.style.display = view==='melhor' ? 'block' : 'none';
-  const rankTitle = document.getElementById('ranking-inner-header');
-  if(rankTitle) rankTitle.style.display = view==='melhor' ? 'none' : 'flex';
   if(view==='melhor') setTimeout(buildMelhorMes, 50);
   update();
 }
@@ -2009,6 +2021,7 @@ function renderBadges(){
   window.fbYearChange = function(){
     const el=document.getElementById('fb-year');
     if(el) fbYear=parseInt(el.value);
+    toggle2026Filters();
     fbApply(); fbLabel();
   };
 
@@ -2027,8 +2040,11 @@ function renderBadges(){
     // Limpa estados
     selectedEstados=[]; filters.estados=[];
     buildEstadoDrop(); updateEstadoLabel();
-    // Limpa filtros e cache
-    filters={dateFrom:'',dateTo:'',status:'',modelo:'',estados:[]};
+    // Limpa filtros e cache (incluindo 2026-only)
+    selectedFbRegs=[]; selectedFbExecs=[];
+    filters={dateFrom:'',dateTo:'',status:'',modelo:'',estados:[],fbRegs:[],fbExecs:[]};
+    toggle2026Filters();
+    fbUpdateRegLabel(); fbUpdateExecLabel();
     invalidateCache();
     if(typeof _monthlyRawLen!=='undefined') _monthlyRawLen=-1;
     // Redesenha tudo
@@ -2059,6 +2075,119 @@ function onFilterChange(){
 }
 ['f-status','f-modelo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',onFilterChange); });
 // resetFilters definido no seletor de meses
+
+// ── 2026-only filters: Regional & Executivo ──────────────────
+var selectedFbRegs  = [];
+var selectedFbExecs = [];
+
+function toggle2026Filters(){
+  const yr = document.getElementById('fb-year');
+  const is2026 = yr && yr.value === '2026';
+  document.querySelectorAll('.fb-2026-only').forEach(el=>{
+    el.style.display = is2026 ? '' : 'none';
+  });
+  if(!is2026){
+    selectedFbRegs=[]; selectedFbExecs=[];
+    filters.fbRegs=[]; filters.fbExecs=[];
+    invalidateCache();
+  }
+}
+
+function fbBuildRegDrop(){
+  const drop=document.getElementById('fb-reg-drop');
+  if(!drop) return;
+  const options=['Regional 1','Regional 2'];
+  drop.innerHTML='';
+  options.forEach(reg=>{
+    const item=document.createElement('div');
+    const checked=selectedFbRegs.includes(reg);
+    item.className='multisel-item'+(checked?' checked':'');
+    const cb=document.createElement('input');
+    cb.type='checkbox'; cb.checked=checked;
+    const lbl=document.createElement('span');
+    lbl.textContent=reg;
+    item.appendChild(cb); item.appendChild(lbl);
+    item.onclick=e=>{
+      e.stopPropagation();
+      if(selectedFbRegs.includes(reg)) selectedFbRegs=selectedFbRegs.filter(r=>r!==reg);
+      else selectedFbRegs.push(reg);
+      filters.fbRegs=[...selectedFbRegs];
+      fbBuildRegDrop(); fbUpdateRegLabel();
+      invalidateCache(); update();
+    };
+    drop.appendChild(item);
+  });
+}
+
+function fbUpdateRegLabel(){
+  const lbl=document.getElementById('fb-reg-label');
+  if(!lbl) return;
+  lbl.textContent = selectedFbRegs.length===0 ? 'Regional (todos)'
+    : selectedFbRegs.length===1 ? selectedFbRegs[0]
+    : 'Regional ('+selectedFbRegs.length+')';
+  const btn=document.getElementById('fb-reg-btn');
+  if(btn) btn.style.borderColor=selectedFbRegs.length>0?'var(--accent)':'';
+}
+
+function fbBuildExecDrop(){
+  const drop=document.getElementById('fb-exec-drop');
+  if(!drop) return;
+  const execs=Object.keys(TEAM)
+    .filter(n=>TEAM[n].cargo!=='Coordenador Comercial'&&TEAM[n].cargo!=='Coordenadora Comercial')
+    .sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  drop.innerHTML='';
+  execs.forEach(nome=>{
+    const item=document.createElement('div');
+    const checked=selectedFbExecs.includes(nome);
+    item.className='multisel-item'+(checked?' checked':'');
+    item.title=nome;
+    const cb=document.createElement('input');
+    cb.type='checkbox'; cb.checked=checked;
+    const lbl=document.createElement('span');
+    lbl.textContent=nome.split(' ').slice(0,2).join(' ');
+    item.appendChild(cb); item.appendChild(lbl);
+    item.onclick=e=>{
+      e.stopPropagation();
+      if(selectedFbExecs.includes(nome)) selectedFbExecs=selectedFbExecs.filter(n=>n!==nome);
+      else selectedFbExecs.push(nome);
+      filters.fbExecs=[...selectedFbExecs];
+      fbBuildExecDrop(); fbUpdateExecLabel();
+      invalidateCache(); update();
+    };
+    drop.appendChild(item);
+  });
+}
+
+function fbUpdateExecLabel(){
+  const lbl=document.getElementById('fb-exec-label');
+  if(!lbl) return;
+  lbl.textContent = selectedFbExecs.length===0 ? 'Executivo (todos)'
+    : selectedFbExecs.length===1 ? selectedFbExecs[0].split(' ').slice(0,2).join(' ')
+    : 'Executivos ('+selectedFbExecs.length+')';
+  const btn=document.getElementById('fb-exec-btn');
+  if(btn) btn.style.borderColor=selectedFbExecs.length>0?'var(--accent)':'';
+}
+
+function fbToggleDrop(e, id){
+  e.stopPropagation();
+  const drop=document.getElementById('fb-'+id+'-drop');
+  if(!drop) return;
+  const isOpen=drop.style.display!=='none';
+  ['reg','exec'].forEach(k=>{ const d=document.getElementById('fb-'+k+'-drop'); if(d) d.style.display='none'; });
+  if(!isOpen){
+    if(id==='reg') fbBuildRegDrop();
+    else fbBuildExecDrop();
+    drop.style.display='';
+  }
+}
+
+document.addEventListener('click',function(){
+  ['reg','exec'].forEach(k=>{ const d=document.getElementById('fb-'+k+'-drop'); if(d) d.style.display='none'; });
+});
+
+// Init: show 2026 filters if year is already 2026 on load
+setTimeout(toggle2026Filters, 200);
+
 
 update();
 
