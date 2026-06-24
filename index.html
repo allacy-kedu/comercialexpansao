@@ -4111,10 +4111,9 @@ function _mbDraw(oc, data, photo){
   const cargoH=42;         // cargo line
   const gap2=isSingle?48:32; // cargo → pct block
   const pctBlockH=isSingle?240:goals.length*150; // pct + labels
-  const gap3=isSingle?52:40; // pct block → META BATIDA
-  const mbH=95;            // META BATIDA! line
+  const gap3=0; // no gap needed — META BATIDA fixed at bottom
 
-  const totalH=photoH+gap1+nameH+cargoH+gap2+pctBlockH+gap3+mbH;
+  const totalH=photoH+gap1+nameH+cargoH+gap2+pctBlockH;
   let y=(S-totalH)/2;      // top of content block
 
   // ── Photo circle ──
