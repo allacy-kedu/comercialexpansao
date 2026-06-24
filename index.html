@@ -4190,12 +4190,12 @@ function _mbDraw(oc, data, photo){
   }
   y+=gap3;
 
-  // ── META BATIDA! — inside frosted rectangle ──
+  // ── META BATIDA! — 50px from bottom ──
   oc.save();
-  oc.textAlign='center'; oc.textBaseline='middle';
+  oc.textAlign='center'; oc.textBaseline='bottom';
   oc.shadowBlur=0;
   oc.font='900 88px Segoe UI,Arial'; oc.fillStyle='#ffffff';
-  oc.fillText('META BATIDA!',cx,1074);
+  oc.fillText('META BATIDA!',cx,S-50);
   oc.restore();
 }
 
