@@ -4148,7 +4148,7 @@ function _mbDraw(oc, data, photo){
   oc.font='700 52px Segoe UI,Arial'; oc.fillStyle='#ffffff'; oc.textBaseline='top';
   oc.fillText(data.name,cx,y);
   y+=nameH;
-  oc.font='400 30px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.72)'; oc.shadowBlur=8;
+  oc.font='600 30px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.95)'; oc.shadowBlur=14;
   oc.fillText(data.cargo.toUpperCase(),cx,y);
   oc.restore();
   y+=cargoH+gap2;
@@ -4166,8 +4166,8 @@ function _mbDraw(oc, data, photo){
     oc.shadowBlur=8; oc.textBaseline='top';
     oc.fillText('DA META ATINGIDA',cx,y);
     y+=50;
-    oc.font='400 28px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.52)';
-    oc.shadowBlur=0; oc.textBaseline='top';
+    oc.font='600 28px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.90)';
+    oc.shadowBlur=10; oc.textBaseline='top';
     oc.fillText(g.label.toUpperCase(),cx,y);
     y+=38;
     oc.restore();
@@ -4183,20 +4183,20 @@ function _mbDraw(oc, data, photo){
       oc.font='900 95px Segoe UI,Arial'; oc.fillStyle='#ffffff';
       oc.shadowBlur=16; oc.textBaseline='top';
       oc.fillText(g.pct+'%',cx,y); y+=105;
-      oc.font='400 26px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.55)';
-      oc.shadowBlur=0; oc.textBaseline='top';
+      oc.font='600 26px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.88)';
+      oc.shadowBlur=8; oc.textBaseline='top';
       oc.fillText(g.label.toUpperCase(),cx,y); y+=34;
       oc.restore();
     });
   }
   y+=gap3;
 
-  // ── META BATIDA! ──
+  // ── META BATIDA! — inside frosted rectangle ──
   oc.save();
-  oc.textAlign='center'; oc.textBaseline='top';
+  oc.textAlign='center'; oc.textBaseline='middle';
   oc.shadowBlur=0;
   oc.font='900 88px Segoe UI,Arial'; oc.fillStyle='#ffffff';
-  oc.fillText('META BATIDA!',cx,y);
+  oc.fillText('META BATIDA!',cx,1074);
   oc.restore();
 }
 
