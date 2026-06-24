@@ -4104,90 +4104,88 @@ function _mbDraw(oc, data, photo){
   const goals = data.goals;
   const isSingle = goals.length===1;
 
-  // Circle photo
-  const cx=330,cy=530,cr=275;
-  oc.save(); oc.beginPath(); oc.arc(cx,cy,cr,0,Math.PI*2); oc.clip();
+  // ── Photo circle — moved up to leave room for name below ──
+  const cx=370, cy=430, cr=250;
+  oc.save();
+  oc.beginPath(); oc.arc(cx,cy,cr,0,Math.PI*2); oc.clip();
   if(photo && photo.naturalWidth>0){
     const ar=photo.naturalWidth/photo.naturalHeight, d=cr*2;
     let dw=d,dh=d; if(ar>1) dw=d*ar; else dh=d/ar;
     oc.drawImage(photo,cx-dw/2,cy-dh/2,dw,dh);
   } else {
     oc.fillStyle='rgba(0,40,120,0.45)'; oc.fill();
-    oc.restore(); oc.save(); oc.beginPath(); oc.arc(cx,cy,cr,0,Math.PI*2); oc.clip();
+    oc.restore(); oc.save();
+    oc.beginPath(); oc.arc(cx,cy,cr,0,Math.PI*2); oc.clip();
     oc.fillStyle='rgba(80,160,255,0.2)'; oc.fill();
-    oc.font='700 200px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.9)';
+    oc.font='700 180px Segoe UI,Arial';
+    oc.fillStyle='rgba(255,255,255,0.9)';
     oc.textAlign='center'; oc.textBaseline='middle';
-    oc.fillText(data.ini,cx,cy);
+    oc.fillText(data.ini, cx, cy);
   }
   oc.restore();
-  oc.save(); oc.beginPath(); oc.arc(cx,cy,cr+6,0,Math.PI*2);
-  oc.strokeStyle='rgba(255,255,255,0.5)'; oc.lineWidth=5; oc.stroke(); oc.restore();
 
-  // Right panel
-  const rx=660,ry=150,rw=620,rh=isSingle?580:680;
-  oc.save(); _mbRoundRect(oc,rx,ry,rw,rh,32);
-  oc.fillStyle='rgba(10,30,100,0.38)'; oc.fill();
-  oc.strokeStyle='rgba(255,255,255,0.22)'; oc.lineWidth=2.5; oc.stroke(); oc.restore();
+  // Circle ring
+  oc.save();
+  oc.beginPath(); oc.arc(cx,cy,cr+6,0,Math.PI*2);
+  oc.strokeStyle='rgba(255,255,255,0.55)'; oc.lineWidth=5; oc.stroke();
+  oc.restore();
 
+  // ── Name below photo ──
+  const nameShort = data.name;
+  oc.save();
+  oc.textAlign='center'; oc.textBaseline='top';
+  oc.shadowColor='rgba(0,30,120,0.7)'; oc.shadowBlur=14;
+  oc.font='700 58px Segoe UI,Arial'; oc.fillStyle='#ffffff';
+  oc.fillText(nameShort, cx, cy+cr+30);
+  oc.font='400 34px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.72)';
+  oc.fillText(data.cargo.toUpperCase(), cx, cy+cr+104);
+  oc.restore();
+
+  // ── % info — right half, no box, text only ──
+  const rx=680, ry=isSingle?320:200, rw=600;
   if(isSingle){
     const g=goals[0];
-    oc.save(); oc.font='900 200px Segoe UI,Arial'; oc.fillStyle='#ffffff';
-    oc.textAlign='center'; oc.textBaseline='middle';
-    oc.shadowColor='rgba(0,100,255,0.5)'; oc.shadowBlur=20;
-    oc.fillText(g.pct+'%',rx+rw/2,ry+rh*0.38); oc.restore();
-    oc.save(); oc.font='600 38px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.75)';
-    oc.textAlign='center'; oc.textBaseline='top'; oc.shadowColor='transparent';
-    oc.fillText('DA META ATINGIDA',rx+rw/2,ry+rh*0.38+108); oc.restore();
-    oc.save(); oc.font='500 30px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.5)';
-    oc.textAlign='center'; oc.textBaseline='top';
-    oc.fillText(g.label.toUpperCase(),rx+rw/2,ry+rh*0.38+155); oc.restore();
+    oc.save();
+    oc.textAlign='center'; oc.shadowColor='rgba(0,80,220,0.6)';
+    // Big %
+    oc.font='900 220px Segoe UI,Arial'; oc.fillStyle='#ffffff';
+    oc.shadowBlur=24; oc.textBaseline='top';
+    oc.fillText(g.pct+'%', rx+rw/2, ry);
+    // "DA META ATINGIDA"
+    oc.font='600 40px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.80)';
+    oc.shadowBlur=8; oc.textBaseline='top';
+    oc.fillText('DA META ATINGIDA', rx+rw/2, ry+242);
+    // Goal label
+    oc.font='500 30px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.52)';
+    oc.shadowBlur=0;
+    oc.fillText(g.label.toUpperCase(), rx+rw/2, ry+294);
+    oc.restore();
   } else {
     goals.forEach((g,i)=>{
-      const rowH=rh/3, rowY=ry+rowH*i, midY=rowY+rowH/2;
-      if(i>0){ oc.save(); oc.strokeStyle='rgba(255,255,255,0.12)'; oc.lineWidth=1.5;
-        oc.beginPath(); oc.moveTo(rx+24,rowY); oc.lineTo(rx+rw-24,rowY); oc.stroke(); oc.restore(); }
-      oc.save(); oc.font='900 110px Segoe UI,Arial'; oc.fillStyle='#ffffff';
-      oc.textAlign='center'; oc.textBaseline='middle';
-      oc.shadowColor='rgba(0,100,255,0.4)'; oc.shadowBlur=12;
-      oc.fillText(g.pct+'%',rx+rw/2,midY-12); oc.restore();
-      oc.save(); oc.font='500 28px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.55)';
-      oc.textAlign='center'; oc.textBaseline='top'; oc.shadowColor='transparent';
-      oc.fillText(g.label.toUpperCase(),rx+rw/2,midY+62); oc.restore();
+      const rowH=290, rowY=ry+rowH*i, midY=rowY+rowH/2;
+      if(i>0){
+        oc.save(); oc.strokeStyle='rgba(255,255,255,0.15)'; oc.lineWidth=1.5;
+        oc.beginPath(); oc.moveTo(rx+40,rowY); oc.lineTo(rx+rw-40,rowY); oc.stroke(); oc.restore();
+      }
+      oc.save(); oc.textAlign='center'; oc.textBaseline='middle';
+      oc.shadowColor='rgba(0,80,220,0.5)'; oc.shadowBlur=16;
+      oc.font='900 120px Segoe UI,Arial'; oc.fillStyle='#ffffff';
+      oc.fillText(g.pct+'%', rx+rw/2, midY-16);
+      oc.shadowBlur=0;
+      oc.font='500 28px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.55)';
+      oc.textBaseline='top';
+      oc.fillText(g.label.toUpperCase(), rx+rw/2, midY+56);
+      oc.restore();
     });
   }
 
-  // META BATIDA!
-  oc.save(); oc.textAlign='left';
-  oc.shadowColor='rgba(0,60,200,0.6)'; oc.shadowBlur=16;
-  oc.fillStyle='#ffffff'; oc.textBaseline='bottom';
-  oc.font='900 120px Segoe UI,Arial'; oc.fillText('META',80,1060);
-  oc.font='900 150px Segoe UI,Arial'; oc.fillText('BATIDA!',80,1200);
+  // ── "META BATIDA" — single line centered at bottom ──
+  oc.save();
+  oc.textAlign='center'; oc.textBaseline='middle';
+  oc.shadowColor='rgba(0,40,180,0.7)'; oc.shadowBlur=20;
+  oc.font='900 100px Segoe UI,Arial'; oc.fillStyle='#ffffff';
+  oc.fillText('META BATIDA!', 675, 1258);
   oc.restore();
-
-  // Name bar
-  oc.save(); _mbRoundRect(oc,640,1075,640,110,18);
-  oc.fillStyle='rgba(20,60,160,0.55)'; oc.fill();
-  oc.strokeStyle='rgba(255,255,255,0.2)'; oc.lineWidth=2; oc.stroke();
-  oc.font='700 54px Segoe UI,Arial'; oc.fillStyle='#ffffff';
-  oc.textAlign='center'; oc.textBaseline='middle'; oc.shadowBlur=0;
-  oc.fillText(data.name,960,1127);
-  oc.font='400 28px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.65)'; oc.textBaseline='top';
-  oc.fillText(data.cargo.toUpperCase(),960,1153); oc.restore();
-
-  // Footer
-  oc.save(); _mbRoundRect(oc,60,1245,1230,75,14);
-  oc.fillStyle='rgba(200,230,255,0.15)'; oc.fill();
-  oc.strokeStyle='rgba(255,255,255,0.12)'; oc.lineWidth=1.5; oc.stroke();
-  oc.font='600 34px Segoe UI,Arial'; oc.fillStyle='rgba(255,255,255,0.65)';
-  oc.textAlign='center'; oc.textBaseline='middle'; oc.shadowBlur=0;
-  oc.fillText('kedu com você, na educação.',675,1282); oc.restore();
-
-  // Rocket badge
-  oc.save(); oc.beginPath(); oc.arc(555,490,48,0,Math.PI*2);
-  oc.fillStyle='rgba(10,40,140,0.7)'; oc.fill();
-  oc.strokeStyle='rgba(255,255,255,0.35)'; oc.lineWidth=3; oc.stroke();
-  oc.font='46px serif'; oc.textAlign='center'; oc.textBaseline='middle';
-  oc.fillText('\uD83D\uDE80',555,493); oc.restore();
 }
 
 window.triggerMBDownload = function(name){
