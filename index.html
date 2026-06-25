@@ -549,7 +549,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   <section class="dash-section" id="sec-meta">
     <div class="section-header">
       <span class="section-title">Meta &amp; Regionais</span>
-      <button onclick="exportMeta()" class="sec-export"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar PNG</button>
+      <button id="btn-share" onclick="exportMeta()" class="sec-export"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar PNG</button>
     </div>
       <div id="meta-capture-zone">
   <div class="meta-bar-wrap">
@@ -1025,6 +1025,12 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
           <option value="taxa">Taxa Média</option>
           <option value="ticket">Ticket Médio</option>
           <option value="spread">Spread Médio</option>
+          <option value="inadim">Inadimplência Prevista</option>
+        </optgroup>
+        <optgroup label="Volume">
+          <option value="alunos">Total de Alunos</option>
+          <option value="unidades">Total de Unidades</option>
+          <option value="confessional">% Confessional</option>
         </optgroup>
         <optgroup label="Margem">
           <option value="margem_med">Média de Margem</option>
@@ -1075,6 +1081,12 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
             <option value="taxa">Taxa Média</option>
             <option value="ticket">Ticket Médio</option>
             <option value="spread">Spread Médio</option>
+            <option value="inadim">Inadimplência Prevista</option>
+          </optgroup>
+          <optgroup label="Volume">
+            <option value="alunos">Total de Alunos</option>
+            <option value="unidades">Total de Unidades</option>
+            <option value="confessional">% Confessional</option>
           </optgroup>
           <optgroup label="Margem">
             <option value="margem_med">Média de Margem</option>
@@ -1117,9 +1129,8 @@ function exportMeta(){
   const zone = document.getElementById('meta-capture-zone');
   if(!zone) return;
   const btn = document.getElementById('btn-share');
-  const origText = btn.innerHTML;
-  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Gerando...';
-  btn.disabled = true;
+  const origText = btn ? btn.innerHTML : '';
+  if(btn){ btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Gerando...'; btn.disabled=true; }
 
   // Build a fixed-width 600px clone for consistent output on any screen
   const EXPORT_W = 600;
@@ -1155,8 +1166,7 @@ function exportMeta(){
     link.href = canvas.toDataURL('image/png');
     link.click();
 
-    btn.innerHTML = origText;
-    btn.disabled = false;
+    if(btn){btn.innerHTML=origText;btn.disabled=false;}
   }).catch(err=>{
     if(document.body.contains(clone)) document.body.removeChild(clone);
     btn.innerHTML = origText;
@@ -3793,15 +3803,17 @@ function toggleTheme(){
     aeBuildDrop('ae-executivos', execs, aeExecs, null, 'executivos', 'Executivos');
   };
 
-  const AE_PCT_KPIS  = ['taxa','ticket','spread','margem_med','margem_gp','margem_og'];
-  const AE_QTD_KPIS  = ['qtd_ctr','qtd_escola'];
+  const AE_PCT_KPIS  = ['taxa','ticket','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
+  const AE_QTD_KPIS  = ['qtd_ctr','qtd_escola','alunos','unidades'];
   const AE_KPI_LABELS = {
     fat_escola:'Fat. Escola', fat_escola_med:'Fat. Escola médio',
     fat_kedu:'Fat. Kedu',     fat_kedu_med:'Fat. Kedu médio',
-    taxa:'Taxa Média',       ticket:'Ticket Médio',    spread:'Spread Médio',
+    taxa:'Taxa Média',        ticket:'Ticket Médio',     spread:'Spread Médio',
+    inadim:'Inadimplência Prev.', alunos:'Total Alunos',
+    unidades:'Total Unidades',    confessional:'% Confessional',
     margem_med:'Média de Margem', margem_rs:'Margem geral',
-    margem_gp:'Margem GP',    margem_og:'Margem Outras',
-    qtd_ctr:'Qtd. Contratos', qtd_escola:'Qtd. Escolas'
+    margem_gp:'Margem GP',        margem_og:'Margem Outras',
+    qtd_ctr:'Qtd. Contratos',     qtd_escola:'Qtd. Escolas'
   };
 
   function aeExtract(cell){
@@ -3811,7 +3823,11 @@ function toggleTheme(){
       case 'fat_escola_med': return cell.ctr>0?cell.fat_e/cell.ctr:0;
       case 'fat_kedu':       return cell.fat;
       case 'fat_kedu_med':   return cell.ctr>0?cell.fat/cell.ctr:0;
-      case 'taxa':           return cell.fat_e>0?cell.fat/cell.fat_e:null;
+      case 'taxa':           return cell.taxa_d>0?cell.taxa_n/cell.taxa_d:null;
+      case 'inadim':         return cell.inadim_d>0?cell.inadim_n/cell.inadim_d:null;
+      case 'alunos':         return cell.alunos_s;
+      case 'unidades':       return cell.unidades_s;
+      case 'confessional':   return cell.ctr>0?(cell.confessional_s/cell.ctr*100):null;
       case 'ticket':         return cell.tk_d>0?cell.tk_n/cell.tk_d:null;
       case 'spread':         return cell.sp_d>0?cell.sp_n/cell.sp_d:null;
       case 'margem_med':     return cell.mg_d>0?(cell.mg_n/cell.mg_d*100):null;
@@ -3825,7 +3841,11 @@ function toggleTheme(){
   }
   function aeFmt(v){
     if(v===null||v===undefined||isNaN(v)) return '—';
-    if(AE_QTD_KPIS.includes(aeKpi)) return Math.round(v)+(aeKpi==='qtd_ctr'?' contratos':' escolas');
+    if(aeKpi==='qtd_ctr')    return Math.round(v)+' ctr';
+    if(aeKpi==='qtd_escola') return Math.round(v)+' escola'+(v!==1?'s':'');
+    if(aeKpi==='alunos')     return Math.round(v).toLocaleString('pt-BR')+' alunos';
+    if(aeKpi==='unidades')   return Math.round(v)+' unid.';
+    if(AE_QTD_KPIS.includes(aeKpi)) return Math.round(v);
     if(AE_PCT_KPIS.includes(aeKpi)) return v.toFixed(2)+'%';
     return 'R$ '+Math.round(v).toLocaleString('pt-BR');
   }
@@ -3865,12 +3885,13 @@ function toggleTheme(){
           if(isGP){c.mg_n_gp+=(r.margem_rs||0);c.mg_d_gp+=(r.garantido||0);}
           else    {c.mg_n_og+=(r.margem_rs||0);c.mg_d_og+=(r.garantido||0);}
         }
-        if(r.spread!=null&&r.fat_escola!=null&&r.fat_escola>0){
-          c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);
-        }
-        if(r.ticket_medio!=null&&r.ticket_medio>0&&r.alunos!=null&&r.alunos>0){
-          c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);
-        }
+        if(r.spread!=null&&(r.fat_escola||0)>0){c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);}
+        if(r.ticket_medio>0&&(r.alunos||0)>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
+        if(r.taxa!=null&&(r.fat_escola||0)>0){c.taxa_n+=r.taxa*(r.fat_escola||0);c.taxa_d+=(r.fat_escola||0);}
+        if(r.inadimplencia_prevista!=null&&(r.fat_escola||0)>0){c.inadim_n+=r.inadimplencia_prevista*(r.fat_escola||0);c.inadim_d+=(r.fat_escola||0);}
+        c.alunos_s+=(r.alunos||0);
+        c.unidades_s+=(r.unidades||1);
+        c.confessional_s+=(r.confessional||0);
         if(r.escola) c.escolas.add(r.escola);
         if(r.num)    c.nums.add(r.num);
       });
@@ -4435,12 +4456,14 @@ window.triggerMBDownload = function(name){
   let kpMeses=new Set();
   let kpChart=null;
 
-  const KP_PCT=['taxa','ticket','spread','margem_med','margem_gp','margem_og'];
-  const KP_QTD=['qtd_ctr','qtd_escola'];
+  const KP_PCT=['taxa','ticket','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
+  const KP_QTD=['qtd_ctr','qtd_escola','alunos','unidades'];
   const KP_LABELS={
     fat_escola:'Fat. Escola',fat_escola_med:'Fat. Escola médio',
     fat_kedu:'Fat. Kedu',fat_kedu_med:'Fat. Kedu médio',
     taxa:'Taxa Média',ticket:'Ticket Médio',spread:'Spread Médio',
+    inadim:'Inadimplência Prev.',alunos:'Total Alunos',
+    unidades:'Total Unidades',confessional:'% Confessional',
     margem_med:'Média de Margem',margem_rs:'Margem geral',
     margem_gp:'Margem GP',margem_og:'Margem Outras',
     qtd_ctr:'Qtd. Contratos',qtd_escola:'Qtd. Escolas'
@@ -4452,17 +4475,24 @@ window.triggerMBDownload = function(name){
   function kpAccum(records){
     const c={fat:0,fat_e:0,ctr:0,mg_n:0,mg_d:0,mg_n_gp:0,mg_d_gp:0,
              mg_n_og:0,mg_d_og:0,sp_n:0,sp_d:0,tk_n:0,tk_d:0,
+             taxa_n:0,taxa_d:0,inadim_n:0,inadim_d:0,
+             alunos_s:0,unidades_s:0,confessional_s:0,
              escolas:new Set(),nums:new Set()};
     records.forEach(r=>{
       c.fat+=(r.fat_kedu||0);c.fat_e+=(r.fat_escola||0);c.ctr+=1;
       const isGP=String(r.modelo||'').trim()==='Garantia Prevista';
-      if(r.margem_rs!=null&&r.garantido>0){
+      if(r.margem_rs!=null&&(r.garantido||0)>0){
         c.mg_n+=(r.margem_rs||0);c.mg_d+=(r.garantido||0);
         if(isGP){c.mg_n_gp+=(r.margem_rs||0);c.mg_d_gp+=(r.garantido||0);}
         else{c.mg_n_og+=(r.margem_rs||0);c.mg_d_og+=(r.garantido||0);}
       }
       if(r.spread!=null&&(r.fat_escola||0)>0){c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);}
-      if(r.ticket_medio>0&&(r.alunos||0)>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
+      if((r.ticket_medio||0)>0&&(r.alunos||0)>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
+      if(r.taxa!=null&&(r.fat_escola||0)>0){c.taxa_n+=r.taxa*(r.fat_escola||0);c.taxa_d+=(r.fat_escola||0);}
+      if(r.inadimplencia_prevista!=null&&(r.fat_escola||0)>0){c.inadim_n+=r.inadimplencia_prevista*(r.fat_escola||0);c.inadim_d+=(r.fat_escola||0);}
+      c.alunos_s+=(r.alunos||0);
+      c.unidades_s+=(r.unidades||1);
+      c.confessional_s+=(r.confessional||0);
       if(r.escola) c.escolas.add(r.escola);
       if(r.num)    c.nums.add(r.num);
     });
@@ -4476,22 +4506,30 @@ window.triggerMBDownload = function(name){
       case 'fat_escola_med': return c.ctr>0?c.fat_e/c.ctr:null;
       case 'fat_kedu':       return c.fat;
       case 'fat_kedu_med':   return c.ctr>0?c.fat/c.ctr:null;
-      case 'taxa':           return c.fat_e>0?c.fat/c.fat_e:null;
+      case 'taxa':           return c.taxa_d>0?c.taxa_n/c.taxa_d:null;
       case 'ticket':         return c.tk_d>0?c.tk_n/c.tk_d:null;
       case 'spread':         return c.sp_d>0?c.sp_n/c.sp_d:null;
+      case 'inadim':         return c.inadim_d>0?c.inadim_n/c.inadim_d:null;
+      case 'alunos':         return c.alunos_s;
+      case 'unidades':       return c.unidades_s;
+      case 'confessional':   return c.ctr>0?(c.confessional_s/c.ctr*100):null;
       case 'margem_med':     return c.mg_d>0?(c.mg_n/c.mg_d*100):null;
       case 'margem_rs':      return c.mg_n;
       case 'margem_gp':      return c.mg_d_gp>0?(c.mg_n_gp/c.mg_d_gp*100):null;
       case 'margem_og':      return c.mg_d_og>0?(c.mg_n_og/c.mg_d_og*100):null;
       case 'qtd_ctr':        return c.nums.size;
-      case 'qtd_escola':     return c.escolas.size;
+      case 'qtd_escola':     return c.unidades_s||c.escolas.size;
       default:               return c.fat;
     }
   }
 
   function kpFmt(v,kpi){
     if(v===null||v===undefined||isNaN(v)) return '—';
-    if(KP_QTD.includes(kpi)) return Math.round(v)+(kpi==='qtd_ctr'?' ctr':' esc.');
+    if(kpi==='qtd_ctr')    return Math.round(v)+' ctr';
+    if(kpi==='qtd_escola') return Math.round(v)+' esc.';
+    if(kpi==='alunos')     return Math.round(v).toLocaleString('pt-BR')+' al.';
+    if(kpi==='unidades')   return Math.round(v)+' unid.';
+    if(KP_QTD.includes(kpi)) return Math.round(v);
     if(KP_PCT.includes(kpi)) return v.toFixed(2)+'%';
     if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M';
     if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1)+'k';
@@ -4593,9 +4631,11 @@ window.triggerMBDownload = function(name){
     }
 
     // ── Regional summary cards ───────────────────────────────
+    const regs=['Regional 1','Regional 2'];
     const regCards=regs.map(reg=>{
       const clr=REG_COLORS[reg];
-      const allRecs=RAW.filter(r=>{
+      const _gd=typeof applyFilters==='function'?applyFilters():RAW;
+      const allRecs=_gd.filter(r=>{
         if(!r.assinatura) return false;
         const yr=parseInt(r.assinatura.slice(0,4));
         const mo=parseInt(r.assinatura.slice(5,7));
@@ -4621,7 +4661,8 @@ window.triggerMBDownload = function(name){
     }).join('');
 
     // ── Executivo ranking ────────────────────────────────────
-    const execNames=[...new Set(RAW.filter(r=>{
+    const _gd2=typeof applyFilters==='function'?applyFilters():RAW;
+    const execNames=[...new Set(_gd2.filter(r=>{
       if(!r.assinatura) return false;
       const yr=parseInt(r.assinatura.slice(0,4));
       const mo=parseInt(r.assinatura.slice(5,7));
@@ -4631,7 +4672,7 @@ window.triggerMBDownload = function(name){
     const execRows=execNames.map(nome=>{
       const cargo=(TEAM[nome]&&TEAM[nome].cargo)||'—';
       const clr=CARGO_COLORS[cargo]||'var(--accent)';
-      const recs=RAW.filter(r=>{
+      const recs=(_gd2||RAW).filter(r=>{
         if(!r.assinatura||r.executivo!==nome) return false;
         const yr=parseInt(r.assinatura.slice(0,4));
         const mo=parseInt(r.assinatura.slice(5,7));
