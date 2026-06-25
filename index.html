@@ -3803,7 +3803,7 @@ function toggleTheme(){
     aeBuildDrop('ae-executivos', execs, aeExecs, null, 'executivos', 'Executivos');
   };
 
-  const AE_PCT_KPIS  = ['taxa','ticket','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
+  const AE_PCT_KPIS  = ['taxa','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
   const AE_QTD_KPIS  = ['qtd_ctr','qtd_escola','alunos','unidades'];
   const AE_KPI_LABELS = {
     fat_escola:'Fat. Escola', fat_escola_med:'Fat. Escola médio',
@@ -3823,13 +3823,13 @@ function toggleTheme(){
       case 'fat_escola_med': return cell.ctr>0?cell.fat_e/cell.ctr:0;
       case 'fat_kedu':       return cell.fat;
       case 'fat_kedu_med':   return cell.ctr>0?cell.fat/cell.ctr:0;
-      case 'taxa':           return cell.taxa_d>0?cell.taxa_n/cell.taxa_d:null;
-      case 'inadim':         return cell.inadim_d>0?cell.inadim_n/cell.inadim_d:null;
+      case 'taxa':           return cell.taxa_d>0?cell.taxa_n/cell.taxa_d*100:null;
+      case 'inadim':         return cell.inadim_d>0?cell.inadim_n/cell.inadim_d*100:null;
       case 'alunos':         return cell.alunos_s;
       case 'unidades':       return cell.unidades_s;
       case 'confessional':   return cell.ctr>0?(cell.confessional_s/cell.ctr*100):null;
       case 'ticket':         return cell.tk_d>0?cell.tk_n/cell.tk_d:null;
-      case 'spread':         return cell.sp_d>0?cell.sp_n/cell.sp_d:null;
+      case 'spread':         return cell.sp_d>0?cell.sp_n/cell.sp_d*100:null;
       case 'margem_med':     return cell.mg_d>0?(cell.mg_n/cell.mg_d*100):null;
       case 'margem_rs':      return cell.mg_n;
       case 'margem_gp':      return cell.mg_d_gp>0?(cell.mg_n_gp/cell.mg_d_gp*100):null;
@@ -3847,6 +3847,9 @@ function toggleTheme(){
     if(aeKpi==='unidades')   return Math.round(v)+' unid.';
     if(AE_QTD_KPIS.includes(aeKpi)) return Math.round(v);
     if(AE_PCT_KPIS.includes(aeKpi)) return v.toFixed(2)+'%';
+    // R$ KPIs: fat_escola, fat_kedu, medians, ticket, margem_rs
+    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M';
+    if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1)+'k';
     return 'R$ '+Math.round(v).toLocaleString('pt-BR');
   }
   function aeAgg(){
@@ -4456,7 +4459,7 @@ window.triggerMBDownload = function(name){
   let kpMeses=new Set();
   let kpChart=null;
 
-  const KP_PCT=['taxa','ticket','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
+  const KP_PCT=['taxa','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
   const KP_QTD=['qtd_ctr','qtd_escola','alunos','unidades'];
   const KP_LABELS={
     fat_escola:'Fat. Escola',fat_escola_med:'Fat. Escola médio',
@@ -4506,10 +4509,10 @@ window.triggerMBDownload = function(name){
       case 'fat_escola_med': return c.ctr>0?c.fat_e/c.ctr:null;
       case 'fat_kedu':       return c.fat;
       case 'fat_kedu_med':   return c.ctr>0?c.fat/c.ctr:null;
-      case 'taxa':           return c.taxa_d>0?c.taxa_n/c.taxa_d:null;
-      case 'ticket':         return c.tk_d>0?c.tk_n/c.tk_d:null;
-      case 'spread':         return c.sp_d>0?c.sp_n/c.sp_d:null;
-      case 'inadim':         return c.inadim_d>0?c.inadim_n/c.inadim_d:null;
+      case 'taxa':           return c.taxa_d>0?c.taxa_n/c.taxa_d*100:null;
+      case 'ticket':         return c.tk_d>0?c.tk_n/c.tk_d:null;      // R$ value
+      case 'spread':         return c.sp_d>0?c.sp_n/c.sp_d*100:null;
+      case 'inadim':         return c.inadim_d>0?c.inadim_n/c.inadim_d*100:null;
       case 'alunos':         return c.alunos_s;
       case 'unidades':       return c.unidades_s;
       case 'confessional':   return c.ctr>0?(c.confessional_s/c.ctr*100):null;
@@ -4537,9 +4540,10 @@ window.triggerMBDownload = function(name){
   }
 
   function kpTickFmt(v,kpi){
-    if(KP_QTD.includes(kpi)) return v;
+    if(v===null||v===undefined||isNaN(v)) return '';
+    if(KP_QTD.includes(kpi)) return Math.round(v);
     if(KP_PCT.includes(kpi)) return v.toFixed(1)+'%';
-    return v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v;
+    return v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+Math.round(v).toLocaleString('pt-BR');
   }
 
   function kpGetMeses(){
@@ -4621,7 +4625,7 @@ window.triggerMBDownload = function(name){
           scales:{
             x:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'}}},
             y:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'},
-               callback:v=>kpTickFmt(v,kpi)}}
+               callback:v=>(v===null||v===undefined?'':kpTickFmt(v,kpi))}}
           }
         }
       });
