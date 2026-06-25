@@ -315,6 +315,35 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .kpi-section{margin-bottom:20px;}
 
 
+
+/* ── KPI breakdown panel ─────────────────────────────────────── */
+.kp-header{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.kp-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.04em;font-family:'DM Mono',monospace;}
+.kp-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto;}
+.kp-select{height:30px;padding:0 10px;background:var(--card2);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;max-width:220px;}
+.kp-yr-pill{height:28px;padding:0 12px;background:transparent;border:1px solid var(--border2);border-radius:20px;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:.15s;}
+.kp-yr-pill.active{background:rgba(78,205,196,.10);border-color:var(--accent);color:var(--accent);font-weight:700;}
+.kp-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.kp-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.kp-reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.kp-reg-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
+.kp-reg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kp-clr,var(--accent));}
+.kp-reg-name{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:6px;}
+.kp-reg-val{font-size:26px;font-weight:700;color:var(--kp-clr,var(--accent));font-family:'DM Mono',monospace;line-height:1;margin-bottom:3px;}
+.kp-reg-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+.kp-reg-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden;}
+.kp-reg-bar-fill{height:100%;border-radius:2px;background:var(--kp-clr,var(--accent));}
+.kp-exec-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.kp-exec-row:last-child{border-bottom:none;}
+.kp-exec-pos{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;width:20px;flex-shrink:0;text-align:right;}
+.kp-exec-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;border:1.5px solid var(--kp-clr,var(--accent));}
+.kp-exec-info{flex:1;min-width:0;}
+.kp-exec-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kp-exec-cargo{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.kp-exec-val{font-size:13px;font-weight:700;color:var(--kp-clr,var(--accent));font-family:'DM Mono',monospace;flex-shrink:0;white-space:nowrap;}
+.kp-exec-bar-wrap{width:100px;flex-shrink:0;}
+.kp-exec-bar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.kp-exec-bar-fill{height:100%;border-radius:2px;background:var(--kp-clr,var(--accent));}
 /* ── AE KPI selector ─────────────────────────────────────────── */
 .ae-kpi-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border);}
 .ae-kpi-label{font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);flex-shrink:0;}
@@ -1029,7 +1058,51 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
     </div>
     <div id="ae-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;"></div>
   </div>
+
+  <!-- ── KPI Breakdown Panel ─────────────────────────────────── -->
+  <div class="trend-card" id="ae-kpi-panel" style="margin-top:14px;">
+    <div class="kp-header">
+      <div class="kp-title">📊 Visão Geral por KPI</div>
+      <div class="kp-controls">
+        <select id="kp-kpi-sel" class="kp-select" onchange="buildKpiPanel()">
+          <optgroup label="Faturamento">
+            <option value="fat_escola">Fat. Escola</option>
+            <option value="fat_escola_med">Fat. Escola médio</option>
+            <option value="fat_kedu" selected>Fat. Kedu</option>
+            <option value="fat_kedu_med">Fat. Kedu médio</option>
+          </optgroup>
+          <optgroup label="Taxas">
+            <option value="taxa">Taxa Média</option>
+            <option value="ticket">Ticket Médio</option>
+            <option value="spread">Spread Médio</option>
+          </optgroup>
+          <optgroup label="Margem">
+            <option value="margem_med">Média de Margem</option>
+            <option value="margem_rs">Margem geral</option>
+            <option value="margem_gp">Margem Garantia Prevista</option>
+            <option value="margem_og">Margem Outras Garantias</option>
+          </optgroup>
+          <optgroup label="Quantidade">
+            <option value="qtd_ctr">Qtd. Contratos</option>
+            <option value="qtd_escola">Qtd. Escolas</option>
+          </optgroup>
+        </select>
+        <div id="kp-year-pills" style="display:flex;gap:4px;"></div>
+        <div class="ae-drop-wrap" id="kp-mes-wrap">
+          <button class="ae-drop-btn" id="kp-mes-btn" onclick="kpToggleMesDrop(event)" style="height:30px;font-size:12px;padding:0 10px;">
+            <span id="kp-mes-lbl">Meses</span>
+            <svg class="ae-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="ae-drop-list" id="kp-mes-drop" style="display:none;min-width:140px;"></div>
+        </div>
+      </div>
+    </div>
+    <div id="kpi-panel-content">
+      <div style="text-align:center;padding:32px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Carregando...</div>
+    </div>
+  </div>
   </section>
+
 
 </div><!-- /content-panel -->
 </div><!-- /app-shell -->
@@ -4350,6 +4423,235 @@ window.triggerMBDownload = function(name){
     };
   }
 };
+
+
+// ── KPI Breakdown Panel ───────────────────────────────────────────
+(function(){
+  const MONTHS_SHORT_KP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  let kpYears = new Set([2026]);
+  let kpMeses = new Set();
+
+  const KP_PCT  = ['taxa','ticket','spread','margem_med','margem_gp','margem_og'];
+  const KP_QTD  = ['qtd_ctr','qtd_escola'];
+  const KP_LABELS = {
+    fat_escola:'Fat. Escola', fat_escola_med:'Fat. Escola médio',
+    fat_kedu:'Fat. Kedu', fat_kedu_med:'Fat. Kedu médio',
+    taxa:'Taxa Média', ticket:'Ticket Médio', spread:'Spread Médio',
+    margem_med:'Média de Margem', margem_rs:'Margem geral',
+    margem_gp:'Margem GP', margem_og:'Margem Outras',
+    qtd_ctr:'Qtd. Contratos', qtd_escola:'Qtd. Escolas'
+  };
+  const REG_COLORS = {'Regional 1':'#4ECDC4','Regional 2':'#A29BFE'};
+  const CARGO_COLORS = {'Closer':'#52c77d','Inside Sales':'#74b9ff',
+    'Coordenador Comercial':'#FFE66D','Coordenadora Comercial':'#FFE66D'};
+
+  function kpAccum(records){
+    const c={fat:0,fat_e:0,ctr:0,mg_n:0,mg_d:0,mg_n_gp:0,mg_d_gp:0,
+              mg_n_og:0,mg_d_og:0,sp_n:0,sp_d:0,tk_n:0,tk_d:0,
+              escolas:new Set(),nums:new Set()};
+    records.forEach(r=>{
+      c.fat+=(r.fat_kedu||0); c.fat_e+=(r.fat_escola||0); c.ctr+=1;
+      const isGP=String(r.modelo||'').trim()==='Garantia Prevista';
+      if(r.margem_rs!=null&&r.garantido!=null&&r.garantido>0){
+        c.mg_n+=(r.margem_rs||0);c.mg_d+=(r.garantido||0);
+        if(isGP){c.mg_n_gp+=(r.margem_rs||0);c.mg_d_gp+=(r.garantido||0);}
+        else{c.mg_n_og+=(r.margem_rs||0);c.mg_d_og+=(r.garantido||0);}
+      }
+      if(r.spread!=null&&r.fat_escola>0){c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);}
+      if(r.ticket_medio!=null&&r.ticket_medio>0&&r.alunos>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
+      if(r.escola) c.escolas.add(r.escola);
+      if(r.num)    c.nums.add(r.num);
+    });
+    return c;
+  }
+
+  function kpVal(c, kpi){
+    if(!c) return null;
+    switch(kpi){
+      case 'fat_escola':     return c.fat_e;
+      case 'fat_escola_med': return c.ctr>0?c.fat_e/c.ctr:null;
+      case 'fat_kedu':       return c.fat;
+      case 'fat_kedu_med':   return c.ctr>0?c.fat/c.ctr:null;
+      case 'taxa':           return c.fat_e>0?c.fat/c.fat_e:null;
+      case 'ticket':         return c.tk_d>0?c.tk_n/c.tk_d:null;
+      case 'spread':         return c.sp_d>0?c.sp_n/c.sp_d:null;
+      case 'margem_med':     return c.mg_d>0?(c.mg_n/c.mg_d*100):null;
+      case 'margem_rs':      return c.mg_n;
+      case 'margem_gp':      return c.mg_d_gp>0?(c.mg_n_gp/c.mg_d_gp*100):null;
+      case 'margem_og':      return c.mg_d_og>0?(c.mg_n_og/c.mg_d_og*100):null;
+      case 'qtd_ctr':        return c.nums.size;
+      case 'qtd_escola':     return c.escolas.size;
+      default:               return c.fat;
+    }
+  }
+
+  function kpFmt(v, kpi){
+    if(v===null||v===undefined||isNaN(v)) return '—';
+    if(KP_QTD.includes(kpi)) return Math.round(v)+(kpi==='qtd_ctr'?' ctr':' esc.');
+    if(KP_PCT.includes(kpi)) return v.toFixed(2)+'%';
+    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M';
+    if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1)+'k';
+    return 'R$ '+Math.round(v).toLocaleString('pt-BR');
+  }
+
+  function kpFilter(){
+    const mList=kpMeses.size>0?[...kpMeses]:null;
+    return RAW.filter(r=>{
+      if(!r.assinatura) return false;
+      const yr=parseInt(r.assinatura.slice(0,4));
+      const mo=parseInt(r.assinatura.slice(5,7));
+      if(!kpYears.has(yr)) return false;
+      if(mList&&!mList.includes(mo)) return false;
+      return true;
+    });
+  }
+
+  window.buildKpiPanel = function(){
+    const kpi = document.getElementById('kp-kpi-sel')?.value || 'fat_kedu';
+    const el  = document.getElementById('kpi-panel-content');
+    if(!el) return;
+
+    const data = kpFilter();
+    if(!data.length){
+      el.innerHTML='<div style="text-align:center;padding:28px;font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;">Sem dados para o período selecionado.</div>';
+      return;
+    }
+
+    // ── Regional breakdown ──────────────────────────────────────
+    const regs=['Regional 1','Regional 2'];
+    const regData = regs.map(reg=>({
+      reg, clr:REG_COLORS[reg]||'var(--accent)',
+      cell: kpAccum(data.filter(r=>r.lideranca===reg))
+    }));
+    const regVals = regData.map(r=>kpVal(r.cell,kpi)??0);
+    const maxReg  = Math.max(...regVals,1);
+
+    const regHtml = regData.map((r,i)=>{
+      const v=regVals[i], pct=Math.round(v/maxReg*100);
+      const execN=new Set(data.filter(d=>d.lideranca===r.reg&&d.executivo).map(d=>d.executivo)).size;
+      return '<div class="kp-reg-card" style="--kp-clr:'+r.clr+';">'+
+        '<div class="kp-reg-name">'+r.reg+'</div>'+
+        '<div class="kp-reg-val">'+kpFmt(v,kpi)+'</div>'+
+        '<div class="kp-reg-sub">'+execN+' executivo'+(execN!==1?'s':'')+'</div>'+
+        '<div class="kp-reg-bar"><div class="kp-reg-bar-fill" style="width:'+pct+'%;"></div></div>'+
+      '</div>';
+    }).join('');
+
+    // ── Executivo breakdown ─────────────────────────────────────
+    const execNames=[...new Set(data.map(r=>r.executivo).filter(Boolean))];
+    const execData = execNames.map(nome=>{
+      const cargo=(TEAM[nome]&&TEAM[nome].cargo)||'—';
+      const clr=CARGO_COLORS[cargo]||'var(--accent)';
+      const cell=kpAccum(data.filter(r=>r.executivo===nome));
+      const v=kpVal(cell,kpi)??0;
+      return {nome,cargo,clr,v};
+    }).filter(e=>e.v>0).sort((a,b)=>b.v-a.v);
+
+    const maxExec = execData.reduce((m,e)=>Math.max(m,e.v),1);
+
+    const execHtml = execData.map((e,i)=>{
+      const barW=Math.round(e.v/maxExec*100);
+      const ini=e.nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const nShort=e.nome.split(' ').slice(0,2).join(' ');
+      const cShort=e.cargo.replace('Coordenador Comercial','Coord.').replace('Coordenadora Comercial','Coord.');
+      return '<div class="kp-exec-row">'+
+        '<span class="kp-exec-pos">'+(i+1)+'</span>'+
+        '<div class="kp-exec-av" style="background:'+e.clr+'22;color:'+e.clr+';border-color:'+e.clr+';">'+ini+'</div>'+
+        '<div class="kp-exec-info">'+
+          '<div class="kp-exec-name">'+nShort+'</div>'+
+          '<div class="kp-exec-cargo">'+cShort+'</div>'+
+        '</div>'+
+        '<div class="kp-exec-val">'+kpFmt(e.v,kpi)+'</div>'+
+        '<div class="kp-exec-bar-wrap">'+
+          '<div class="kp-exec-bar-track"><div class="kp-exec-bar-fill" style="width:'+barW+'%;background:'+e.clr+';"></div></div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    const kpiLabel=KP_LABELS[kpi]||kpi;
+    el.innerHTML=
+      '<div class="kp-section-label">Por Regional</div>'+
+      '<div class="kp-reg-grid">'+regHtml+'</div>'+
+      '<div class="kp-section-label">Por Executivo · '+kpiLabel+'</div>'+
+      '<div>'+execHtml+'</div>';
+  };
+
+  // ── Year pills ───────────────────────────────────────────────
+  function buildKpYearPills(){
+    const wrap=document.getElementById('kp-year-pills');
+    if(!wrap) return;
+    const anos=[...new Set(RAW.map(r=>r.assinatura&&parseInt(r.assinatura.slice(0,4))).filter(Boolean))].sort();
+    wrap.innerHTML=anos.map(yr=>
+      '<button class="kp-yr-pill'+(kpYears.has(yr)?' active':'')+'" onclick="kpToggleYear('+yr+',this)">'+yr+'</button>'
+    ).join('');
+  }
+
+  window.kpToggleYear=function(yr,btn){
+    kpYears.has(yr)?kpYears.delete(yr):kpYears.add(yr);
+    if(!kpYears.size) kpYears.add(yr); // always keep at least one
+    btn.classList.toggle('active',kpYears.has(yr));
+    buildKpiPanel();
+  };
+
+  // ── Month dropdown ───────────────────────────────────────────
+  function buildKpMesDrop(){
+    const drop=document.getElementById('kp-mes-drop');
+    if(!drop) return;
+    drop.innerHTML='<div class="ae-drop-list-header"><span>Meses</span><button onclick="kpClearMeses()">limpar</button></div>';
+    MONTHS_SHORT_KP.forEach((m,i)=>{
+      const n=i+1, checked=kpMeses.has(n);
+      const item=document.createElement('div');
+      item.className='ae-item'+(checked?' checked':'');
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=checked;
+      const lbl=document.createElement('span'); lbl.textContent=m;
+      item.appendChild(cb); item.appendChild(lbl);
+      item.onclick=e=>{
+        e.stopPropagation();
+        kpMeses.has(n)?kpMeses.delete(n):kpMeses.add(n);
+        item.classList.toggle('checked',kpMeses.has(n)); cb.checked=kpMeses.has(n);
+        kpUpdateMesBtn(); buildKpiPanel();
+      };
+      drop.appendChild(item);
+    });
+  }
+
+  function kpUpdateMesBtn(){
+    const lbl=document.getElementById('kp-mes-lbl');
+    const btn=document.getElementById('kp-mes-btn');
+    if(!lbl) return;
+    lbl.textContent=kpMeses.size===0?'Meses':MONTHS_SHORT_KP.filter((_,i)=>kpMeses.has(i+1)).join(', ');
+    if(btn) btn.classList.toggle('has-sel',kpMeses.size>0);
+  }
+
+  window.kpClearMeses=function(){ kpMeses.clear(); kpUpdateMesBtn(); buildKpiPanel(); };
+
+  window.kpToggleMesDrop=function(e){
+    e.stopPropagation();
+    const drop=document.getElementById('kp-mes-drop');
+    const isOpen=drop.style.display!=='none';
+    document.querySelectorAll('.ae-drop-list').forEach(d=>d.style.display='none');
+    drop.style.display=isOpen?'none':'';
+    if(!isOpen) buildKpMesDrop();
+  };
+
+  document.addEventListener('click',function(){
+    const d=document.getElementById('kp-mes-drop');
+    if(d) d.style.display='none';
+  });
+
+  // Init after data loads
+  const _origLoad = window.onDataLoad || (()=>{});
+  function kpInit(){
+    buildKpYearPills();
+    buildKpiPanel();
+  }
+  // Hook into update cycle
+  const _kpOrigUpdate=window.update;
+  if(typeof _kpOrigUpdate==='function'){
+    window.update=function(){_kpOrigUpdate.apply(this,arguments);buildKpiPanel();};
+  }
+  setTimeout(kpInit, 600);
+})();
 
 </script>
 
