@@ -1097,9 +1097,12 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         </div>
       </div>
     </div>
-    <div id="kpi-panel-content">
-      <div style="text-align:center;padding:32px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Carregando...</div>
+    <!-- Chart -->
+    <div style="position:relative;height:220px;margin-bottom:20px;">
+      <canvas id="kp-chart"></canvas>
     </div>
+    <!-- Below chart -->
+    <div id="kpi-panel-content"></div>
   </div>
   </section>
 
@@ -4427,45 +4430,46 @@ window.triggerMBDownload = function(name){
 
 // ── KPI Breakdown Panel ───────────────────────────────────────────
 (function(){
-  const MONTHS_SHORT_KP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  let kpYears = new Set([2026]);
-  let kpMeses = new Set();
+  const MO_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  let kpYears=new Set([2026]);
+  let kpMeses=new Set();
+  let kpChart=null;
 
-  const KP_PCT  = ['taxa','ticket','spread','margem_med','margem_gp','margem_og'];
-  const KP_QTD  = ['qtd_ctr','qtd_escola'];
-  const KP_LABELS = {
-    fat_escola:'Fat. Escola', fat_escola_med:'Fat. Escola médio',
-    fat_kedu:'Fat. Kedu', fat_kedu_med:'Fat. Kedu médio',
-    taxa:'Taxa Média', ticket:'Ticket Médio', spread:'Spread Médio',
-    margem_med:'Média de Margem', margem_rs:'Margem geral',
-    margem_gp:'Margem GP', margem_og:'Margem Outras',
-    qtd_ctr:'Qtd. Contratos', qtd_escola:'Qtd. Escolas'
+  const KP_PCT=['taxa','ticket','spread','margem_med','margem_gp','margem_og'];
+  const KP_QTD=['qtd_ctr','qtd_escola'];
+  const KP_LABELS={
+    fat_escola:'Fat. Escola',fat_escola_med:'Fat. Escola médio',
+    fat_kedu:'Fat. Kedu',fat_kedu_med:'Fat. Kedu médio',
+    taxa:'Taxa Média',ticket:'Ticket Médio',spread:'Spread Médio',
+    margem_med:'Média de Margem',margem_rs:'Margem geral',
+    margem_gp:'Margem GP',margem_og:'Margem Outras',
+    qtd_ctr:'Qtd. Contratos',qtd_escola:'Qtd. Escolas'
   };
-  const REG_COLORS = {'Regional 1':'#4ECDC4','Regional 2':'#A29BFE'};
-  const CARGO_COLORS = {'Closer':'#52c77d','Inside Sales':'#74b9ff',
+  const REG_COLORS={'Regional 1':'#4ECDC4','Regional 2':'#A29BFE'};
+  const CARGO_COLORS={'Closer':'#52c77d','Inside Sales':'#74b9ff',
     'Coordenador Comercial':'#FFE66D','Coordenadora Comercial':'#FFE66D'};
 
   function kpAccum(records){
     const c={fat:0,fat_e:0,ctr:0,mg_n:0,mg_d:0,mg_n_gp:0,mg_d_gp:0,
-              mg_n_og:0,mg_d_og:0,sp_n:0,sp_d:0,tk_n:0,tk_d:0,
-              escolas:new Set(),nums:new Set()};
+             mg_n_og:0,mg_d_og:0,sp_n:0,sp_d:0,tk_n:0,tk_d:0,
+             escolas:new Set(),nums:new Set()};
     records.forEach(r=>{
-      c.fat+=(r.fat_kedu||0); c.fat_e+=(r.fat_escola||0); c.ctr+=1;
+      c.fat+=(r.fat_kedu||0);c.fat_e+=(r.fat_escola||0);c.ctr+=1;
       const isGP=String(r.modelo||'').trim()==='Garantia Prevista';
-      if(r.margem_rs!=null&&r.garantido!=null&&r.garantido>0){
+      if(r.margem_rs!=null&&r.garantido>0){
         c.mg_n+=(r.margem_rs||0);c.mg_d+=(r.garantido||0);
         if(isGP){c.mg_n_gp+=(r.margem_rs||0);c.mg_d_gp+=(r.garantido||0);}
         else{c.mg_n_og+=(r.margem_rs||0);c.mg_d_og+=(r.garantido||0);}
       }
-      if(r.spread!=null&&r.fat_escola>0){c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);}
-      if(r.ticket_medio!=null&&r.ticket_medio>0&&r.alunos>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
+      if(r.spread!=null&&(r.fat_escola||0)>0){c.sp_n+=r.spread*(r.fat_escola||0);c.sp_d+=(r.fat_escola||0);}
+      if(r.ticket_medio>0&&(r.alunos||0)>0){c.tk_n+=r.ticket_medio*(r.alunos||0);c.tk_d+=(r.alunos||0);}
       if(r.escola) c.escolas.add(r.escola);
       if(r.num)    c.nums.add(r.num);
     });
     return c;
   }
 
-  function kpVal(c, kpi){
+  function kpVal(c,kpi){
     if(!c) return null;
     switch(kpi){
       case 'fat_escola':     return c.fat_e;
@@ -4485,7 +4489,7 @@ window.triggerMBDownload = function(name){
     }
   }
 
-  function kpFmt(v, kpi){
+  function kpFmt(v,kpi){
     if(v===null||v===undefined||isNaN(v)) return '—';
     if(KP_QTD.includes(kpi)) return Math.round(v)+(kpi==='qtd_ctr'?' ctr':' esc.');
     if(KP_PCT.includes(kpi)) return v.toFixed(2)+'%';
@@ -4494,62 +4498,151 @@ window.triggerMBDownload = function(name){
     return 'R$ '+Math.round(v).toLocaleString('pt-BR');
   }
 
-  function kpFilter(){
-    const mList=kpMeses.size>0?[...kpMeses]:null;
-    return RAW.filter(r=>{
-      if(!r.assinatura) return false;
-      const yr=parseInt(r.assinatura.slice(0,4));
-      const mo=parseInt(r.assinatura.slice(5,7));
-      if(!kpYears.has(yr)) return false;
-      if(mList&&!mList.includes(mo)) return false;
-      return true;
-    });
+  function kpTickFmt(v,kpi){
+    if(KP_QTD.includes(kpi)) return v;
+    if(KP_PCT.includes(kpi)) return v.toFixed(1)+'%';
+    return v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v;
   }
 
-  window.buildKpiPanel = function(){
-    const kpi = document.getElementById('kp-kpi-sel')?.value || 'fat_kedu';
-    const el  = document.getElementById('kpi-panel-content');
+  function kpGetMeses(){
+    const anos=[...kpYears].sort();
+    const today=new Date();
+    const allMo=kpMeses.size>0?[...kpMeses].sort():Array.from({length:12},(_,i)=>i+1);
+    // Build {yr, mo} pairs
+    const pairs=[];
+    anos.forEach(yr=>{
+      allMo.forEach(mo=>{
+        if(yr===today.getFullYear()&&mo>today.getMonth()+1) return;
+        pairs.push({yr,mo});
+      });
+    });
+    return pairs;
+  }
+
+  window.buildKpiPanel=function(){
+    const kpi=document.getElementById('kp-kpi-sel')?.value||'fat_kedu';
+    const kpiLabel=KP_LABELS[kpi]||kpi;
+    const pairs=kpGetMeses();
+    const anos=[...kpYears].sort();
+    const el=document.getElementById('kpi-panel-content');
     if(!el) return;
 
-    const data = kpFilter();
-    if(!data.length){
-      el.innerHTML='<div style="text-align:center;padding:28px;font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;">Sem dados para o período selecionado.</div>';
-      return;
+    // ── Build datasets: one per Year (total) ────────────────
+    const YR_CLR={2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
+    const datasets=[];
+    const multiYr=anos.length>1;
+    const moList=kpMeses.size>0?[...kpMeses].sort():Array.from({length:12},(_,i)=>i+1);
+
+    anos.forEach(yr=>{
+      const clr=YR_CLR[yr]||'var(--accent)';
+      const dataPoints=moList.map(mo=>{
+        const today=new Date();
+        if(yr===today.getFullYear()&&mo>today.getMonth()+1) return null;
+        const recs=RAW.filter(r=>{
+          if(!r.assinatura) return false;
+          const ry=parseInt(r.assinatura.slice(0,4));
+          const rm=parseInt(r.assinatura.slice(5,7));
+          return ry===yr&&rm===mo;
+        });
+        const v=kpVal(kpAccum(recs),kpi);
+        return v===null?null:(v||0);
+      });
+      if(!dataPoints.some(v=>v!==null&&v>0)) return;
+      datasets.push({
+        label:String(yr),
+        data:dataPoints,
+        borderColor:clr,
+        backgroundColor:clr+'22',
+        borderWidth:2.5,
+        pointBackgroundColor:clr,
+        pointRadius:3.5,pointHoverRadius:6,
+        tension:.4,fill:false,spanGaps:false
+      });
+    });
+
+    // ── Labels for X axis (months only) ──────────────────────
+    const labels=moList.map(mo=>MO_SHORT[mo-1]);
+
+    // ── Chart ────────────────────────────────────────────────
+    const canvas=document.getElementById('kp-chart');
+    if(kpChart){kpChart.destroy();kpChart=null;}
+    if(canvas && datasets.length){
+      const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+      const gridClr=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+      const textClr=isDark?'#5a6a82':'#8892a0';
+      kpChart=new Chart(canvas.getContext('2d'),{
+        type:'line',
+        data:{labels,datasets},
+        options:{
+          responsive:true,maintainAspectRatio:false,animation:{duration:300},
+          interaction:{mode:'index',intersect:false},
+          plugins:{
+            legend:{display:true,position:'top',labels:{color:textClr,font:{size:11,family:'DM Mono'},boxWidth:12,padding:16}},
+            tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+kpTickFmt(ctx.parsed.y,kpi)}}
+          },
+          scales:{
+            x:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'}}},
+            y:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'},
+               callback:v=>kpTickFmt(v,kpi)}}
+          }
+        }
+      });
+    } else if(canvas){
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
     }
 
-    // ── Regional breakdown ──────────────────────────────────────
-    const regs=['Regional 1','Regional 2'];
-    const regData = regs.map(reg=>({
-      reg, clr:REG_COLORS[reg]||'var(--accent)',
-      cell: kpAccum(data.filter(r=>r.lideranca===reg))
-    }));
-    const regVals = regData.map(r=>kpVal(r.cell,kpi)??0);
-    const maxReg  = Math.max(...regVals,1);
-
-    const regHtml = regData.map((r,i)=>{
-      const v=regVals[i], pct=Math.round(v/maxReg*100);
-      const execN=new Set(data.filter(d=>d.lideranca===r.reg&&d.executivo).map(d=>d.executivo)).size;
-      return '<div class="kp-reg-card" style="--kp-clr:'+r.clr+';">'+
-        '<div class="kp-reg-name">'+r.reg+'</div>'+
+    // ── Regional summary cards ───────────────────────────────
+    const regCards=regs.map(reg=>{
+      const clr=REG_COLORS[reg];
+      const allRecs=RAW.filter(r=>{
+        if(!r.assinatura) return false;
+        const yr=parseInt(r.assinatura.slice(0,4));
+        const mo=parseInt(r.assinatura.slice(5,7));
+        if(!kpYears.has(yr)) return false;
+        if(kpMeses.size>0&&!kpMeses.has(mo)) return false;
+        return r.lideranca===reg;
+      });
+      const cell=kpAccum(allRecs);
+      const v=kpVal(cell,kpi);
+      const execN=new Set(allRecs.filter(r=>r.executivo).map(r=>r.executivo)).size;
+      const pct=0; // computed below
+      return {reg,clr,v,execN,cell};
+    });
+    const maxReg=Math.max(...regCards.map(r=>r.v??0),1);
+    const regHtml=regCards.map(({reg,clr,v,execN})=>{
+      const barW=Math.round((v??0)/maxReg*100);
+      return '<div class="kp-reg-card" style="--kp-clr:'+clr+';">'+
+        '<div class="kp-reg-name">'+reg+'</div>'+
         '<div class="kp-reg-val">'+kpFmt(v,kpi)+'</div>'+
         '<div class="kp-reg-sub">'+execN+' executivo'+(execN!==1?'s':'')+'</div>'+
-        '<div class="kp-reg-bar"><div class="kp-reg-bar-fill" style="width:'+pct+'%;"></div></div>'+
+        '<div class="kp-reg-bar"><div class="kp-reg-bar-fill" style="width:'+barW+'%;"></div></div>'+
       '</div>';
     }).join('');
 
-    // ── Executivo breakdown ─────────────────────────────────────
-    const execNames=[...new Set(data.map(r=>r.executivo).filter(Boolean))];
-    const execData = execNames.map(nome=>{
+    // ── Executivo ranking ────────────────────────────────────
+    const execNames=[...new Set(RAW.filter(r=>{
+      if(!r.assinatura) return false;
+      const yr=parseInt(r.assinatura.slice(0,4));
+      const mo=parseInt(r.assinatura.slice(5,7));
+      return kpYears.has(yr)&&(kpMeses.size===0||kpMeses.has(mo))&&r.executivo;
+    }).map(r=>r.executivo))];
+
+    const execRows=execNames.map(nome=>{
       const cargo=(TEAM[nome]&&TEAM[nome].cargo)||'—';
       const clr=CARGO_COLORS[cargo]||'var(--accent)';
-      const cell=kpAccum(data.filter(r=>r.executivo===nome));
-      const v=kpVal(cell,kpi)??0;
-      return {nome,cargo,clr,v};
+      const recs=RAW.filter(r=>{
+        if(!r.assinatura||r.executivo!==nome) return false;
+        const yr=parseInt(r.assinatura.slice(0,4));
+        const mo=parseInt(r.assinatura.slice(5,7));
+        return kpYears.has(yr)&&(kpMeses.size===0||kpMeses.has(mo));
+      });
+      const v=kpVal(kpAccum(recs),kpi);
+      return {nome,cargo,clr,v:v??0};
     }).filter(e=>e.v>0).sort((a,b)=>b.v-a.v);
 
-    const maxExec = execData.reduce((m,e)=>Math.max(m,e.v),1);
-
-    const execHtml = execData.map((e,i)=>{
+    const maxExec=Math.max(...execRows.map(e=>e.v),1);
+    const execHtml=execRows.map((e,i)=>{
       const barW=Math.round(e.v/maxExec*100);
       const ini=e.nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
       const nShort=e.nome.split(' ').slice(0,2).join(' ');
@@ -4562,21 +4655,18 @@ window.triggerMBDownload = function(name){
           '<div class="kp-exec-cargo">'+cShort+'</div>'+
         '</div>'+
         '<div class="kp-exec-val">'+kpFmt(e.v,kpi)+'</div>'+
-        '<div class="kp-exec-bar-wrap">'+
-          '<div class="kp-exec-bar-track"><div class="kp-exec-bar-fill" style="width:'+barW+'%;background:'+e.clr+';"></div></div>'+
-        '</div>'+
+        '<div class="kp-exec-bar-wrap"><div class="kp-exec-bar-track"><div class="kp-exec-bar-fill" style="width:'+barW+'%;background:'+e.clr+';"></div></div></div>'+
       '</div>';
     }).join('');
 
-    const kpiLabel=KP_LABELS[kpi]||kpi;
     el.innerHTML=
-      '<div class="kp-section-label">Por Regional</div>'+
+      '<div class="kp-section-label" style="margin-bottom:10px;">Por Regional · '+kpiLabel+'</div>'+
       '<div class="kp-reg-grid">'+regHtml+'</div>'+
-      '<div class="kp-section-label">Por Executivo · '+kpiLabel+'</div>'+
+      '<div class="kp-section-label" style="margin-top:16px;margin-bottom:8px;">Por Executivo · '+kpiLabel+'</div>'+
       '<div>'+execHtml+'</div>';
   };
 
-  // ── Year pills ───────────────────────────────────────────────
+  // ── Year pills ──────────────────────────────────────────────
   function buildKpYearPills(){
     const wrap=document.getElementById('kp-year-pills');
     if(!wrap) return;
@@ -4588,43 +4678,40 @@ window.triggerMBDownload = function(name){
 
   window.kpToggleYear=function(yr,btn){
     kpYears.has(yr)?kpYears.delete(yr):kpYears.add(yr);
-    if(!kpYears.size) kpYears.add(yr); // always keep at least one
+    if(!kpYears.size) kpYears.add(yr);
     btn.classList.toggle('active',kpYears.has(yr));
     buildKpiPanel();
   };
 
-  // ── Month dropdown ───────────────────────────────────────────
+  // ── Month dropdown ──────────────────────────────────────────
   function buildKpMesDrop(){
     const drop=document.getElementById('kp-mes-drop');
     if(!drop) return;
     drop.innerHTML='<div class="ae-drop-list-header"><span>Meses</span><button onclick="kpClearMeses()">limpar</button></div>';
-    MONTHS_SHORT_KP.forEach((m,i)=>{
-      const n=i+1, checked=kpMeses.has(n);
+    MO_SHORT.forEach((m,i)=>{
+      const n=i+1,checked=kpMeses.has(n);
       const item=document.createElement('div');
       item.className='ae-item'+(checked?' checked':'');
-      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=checked;
-      const lbl=document.createElement('span'); lbl.textContent=m;
-      item.appendChild(cb); item.appendChild(lbl);
+      const cb=document.createElement('input');cb.type='checkbox';cb.checked=checked;
+      const lbl=document.createElement('span');lbl.textContent=m;
+      item.appendChild(cb);item.appendChild(lbl);
       item.onclick=e=>{
         e.stopPropagation();
         kpMeses.has(n)?kpMeses.delete(n):kpMeses.add(n);
-        item.classList.toggle('checked',kpMeses.has(n)); cb.checked=kpMeses.has(n);
-        kpUpdateMesBtn(); buildKpiPanel();
+        item.classList.toggle('checked',kpMeses.has(n));cb.checked=kpMeses.has(n);
+        kpUpdateMesBtn();buildKpiPanel();
       };
       drop.appendChild(item);
     });
   }
-
   function kpUpdateMesBtn(){
     const lbl=document.getElementById('kp-mes-lbl');
     const btn=document.getElementById('kp-mes-btn');
     if(!lbl) return;
-    lbl.textContent=kpMeses.size===0?'Meses':MONTHS_SHORT_KP.filter((_,i)=>kpMeses.has(i+1)).join(', ');
+    lbl.textContent=kpMeses.size===0?'Meses':MO_SHORT.filter((_,i)=>kpMeses.has(i+1)).join(', ');
     if(btn) btn.classList.toggle('has-sel',kpMeses.size>0);
   }
-
-  window.kpClearMeses=function(){ kpMeses.clear(); kpUpdateMesBtn(); buildKpiPanel(); };
-
+  window.kpClearMeses=function(){kpMeses.clear();kpUpdateMesBtn();buildKpiPanel();};
   window.kpToggleMesDrop=function(e){
     e.stopPropagation();
     const drop=document.getElementById('kp-mes-drop');
@@ -4633,24 +4720,12 @@ window.triggerMBDownload = function(name){
     drop.style.display=isOpen?'none':'';
     if(!isOpen) buildKpMesDrop();
   };
-
   document.addEventListener('click',function(){
     const d=document.getElementById('kp-mes-drop');
     if(d) d.style.display='none';
   });
 
-  // Init after data loads
-  const _origLoad = window.onDataLoad || (()=>{});
-  function kpInit(){
-    buildKpYearPills();
-    buildKpiPanel();
-  }
-  // Hook into update cycle
-  const _kpOrigUpdate=window.update;
-  if(typeof _kpOrigUpdate==='function'){
-    window.update=function(){_kpOrigUpdate.apply(this,arguments);buildKpiPanel();};
-  }
-  setTimeout(kpInit, 600);
+  setTimeout(function(){buildKpYearPills();buildKpiPanel();},700);
 })();
 
 </script>
