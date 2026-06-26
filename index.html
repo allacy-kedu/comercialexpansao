@@ -4004,18 +4004,26 @@ function toggleTheme(){
         sw.onmouseover=()=>{if(hex!==ds.borderColor)sw.style.transform='scale(1.2)';};
         sw.onmouseout=()=>{sw.style.transform='scale(1)';};
         sw.onclick=()=>{
-          // Update color in aeColorMap
+          // Update color map
           aeColorMap[ds._k]=hex;
-          ds.borderColor=hex;
-          ds.pointBackgroundColor=hex;
+          // Update legend pill visuals
           dotEl.style.background=hex; valEl.style.color=hex;
           p.style.border='1px solid '+hexA(hex,.25); p.style.background=hexA(hex,.06);
           swRow.style.borderTopColor=hexA(hex,.15);
           pbtn.style.color=hex;
           swRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent');
           sw.style.borderColor='#fff';
-          // Redraw chart with new color
-          if(aeChart){ aeChart.data.datasets.forEach(d=>{if(d._k===ds._k&&d._yr===ds._yr){d.borderColor=hexA(hex,1);d.pointBackgroundColor=hexA(hex,1);}});aeChart.update('none');}
+          // Update ALL datasets for this key (all years)
+          if(aeChart){
+            aeChart.data.datasets.forEach(d=>{
+              if(d._k===ds._k){
+                d.borderColor=hex;
+                d.pointBackgroundColor=hex;
+                d.pointBorderColor=hex;
+              }
+            });
+            aeChart.update();
+          }
         };
         swRow.appendChild(sw);
       });
