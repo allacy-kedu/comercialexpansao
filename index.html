@@ -3870,7 +3870,7 @@ function toggleTheme(){
   }
   function aeAgg(){
     const agg={};
-    const meses=aeMeses.size>0?[...aeMeses]:null;
+    const meses=aeMeses.size>0?[...aeMeses].sort((a,b)=>a-b):null;
     RAW.forEach(r=>{
       if(!r.assinatura) return;
       const yr=parseInt(r.assinatura.slice(0,4));
@@ -3923,7 +3923,7 @@ function toggleTheme(){
     const agg=aeAgg();
     const keys=Object.keys(agg);
     const anos=[...aeAnos].sort();
-    const meses=aeMeses.size>0?[...aeMeses].sort():Array.from({length:12},(_,i)=>i+1);
+    const meses=aeMeses.size>0?[...aeMeses].sort((a,b)=>a-b):Array.from({length:12},(_,i)=>i+1);
     const labels=meses.map(m=>MONTHS_SHORT[m-1]);
     const empty=document.getElementById('ae-empty');
     const wrap=document.getElementById('ae-canvas-wrap');
@@ -4566,7 +4566,7 @@ window.triggerMBDownload = function(name){
   function kpGetMeses(){
     const anos=[...kpYears].sort();
     const today=new Date();
-    const allMo=kpMeses.size>0?[...kpMeses].sort():Array.from({length:12},(_,i)=>i+1);
+    const allMo=kpMeses.size>0?[...kpMeses].sort((a,b)=>a-b):Array.from({length:12},(_,i)=>i+1);
     // Build {yr, mo} pairs
     const pairs=[];
     anos.forEach(yr=>{
@@ -4590,7 +4590,7 @@ window.triggerMBDownload = function(name){
     const YR_CLR={2022:'#e17055',2023:'#fdcb6e',2024:'#6c5ce7',2025:'#00b894',2026:'#fd79a8'};
     const datasets=[];
     const multiYr=anos.length>1;
-    const moList=kpMeses.size>0?[...kpMeses].sort():Array.from({length:12},(_,i)=>i+1);
+    const moList=kpMeses.size>0?[...kpMeses].sort((a,b)=>a-b):Array.from({length:12},(_,i)=>i+1);
 
     anos.forEach(yr=>{
       const clr=YR_CLR[yr]||'var(--accent)';
