@@ -2526,42 +2526,44 @@ update();
     const today=new Date();
     const nowMonth=today.getMonth()+1, nowYear=today.getFullYear();
 
-    // Try standard growth-factor forecast first
-    const fc=calcForecast(monthly,cnt);
-
-    // Build realized array for 2026
+    // Build realized 2026 array
     const real2026=[];
+    let lastRealized=0;
     for(let m=1;m<=12;m++){
-      const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
-      if(nowYear===2026&&m<=nowMonth) real2026.push({m,v});
-    }
-
-    // 3-month moving average fallback for months where forecast is null/missing
-    for(let m=fc.lastRealizedMonth+1;m<=12;m++){
-      if(fc.forecast[m]) continue; // already has a value from growth factor
-      // Take last 3 realized values (prefer non-zero)
-      const pool=[...real2026].reverse();
-      const last3=[];
-      for(const {v} of pool){ if(v>0&&last3.length<3) last3.push(v); }
-      if(!last3.length){ for(const {v} of pool){ if(last3.length<3) last3.push(v); } }
-      if(last3.length){
-        const ma=Math.round(last3.reduce((s,v)=>s+v,0)/last3.length);
-        fc.forecast[m]=ma;
-        // also update the projected realized as base for next iteration
-        real2026.push({m,v:ma});
+      const ym='2026-'+String(m).padStart(2,'0');
+      const v=monthly[ym]||0;
+      if(nowYear===2026&&m<=nowMonth){
+        real2026.push({m,v});
+        if(v>0) lastRealized=m;
       }
     }
 
-    // Recompute growth factor label: use actual realized vs 2025
+    // 3-month MA forecast for ALL future months (consistent for every executive)
+    const forecast={};
+    const chain=[...real2026]; // working copy to chain projections
+    for(let m=lastRealized+1;m<=12;m++){
+      const pool=[...chain].reverse();
+      const last3=[];
+      for(const {v} of pool){ if(v>0&&last3.length<3) last3.push(v); }
+      if(!last3.length){ for(const {v} of pool){ if(last3.length<3) last3.push(v); } }
+      const ma=last3.length?Math.round(last3.reduce((s,v)=>s+v,0)/last3.length):0;
+      if(ma>0){ forecast[m]=ma; chain.push({m,v:ma}); }
+    }
+
+    // Growth factor vs 2025 — kept for badge only, not used for projection
     let rNum=0,rDen=0;
     for(let m=1;m<nowMonth;m++){
       const r=monthly['2026-'+String(m).padStart(2,'0')]||0;
       const p=monthly['2025-'+String(m).padStart(2,'0')]||0;
       if(r>0&&p>0){rNum+=r;rDen+=p;}
     }
-    if(rDen>0) fc.growthFactor=rNum/rDen;
+    const growthFactor=rDen>0?rNum/rDen:1.0;
 
-    return fc;
+    // realized map (used by popup)
+    const realized={};
+    for(let m=1;m<=12;m++) realized[m]=monthly['2026-'+String(m).padStart(2,'0')]||0;
+
+    return {forecast,lastRealizedMonth:lastRealized,growthFactor,realized,forecastCnt:{}};
   }
 
   function tExecDatasets(){
