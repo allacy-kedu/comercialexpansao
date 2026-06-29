@@ -2390,7 +2390,7 @@ update();
   const MONTHS_SHORT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const MONTHS_LONG=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const YEARS=[2022,2023,2024,2025,2026];
-  const activeYears=new Set([2022,2023,2024,2025,2026,'meta','forecast']);
+  const activeYears=new Set([2026,'meta','forecast']); // matches button active states in HTML
   let _chart=null, _simActive=false, _simOverride=null;
 
   let _monthlyCache = null;
