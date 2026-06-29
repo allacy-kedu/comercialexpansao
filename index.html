@@ -2549,7 +2549,7 @@ update();
         borderDash:[],
         pointBackgroundColor:clr,
         pointRadius:3,pointHoverRadius:5,
-        tension:.4,fill:false,spanGaps:false
+        tension:.4,fill:false,spanGaps:true
       });
 
       // Forecast line
@@ -2752,6 +2752,32 @@ update();
         row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">META 2026</span></span><span style="font-weight:700;color:#dfe6e9;">'+fmtV(mv)+'</span>';
         popup.appendChild(row);
       }
+    }
+    // Per-executive rows
+    if(typeof _execSel!=='undefined'&&_execSel.size>0){
+      const sep=document.createElement('div');
+      sep.style.cssText='border-top:1px solid rgba(99,179,237,0.1);margin:6px 0;';
+      popup.appendChild(sep);
+      [..._execSel].forEach(nome=>{
+        const clr=_execColors[nome]||'#a29bfe';
+        const {monthly}=tExecMonthly(nome);
+        const fc=tExecForecast(nome);
+        const realized=monthly['2026-'+String(m).padStart(2,'0')]||null;
+        const fcVal=fc.forecast[m]||null;
+        const nShort=nome.split(' ').slice(0,2).join(' ');
+        const isFuture=m>fc.lastRealizedMonth;
+        const val=isFuture?fcVal:realized;
+        if(!val) return;
+        const dot=isFuture
+          ?'<span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+clr+';background:transparent;flex-shrink:0;display:inline-block;"></span>'
+          :'<span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span>';
+        const tag=isFuture?' (prev.)':'';
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+        row.innerHTML='<span style="display:flex;align-items:center;gap:6px">'+dot+'<span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+tag+'</span></span>'
+          +'<span style="font-weight:700;color:'+clr+';">'+fmtV(val)+'</span>';
+        popup.appendChild(row);
+      });
     }
     document.body.appendChild(popup);
     const pw=popup.offsetWidth||220,ph=popup.offsetHeight||160;
