@@ -786,24 +786,11 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <button class="trend-yr-btn active" data-year="2026" style="--yr-c:#fd79a8">2026</button>
         <button class="trend-yr-btn trend-yr-meta active" data-year="meta">Meta</button>
         <button class="trend-yr-btn active" data-year="forecast" style="--yr-c:#74b9ff">Previsão</button>
-        <div class="trend-exec-wrap" id="trend-exec-wrap">
-          <button class="trend-exec-btn" id="trend-exec-btn" onclick="tExecToggle(event)">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span id="trend-exec-lbl">Executivos</span>
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="trend-exec-drop" id="trend-exec-drop" style="display:none;">
-            <div class="trend-exec-drop-header"><span>Executivos 2026</span><button onclick="tExecClear()">limpar</button></div>
-            <div id="trend-exec-list"></div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="trend-canvas-wrap" style="position:relative;">
       <canvas id="trend-chart" style="height:220px;"></canvas>
     </div>
-    <div class="trend-exec-info" id="trend-exec-info" style="display:none;padding-top:10px;border-top:1px solid var(--border);margin-top:10px;flex-wrap:wrap;gap:6px;"></div>
-
     <!-- Simulador de Previsão -->
     <div id="sim-toggle" onclick="toggleSim()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;margin-top:12px;border-top:1px solid rgba(99,179,237,0.08);user-select:none;">
       <span style="font-size:12px;font-family:DM Mono,monospace;color:rgba(90,106,130,0.8);letter-spacing:.05em;text-transform:uppercase;">Simulador de Previsão</span>
@@ -849,6 +836,38 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ── Tendência por Executivo ───────────────────────────── -->
+  <div class="trend-card" id="exec-trend-card" style="margin-top:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text);">Tendência por Executivo</div>
+        <div id="exec-trend-sub" style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;">Selecione executivos no menu ao lado</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="trend-exec-wrap" id="trend-exec-wrap">
+          <button class="trend-exec-btn" id="trend-exec-btn" onclick="tExecToggle(event)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span id="trend-exec-lbl">Executivos</span>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="trend-exec-drop" id="trend-exec-drop" style="display:none;">
+            <div class="trend-exec-drop-header"><span>Executivos 2026</span><button onclick="tExecClear()">limpar</button></div>
+            <div id="trend-exec-list"></div>
+          </div>
+        </div>
+        <button onclick="tExecClear()" style="height:28px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
+      </div>
+    </div>
+    <div class="trend-exec-info" id="trend-exec-info" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+    <div id="exec-trend-empty" style="text-align:center;padding:40px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.03em;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25;display:block;margin:0 auto 10px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Selecione um ou mais executivos para ver a tendência individual
+    </div>
+    <div id="exec-trend-chart-wrap" style="position:relative;height:240px;display:none;">
+      <canvas id="exec-trend-chart" role="img" aria-label="Tendência mensal por executivo"></canvas>
     </div>
   </div>
   </section>
@@ -2481,8 +2500,6 @@ update();
     if(activeYears.has('forecast')){
       datasets.push({label:'forecast',data:Array.from({length:12},(_,i)=>forecast[i+1]||null),borderColor:FC_COLOR,borderWidth:2,borderDash:[5,4],pointBackgroundColor:'rgba(8,9,15,0.7)',pointBorderColor:FC_COLOR,pointBorderWidth:1.5,pointRadius:4,pointHoverRadius:6,tension:0,fill:false});
     }
-    // Add per-executive datasets
-    tExecDatasets().forEach(d=>datasets.push(d));
     return datasets;
   }
 
@@ -2671,7 +2688,7 @@ update();
         e.stopPropagation();
         if(_execSel.has(nome)){ _execSel.delete(nome); delete _execColors[nome]; }
         else { _execSel.add(nome); tExecColor(nome); }
-        tExecUpdateBtn(); tExecUpdateInfo(); drawChart(); tExecBuildDrop();
+        tExecUpdateBtn(); tExecUpdateInfo(); buildExecTrendChart(); tExecBuildDrop();
       };
       list.appendChild(item);
     });
@@ -2686,6 +2703,8 @@ update();
       'Executivos ('+_execSel.size+')';
     btn.classList.toggle('has-sel',_execSel.size>0);
   }
+
+  let _execTrendChart=null;
 
   function tExecUpdateInfo(){
     const bar=document.getElementById('trend-exec-info');
@@ -2708,6 +2727,116 @@ update();
     }).join('');
   }
 
+  function buildExecTrendChart(){
+    const empty=document.getElementById('exec-trend-empty');
+    const wrap=document.getElementById('exec-trend-chart-wrap');
+    const sub=document.getElementById('exec-trend-sub');
+    if(!wrap) return;
+
+    if(!_execSel.size){
+      if(empty) empty.style.display='block';
+      wrap.style.display='none';
+      if(_execTrendChart){_execTrendChart.destroy();_execTrendChart=null;}
+      if(sub) sub.textContent='Selecione executivos no menu ao lado';
+      return;
+    }
+
+    if(empty) empty.style.display='none';
+    wrap.style.display='block';
+
+    const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const datasets=tExecDatasets();
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    const gridClr=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+    const textClr=isDark?'#5a6a82':'#8892a0';
+
+    if(_execTrendChart){
+      _execTrendChart.data.datasets=datasets;
+      _execTrendChart.update('none');
+    } else {
+      const canvas=document.getElementById('exec-trend-chart');
+      if(!canvas) return;
+      _execTrendChart=new Chart(canvas,{
+        type:'line',
+        data:{labels:months,datasets},
+        options:{
+          responsive:true,maintainAspectRatio:false,animation:{duration:300},
+          interaction:{mode:'none'},
+          onClick:(evt,_,chart)=>{
+            const x=chart.scales.x;
+            if(!x) return;
+            const rect=canvas.getBoundingClientRect();
+            const xPx=evt.native.clientX-rect.left;
+            let closest=0,minD=Infinity;
+            months.forEach((_,i)=>{const px=x.getPixelForValue(i);const d=Math.abs(xPx-px);if(d<minD){minD=d;closest=i+1;}});
+            if(minD<40) showExecMonthPopup(closest,evt.native);
+          },
+          plugins:{
+            legend:{display:false},
+            tooltip:{enabled:false}
+          },
+          scales:{
+            x:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'}}},
+            y:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'},maxTicksLimit:5,
+               callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v}}
+          }
+        }
+      });
+    }
+
+    const names=[..._execSel].map(n=>n.split(' ')[0]).join(', ');
+    if(sub) sub.textContent=(_execSel.size===1?[..._execSel][0]:_execSel.size+' executivos')+' · Realizado + Projeção MA 3m';
+  }
+
+  function showExecMonthPopup(m, nativeEvt){
+    document.querySelectorAll('.month-popup').forEach(p=>p.remove());
+    const popup=document.createElement('div');
+    popup.className='month-popup';
+    popup.style.cssText='position:fixed;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;z-index:9999;min-width:220px;box-shadow:0 8px 28px rgba(0,0,0,.4);font-family:DM Mono,monospace;';
+    const PROJ_CLR='#ffeaa7';
+    const todayM=new Date().getMonth()+1;
+    const mName=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m-1];
+    const close=document.createElement('div');
+    close.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;';
+    close.innerHTML='<span style="font-weight:700;font-size:13px;color:var(--text);">'+mName+'</span><span style="cursor:pointer;color:var(--muted);font-size:14px;" onclick="this.parentElement.parentElement.remove()">×</span>';
+    popup.appendChild(close);
+
+    [..._execSel].forEach(nome=>{
+      const clr=tExecColor(nome);
+      const {monthly}=tExecMonthly(nome);
+      const fc=tExecForecast(nome);
+      const nShort=nome.split(' ').slice(0,2).join(' ');
+      if(m<todayM){
+        const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+        row.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+'</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
+        popup.appendChild(row);
+      } else if(m===todayM){
+        const vR=monthly['2026-'+String(m).padStart(2,'0')]||0;
+        const vP=fc.forecast[m]||null;
+        if(vR){const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:4px;';r.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (feito)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(vR)+'</span>';popup.appendChild(r);}
+        if(vP){const r2=document.createElement('div');r2.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';r2.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;border:2px solid '+PROJ_CLR+';background:transparent;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (proj.)</span></span><span style="font-weight:700;color:'+PROJ_CLR+';">'+fmtV(vP)+'</span>';popup.appendChild(r2);}
+      } else {
+        const v=fc.forecast[m]||null;
+        if(!v) return;
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+        row.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+clr+';background:transparent;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (MA 3m)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
+        popup.appendChild(row);
+      }
+    });
+
+    document.body.appendChild(popup);
+    const pw=popup.offsetWidth||220,ph=popup.offsetHeight||160;
+    let left=nativeEvt.clientX+10, top=nativeEvt.clientY-ph/2;
+    if(left+pw>window.innerWidth-10) left=nativeEvt.clientX-pw-10;
+    if(top<8) top=8;
+    if(top+ph>window.innerHeight-8) top=window.innerHeight-ph-8;
+    popup.style.left=left+'px'; popup.style.top=top+'px';
+    setTimeout(()=>document.addEventListener('click',function h(){popup.remove();document.removeEventListener('click',h);}),10);
+  }
+
   window.tExecToggle=function(e){
     e.stopPropagation();
     const drop=document.getElementById('trend-exec-drop');
@@ -2719,8 +2848,8 @@ update();
 
   window.tExecClear=function(){
     _execSel.clear(); _execColors={};
-    tExecUpdateBtn(); tExecUpdateInfo(); drawChart();
-    document.getElementById('trend-exec-drop').style.display='none';
+    tExecUpdateBtn(); tExecUpdateInfo(); buildExecTrendChart();
+    const d=document.getElementById('trend-exec-drop'); if(d) d.style.display='none';
   };
 
   document.addEventListener('click',function(e){
