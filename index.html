@@ -2523,7 +2523,45 @@ update();
 
   function tExecForecast(nome){
     const {monthly,cnt}=tExecMonthly(nome);
-    return calcForecast(monthly,cnt);
+    const today=new Date();
+    const nowMonth=today.getMonth()+1, nowYear=today.getFullYear();
+
+    // Try standard growth-factor forecast first
+    const fc=calcForecast(monthly,cnt);
+
+    // Build realized array for 2026
+    const real2026=[];
+    for(let m=1;m<=12;m++){
+      const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
+      if(nowYear===2026&&m<=nowMonth) real2026.push({m,v});
+    }
+
+    // 3-month moving average fallback for months where forecast is null/missing
+    for(let m=fc.lastRealizedMonth+1;m<=12;m++){
+      if(fc.forecast[m]) continue; // already has a value from growth factor
+      // Take last 3 realized values (prefer non-zero)
+      const pool=[...real2026].reverse();
+      const last3=[];
+      for(const {v} of pool){ if(v>0&&last3.length<3) last3.push(v); }
+      if(!last3.length){ for(const {v} of pool){ if(last3.length<3) last3.push(v); } }
+      if(last3.length){
+        const ma=Math.round(last3.reduce((s,v)=>s+v,0)/last3.length);
+        fc.forecast[m]=ma;
+        // also update the projected realized as base for next iteration
+        real2026.push({m,v:ma});
+      }
+    }
+
+    // Recompute growth factor label: use actual realized vs 2025
+    let rNum=0,rDen=0;
+    for(let m=1;m<nowMonth;m++){
+      const r=monthly['2026-'+String(m).padStart(2,'0')]||0;
+      const p=monthly['2025-'+String(m).padStart(2,'0')]||0;
+      if(r>0&&p>0){rNum+=r;rDen+=p;}
+    }
+    if(rDen>0) fc.growthFactor=rNum/rDen;
+
+    return fc;
   }
 
   function tExecDatasets(){
