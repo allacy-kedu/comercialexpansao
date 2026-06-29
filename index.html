@@ -2534,11 +2534,11 @@ update();
       const fc=tExecForecast(nome);
       const today=new Date(),nowMonth=today.getMonth()+1,nowYear=today.getFullYear();
 
-      // 2026 realized line
+      // 2026 realized line — 0 for months without sales, null for future months
       const realized2026=Array.from({length:12},(_,i)=>{
         const m=i+1;
-        if(nowYear===2026&&m>nowMonth) return null;
-        return monthly['2026-'+String(m).padStart(2,'0')]||null;
+        if(nowYear===2026&&m>nowMonth) return null;   // future → line stops cleanly
+        return monthly['2026-'+String(m).padStart(2,'0')]||0; // past → 0 if no sales
       });
       ds.push({
         label:'exec:'+nome,
@@ -2549,7 +2549,7 @@ update();
         borderDash:[],
         pointBackgroundColor:clr,
         pointRadius:3,pointHoverRadius:5,
-        tension:.4,fill:false,spanGaps:true
+        tension:.4,fill:false,spanGaps:false
       });
 
       // Forecast line
