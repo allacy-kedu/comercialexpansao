@@ -394,6 +394,17 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .mb-footer{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;width:100%;padding-top:9px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;}
 .mb-footer strong{color:var(--text);font-weight:700;}
 .mb-empty{text-align:center;padding:40px 20px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;}
+
+/* ── Trend executive dropdown ───────────────────────────────── */
+.trend-exec-wrap{position:relative;}
+.trend-exec-btn{height:24px;padding:0 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);transition:.18s;letter-spacing:.04em;display:inline-flex;align-items:center;gap:5px;}
+.trend-exec-btn:hover,.trend-exec-btn.has-sel{border-color:var(--accent);color:var(--accent);}
+.trend-exec-drop{position:absolute;right:0;top:calc(100% + 5px);background:var(--card2);border:1px solid var(--border2);border-radius:11px;padding:6px;z-index:500;min-width:220px;max-height:280px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.45);}
+.trend-exec-drop-header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 7px;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.trend-exec-drop-header span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace;}
+.trend-exec-drop-header button{background:none;border:none;color:var(--accent);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;padding:0;}
+.trend-exec-info{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 4px;}
+.trend-exec-badge{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;border:1px solid;white-space:nowrap;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -775,11 +786,23 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
         <button class="trend-yr-btn active" data-year="2026" style="--yr-c:#fd79a8">2026</button>
         <button class="trend-yr-btn trend-yr-meta active" data-year="meta">Meta</button>
         <button class="trend-yr-btn active" data-year="forecast" style="--yr-c:#74b9ff">Previsão</button>
+        <div class="trend-exec-wrap" id="trend-exec-wrap">
+          <button class="trend-exec-btn" id="trend-exec-btn" onclick="tExecToggle(event)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span id="trend-exec-lbl">Executivos</span>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="trend-exec-drop" id="trend-exec-drop" style="display:none;">
+            <div class="trend-exec-drop-header"><span>Executivos 2026</span><button onclick="tExecClear()">limpar</button></div>
+            <div id="trend-exec-list"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="trend-canvas-wrap" style="position:relative;">
       <canvas id="trend-chart" style="height:220px;"></canvas>
     </div>
+    <div class="trend-exec-info" id="trend-exec-info" style="display:none;padding-top:10px;border-top:1px solid var(--border);margin-top:10px;flex-wrap:wrap;gap:6px;"></div>
 
     <!-- Simulador de Previsão -->
     <div id="sim-toggle" onclick="toggleSim()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;margin-top:12px;border-top:1px solid rgba(99,179,237,0.08);user-select:none;">
@@ -2458,6 +2481,8 @@ update();
     if(activeYears.has('forecast')){
       datasets.push({label:'forecast',data:Array.from({length:12},(_,i)=>forecast[i+1]||null),borderColor:FC_COLOR,borderWidth:2,borderDash:[5,4],pointBackgroundColor:'rgba(8,9,15,0.7)',pointBorderColor:FC_COLOR,pointBorderWidth:1.5,pointRadius:4,pointHoverRadius:6,tension:0,fill:false});
     }
+    // Add per-executive datasets
+    tExecDatasets().forEach(d=>datasets.push(d));
     return datasets;
   }
 
@@ -2469,6 +2494,178 @@ update();
     const clr=growthFactor>=1?'#52c77d':'#FFE66D';
     subEl.innerHTML='<span style="color:'+clr+';font-weight:700;font-size:13px;letter-spacing:.04em;">Fator de crescimento vs 2025: '+sign+factorPct+'%</span>';
   }
+
+
+  // ── Per-executive trend & forecast ──────────────────────────
+  const EXEC_PALETTE=['#a29bfe','#ffeaa7','#55efc4','#fdcb6e','#e17055','#81ecec','#b2bec3','#dfe6e9','#fab1a0','#636e72'];
+  let _execSel=new Set();   // selected exec names
+  let _execColors={};       // nome → color
+
+  function tExecColor(nome){
+    if(!_execColors[nome]){
+      const used=new Set(Object.values(_execColors));
+      const c=EXEC_PALETTE.find(c=>!used.has(c))||EXEC_PALETTE[Object.keys(_execColors).length%EXEC_PALETTE.length];
+      _execColors[nome]=c;
+    }
+    return _execColors[nome];
+  }
+
+  function tExecMonthly(nome){
+    const m={},c={};
+    RAW.forEach(r=>{
+      if(r.executivo!==nome||!r.assinatura) return;
+      const ym=r.assinatura.slice(0,7);
+      m[ym]=(m[ym]||0)+(r.fat_kedu||0);
+      c[ym]=(c[ym]||0)+1;
+    });
+    return {monthly:m,cnt:c};
+  }
+
+  function tExecForecast(nome){
+    const {monthly,cnt}=tExecMonthly(nome);
+    return calcForecast(monthly,cnt);
+  }
+
+  function tExecDatasets(){
+    const ds=[];
+    [..._execSel].forEach(nome=>{
+      const clr=tExecColor(nome);
+      const {monthly}=tExecMonthly(nome);
+      const fc=tExecForecast(nome);
+      const today=new Date(),nowMonth=today.getMonth()+1,nowYear=today.getFullYear();
+
+      // 2026 realized line
+      const realized2026=Array.from({length:12},(_,i)=>{
+        const m=i+1;
+        if(nowYear===2026&&m>nowMonth) return null;
+        return monthly['2026-'+String(m).padStart(2,'0')]||null;
+      });
+      ds.push({
+        label:'exec:'+nome,
+        data:realized2026,
+        borderColor:clr,
+        backgroundColor:'transparent',
+        borderWidth:1.8,
+        borderDash:[],
+        pointBackgroundColor:clr,
+        pointRadius:3,pointHoverRadius:5,
+        tension:.4,fill:false,spanGaps:false
+      });
+
+      // Forecast line
+      const fcData=Array.from({length:12},(_,i)=>{
+        const m=i+1;
+        if(m<=fc.lastRealizedMonth) return null;
+        return fc.forecast[m]||null;
+      });
+      if(fcData.some(v=>v!==null)){
+        ds.push({
+          label:'exec-fc:'+nome,
+          data:fcData,
+          borderColor:clr,
+          backgroundColor:'transparent',
+          borderWidth:1.2,
+          borderDash:[4,3],
+          pointBackgroundColor:'transparent',
+          pointBorderColor:clr,
+          pointBorderWidth:1.5,
+          pointRadius:2.5,pointHoverRadius:4,
+          tension:0,fill:false,spanGaps:false
+        });
+      }
+    });
+    return ds;
+  }
+
+  function tExecBuildDrop(){
+    const list=document.getElementById('trend-exec-list');
+    if(!list) return;
+    const active2026=[...new Set(
+      RAW.filter(r=>r.assinatura&&r.assinatura.startsWith('2026')&&r.executivo&&TEAM[r.executivo])
+         .map(r=>r.executivo)
+    )].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    list.innerHTML='';
+    active2026.forEach(nome=>{
+      const checked=_execSel.has(nome);
+      const clr=checked?tExecColor(nome):'var(--muted)';
+      const item=document.createElement('div');
+      item.className='ae-item'+(checked?' checked':'');
+      item.style.cssText='display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-family:DM Mono,monospace;transition:background .12s;';
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=checked;
+      cb.style.accentColor=checked?tExecColor(nome):'';
+      // Avatar
+      const av=document.createElement('div');
+      const ini=nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      av.style.cssText='width:28px;height:28px;border-radius:50%;flex-shrink:0;overflow:hidden;border:1.5px solid '+(checked?clr:'var(--border2)')+';position:relative;';
+      av.innerHTML='<img src="fotos/'+nome+'.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
+        +'<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:DM Mono,monospace;background:'+(checked?clr+'22':'var(--bg2)')+';color:'+(checked?clr:'var(--muted)')+';">'+ini+'</span>';
+      const lbl=document.createElement('span'); lbl.textContent=nome.split(' ').slice(0,2).join(' ');
+      lbl.style.color=clr;
+      const cargo=document.createElement('span');
+      cargo.textContent=(TEAM[nome]?.cargo||'').replace('Coordenador Comercial','Coord.').replace('Coordenadora Comercial','Coord.');
+      cargo.style.cssText='font-size:10px;color:var(--muted);margin-left:auto;';
+      item.appendChild(cb); item.appendChild(av); item.appendChild(lbl); item.appendChild(cargo);
+      item.onclick=e=>{
+        e.stopPropagation();
+        if(_execSel.has(nome)){ _execSel.delete(nome); delete _execColors[nome]; }
+        else { _execSel.add(nome); tExecColor(nome); }
+        tExecUpdateBtn(); tExecUpdateInfo(); drawChart(); tExecBuildDrop();
+      };
+      list.appendChild(item);
+    });
+  }
+
+  function tExecUpdateBtn(){
+    const btn=document.getElementById('trend-exec-btn');
+    const lbl=document.getElementById('trend-exec-lbl');
+    if(!btn||!lbl) return;
+    lbl.textContent=_execSel.size===0?'Executivos':
+      _execSel.size===1?[..._execSel][0].split(' ')[0]:
+      'Executivos ('+_execSel.size+')';
+    btn.classList.toggle('has-sel',_execSel.size>0);
+  }
+
+  function tExecUpdateInfo(){
+    const bar=document.getElementById('trend-exec-info');
+    if(!bar) return;
+    if(!_execSel.size){ bar.style.display='none'; bar.innerHTML=''; return; }
+    bar.style.display='flex';
+    bar.innerHTML=[..._execSel].map(nome=>{
+      const clr=tExecColor(nome);
+      const fc=tExecForecast(nome);
+      const gp=((fc.growthFactor-1)*100);
+      const sign=gp>=0?'+':'';
+      const arrow=gp>=0?'↑':'↓';
+      const arrowClr=gp>=0?'#52c77d':'#e17055';
+      const nShort=nome.split(' ').slice(0,2).join(' ');
+      return '<div class="trend-exec-badge" style="background:'+clr+'18;border-color:'+clr+'44;color:'+clr+';">'+
+        '<span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span>'+
+        nShort+
+        ' <span style="color:'+arrowClr+';font-weight:700;">'+arrow+' '+Math.abs(gp).toFixed(1)+'% vs 2025</span>'+
+      '</div>';
+    }).join('');
+  }
+
+  window.tExecToggle=function(e){
+    e.stopPropagation();
+    const drop=document.getElementById('trend-exec-drop');
+    if(!drop) return;
+    const isOpen=drop.style.display!=='none';
+    drop.style.display=isOpen?'none':'';
+    if(!isOpen) tExecBuildDrop();
+  };
+
+  window.tExecClear=function(){
+    _execSel.clear(); _execColors={};
+    tExecUpdateBtn(); tExecUpdateInfo(); drawChart();
+    document.getElementById('trend-exec-drop').style.display='none';
+  };
+
+  document.addEventListener('click',function(e){
+    const wrap=document.getElementById('trend-exec-wrap');
+    const drop=document.getElementById('trend-exec-drop');
+    if(drop&&wrap&&!wrap.contains(e.target)) drop.style.display='none';
+  });
 
   function drawChart(){
     const canvas=document.getElementById('trend-chart');
