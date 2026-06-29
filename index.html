@@ -2568,48 +2568,70 @@ update();
 
   function tExecDatasets(){
     const ds=[];
+    const today=new Date(),nowMonth=today.getMonth()+1,nowYear=today.getFullYear();
+    const PROJ_CLR='#ffeaa7'; // amber for current-month projection dot
+
     [..._execSel].forEach(nome=>{
       const clr=tExecColor(nome);
       const {monthly}=tExecMonthly(nome);
       const fc=tExecForecast(nome);
-      const today=new Date(),nowMonth=today.getMonth()+1,nowYear=today.getFullYear();
 
-      // 2026 realized line — 0 for months without sales, null for future months
-      const realized2026=Array.from({length:12},(_,i)=>{
+      // ── 1. Realized line: Jan → month before current (solid) ──
+      const realizedLine=Array.from({length:12},(_,i)=>{
         const m=i+1;
-        if(nowYear===2026&&m>nowMonth) return null;   // future → line stops cleanly
-        return monthly['2026-'+String(m).padStart(2,'0')]||0; // past → 0 if no sales
+        if(nowYear===2026&&m>=nowMonth) return null; // stop before current month
+        return monthly['2026-'+String(m).padStart(2,'0')]||0;
       });
       ds.push({
         label:'exec:'+nome,
-        data:realized2026,
-        borderColor:clr,
-        backgroundColor:'transparent',
-        borderWidth:1.8,
-        borderDash:[],
-        pointBackgroundColor:clr,
-        pointRadius:3,pointHoverRadius:5,
-        tension:.4,fill:false,spanGaps:false
+        data:realizedLine,
+        borderColor:clr,borderWidth:1.8,borderDash:[],
+        pointBackgroundColor:clr,pointRadius:3,pointHoverRadius:5,
+        tension:.35,fill:false,spanGaps:false
       });
 
-      // Forecast line
-      const fcData=Array.from({length:12},(_,i)=>{
+      // ── 2. Current month realized (solid dot) ─────────────────
+      const curRealized=monthly['2026-'+String(nowMonth).padStart(2,'0')]||0;
+      const curPoint=Array.from({length:12},(_,i)=>i+1===nowMonth?curRealized:null);
+      ds.push({
+        label:'exec-cur:'+nome,
+        data:curPoint,
+        borderColor:'transparent',borderWidth:0,
+        pointBackgroundColor:clr,pointBorderColor:clr,
+        pointRadius:5,pointHoverRadius:7,
+        fill:false
+      });
+
+      // ── 3. Current month projection (hollow dot, amber) ───────
+      const curProj=fc.forecast[nowMonth]||null;
+      if(curProj){
+        const projPoint=Array.from({length:12},(_,i)=>i+1===nowMonth?curProj:null);
+        ds.push({
+          label:'exec-proj:'+nome,
+          data:projPoint,
+          borderColor:'transparent',borderWidth:0,
+          pointBackgroundColor:'transparent',
+          pointBorderColor:PROJ_CLR,pointBorderWidth:2,
+          pointRadius:6,pointHoverRadius:8,
+          fill:false
+        });
+      }
+
+      // ── 4. Future forecast (dashed, from current month → Dec) ─
+      const fcLine=Array.from({length:12},(_,i)=>{
         const m=i+1;
-        if(m<=fc.lastRealizedMonth) return null;
+        if(m<nowMonth) return null;
         return fc.forecast[m]||null;
       });
-      if(fcData.some(v=>v!==null)){
+      if(fcLine.some(v=>v!==null)){
         ds.push({
           label:'exec-fc:'+nome,
-          data:fcData,
-          borderColor:clr,
-          backgroundColor:'transparent',
-          borderWidth:1.2,
-          borderDash:[4,3],
+          data:fcLine,
+          borderColor:clr,borderWidth:1.5,borderDash:[5,4],
           pointBackgroundColor:'transparent',
-          pointBorderColor:clr,
-          pointBorderWidth:1.5,
-          pointRadius:2.5,pointHoverRadius:4,
+          pointBorderColor:clr,pointBorderWidth:1.5,
+          pointRadius:fcLine.map((v,i)=>v&&i+1>nowMonth?2.5:0),
+          pointHoverRadius:4,
           tension:0,fill:false,spanGaps:false
         });
       }
@@ -2798,25 +2820,47 @@ update();
       const sep=document.createElement('div');
       sep.style.cssText='border-top:1px solid rgba(99,179,237,0.1);margin:6px 0;';
       popup.appendChild(sep);
+      const PROJ_CLR_POP='#ffeaa7';
       [..._execSel].forEach(nome=>{
         const clr=_execColors[nome]||'#a29bfe';
         const {monthly}=tExecMonthly(nome);
         const fc=tExecForecast(nome);
-        const realized=monthly['2026-'+String(m).padStart(2,'0')]||null;
-        const fcVal=fc.forecast[m]||null;
         const nShort=nome.split(' ').slice(0,2).join(' ');
-        const isFuture=m>fc.lastRealizedMonth;
-        const val=isFuture?fcVal:realized;
-        if(!val) return;
-        const dot=isFuture
-          ?'<span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+clr+';background:transparent;flex-shrink:0;display:inline-block;"></span>'
-          :'<span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span>';
-        const tag=isFuture?' (prev.)':'';
-        const row=document.createElement('div');
-        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
-        row.innerHTML='<span style="display:flex;align-items:center;gap:6px">'+dot+'<span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+tag+'</span></span>'
-          +'<span style="font-weight:700;color:'+clr+';">'+fmtV(val)+'</span>';
-        popup.appendChild(row);
+        const todayM=new Date().getMonth()+1;
+
+        if(m<todayM){
+          // Past: show realized
+          const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
+          if(!v) return;
+          const row=document.createElement('div');
+          row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+          row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+'</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
+          popup.appendChild(row);
+        } else if(m===todayM){
+          // Current: show realized (partial) + projection
+          const vReal=monthly['2026-'+String(m).padStart(2,'0')]||0;
+          const vProj=fc.forecast[m]||null;
+          if(vReal){
+            const row=document.createElement('div');
+            row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:4px;';
+            row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (feito)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(vReal)+'</span>';
+            popup.appendChild(row);
+          }
+          if(vProj){
+            const row2=document.createElement('div');
+            row2.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+            row2.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:transparent;border:2px solid '+PROJ_CLR_POP+';flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (proj. mês)</span></span><span style="font-weight:700;color:'+PROJ_CLR_POP+';">'+fmtV(vProj)+'</span>';
+            popup.appendChild(row2);
+          }
+        } else {
+          // Future: show MA forecast
+          const v=fc.forecast[m]||null;
+          if(!v) return;
+          const row=document.createElement('div');
+          row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
+          row.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+clr+';background:transparent;flex-shrink:0;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (MA 3m)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
+          popup.appendChild(row);
+        }
       });
     }
     document.body.appendChild(popup);
