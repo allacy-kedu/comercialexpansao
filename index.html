@@ -2761,13 +2761,24 @@ update();
           responsive:true,maintainAspectRatio:false,animation:{duration:300},
           interaction:{mode:'none'},
           onClick:(evt,_,chart)=>{
-            const x=chart.scales.x;
-            if(!x) return;
-            const rect=canvas.getBoundingClientRect();
-            const xPx=evt.native.clientX-rect.left;
-            let closest=0,minD=Infinity;
-            months.forEach((_,i)=>{const px=x.getPixelForValue(i);const d=Math.abs(xPx-px);if(d<minD){minD=d;closest=i+1;}});
-            if(minD<40) showExecMonthPopup(closest,evt.native);
+            let closest=null;
+            const els=chart.getElementsAtEventForMode(evt.native,'index',{intersect:false},true);
+            if(els&&els.length) closest=els[0].index+1;
+            if(closest===null){
+              // Fallback: manual pixel distance calc
+              const x=chart.scales.x;
+              if(!x) return;
+              const rect=canvas.getBoundingClientRect();
+              const xPx=evt.native.clientX-rect.left;
+              let minD=Infinity;
+              months.forEach((_,i)=>{
+                const px=(typeof x.getPixelForTick==='function')?x.getPixelForTick(i):x.getPixelForValue(i);
+                const d=Math.abs(xPx-px);
+                if(d<minD){minD=d;closest=i+1;}
+              });
+              if(minD>=80) closest=null;
+            }
+            if(closest!==null) showExecMonthPopup(closest,evt.native);
           },
           plugins:{
             legend:{display:false},
