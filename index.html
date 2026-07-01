@@ -2879,6 +2879,7 @@ update();
       if(!existing){
         const div=document.createElement('div');
         div.className='exec-sm-card';
+        div.id='exec-sm-'+canvasId;
         div.dataset.exec=nome;
         div.innerHTML=`<div class="exec-sm-head">`
           +`<div class="exec-sm-av" style="background:${clr}22;color:${clr};">`
