@@ -2541,8 +2541,131 @@ update();
     subEl.innerHTML='<span style="color:'+clr+';font-weight:700;font-size:13px;letter-spacing:.04em;">Fator de crescimento vs 2025: '+sign+factorPct+'%</span>';
   }
 
+  function drawChart(){
+    const canvas=document.getElementById('trend-chart');
+    if(!canvas) return;
+    if(typeof Chart==='undefined') return setTimeout(drawChart,100);
+    const {agg,cnt}=buildMonthly();
+    if(_simOverride){const today=new Date();const ym=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');agg[ym]=_simOverride.fat;}
+    const monthly={...agg},monthly_cnt={...cnt};
+    const {forecast,lastRealizedMonth,growthFactor,currentProj,forecastCnt}=calcForecast(monthly,monthly_cnt);
+    updateSubtitle(forecast,growthFactor);
+    const datasets=buildDatasets(agg,forecast);
+    const fmtV=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
+    if(_chart){_chart.data.datasets=datasets;_chart.update('none');return;}
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    const gridClr=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+    const textClr=isDark?'#5a6a82':'#8892a0';
+    _chart=new Chart(canvas,{
+      type:'line',
+      data:{labels:MONTHS_SHORT,datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,animation:false,
+        interaction:{mode:'none'},
+        onClick:(evt,_,chart)=>{
+          const els=chart.getElementsAtEventForMode(evt.native,'index',{intersect:false},true);
+          const m=els&&els.length?els[0].index+1:null;
+          if(m) showMonthPopup(m,forecast,currentProj,lastRealizedMonth,forecastCnt,fmtV,evt.native);
+        },
+        plugins:{legend:{display:false},tooltip:{enabled:false}},
+        scales:{
+          x:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'}}},
+          y:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'},
+             callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v}}
+        }
+      }
+    });
+  }
 
-  // ── Per-executive trend & forecast ──────────────────────────
+  function showMonthPopup(m,forecast,currentProj,lastRealizedMonth,forecastCnt,fmtV,nativeEvt){
+    document.querySelectorAll('.month-popup').forEach(p=>p.remove());
+    const popup=document.createElement('div');
+    popup.className='month-popup';
+    popup.style.cssText='position:fixed;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;z-index:9999;min-width:220px;box-shadow:0 8px 28px rgba(0,0,0,.4);font-family:DM Mono,monospace;';
+    const mName=MONTHS_LONG[m-1];
+    const close=document.createElement('div');
+    close.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;';
+    close.innerHTML='<span style="font-weight:700;font-size:13px;color:var(--text);">'+mName+'</span><span style="cursor:pointer;color:var(--muted);font-size:14px;" onclick="this.parentElement.parentElement.remove()">×</span>';
+    popup.appendChild(close);
+    const addRow=(dot,label,val,sub)=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:7px;';
+      row.innerHTML='<span style="display:flex;align-items:center;gap:6px;color:#8394aa;font-size:11px;">'+dot+label+'</span><div style="text-align:right;"><div style="font-weight:700;font-size:13px;color:var(--text);">'+val+'</div>'+(sub?'<div style="font-size:10px;color:#5a6a82;">'+sub+'</div>':'')+'</div>';
+      popup.appendChild(row);
+    };
+    const dot=(clr,dashed)=>dashed
+      ?'<span style="width:10px;height:10px;border-radius:50%;background:transparent;border:2px solid '+clr+';flex-shrink:0;display:inline-block;"></span>'
+      :'<span style="width:10px;height:10px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span>';
+    // Forecast row
+    if(m>lastRealizedMonth&&forecast[m]){
+      addRow(dot(FC_COLOR,true),'PREVISÃO',fmtV(forecast[m]),forecastCnt[m]?'~'+forecastCnt[m]+' contratos':'');
+    } else if(m===lastRealizedMonth&&currentProj&&currentProj>0){
+      addRow(dot(FC_COLOR,true),'PREVISÃO MÊS',fmtV(currentProj),'');
+    }
+    // Meta row
+    const metaVal=METAS_GERAL['2026-'+String(m).padStart(2,'0')];
+    if(metaVal) addRow(dot(META_COLOR),'META 2026',fmtV(metaVal),'');
+    // Year rows
+    YEARS.forEach(y=>{
+      if(!activeYears.has(y)) return;
+      const {agg}=buildMonthly();
+      const ym=y+'-'+String(m).padStart(2,'0');
+      const v=agg[ym]||0;
+      if(!v&&y!==2026) return;
+      addRow(dot(COLORS[y]),String(y),fmtV(v),'');
+    });
+    // Exec section (if any selected)
+    if(typeof _execSel!=='undefined'&&_execSel.size>0){
+      const sep=document.createElement('div');
+      sep.style.cssText='border-top:1px solid rgba(99,179,237,0.1);margin:6px 0;';
+      popup.appendChild(sep);
+      const PROJ_CLR_POP='#ffeaa7';
+      const todayM=new Date().getMonth()+1;
+      [..._execSel].forEach(nome=>{
+        const clr=_execColors[nome]||'#a29bfe';
+        const {monthly}=tExecMonthly(nome);
+        const fc_=tExecForecastBar(nome);
+        const nShort=nome.split(' ').slice(0,2).join(' ');
+        if(m<todayM){
+          const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
+          if(v) addRow(dot(clr),nShort.toUpperCase(),fmtV(v),'');
+        } else if(m===todayM){
+          const vR=monthly['2026-'+String(m).padStart(2,'0')]||0;
+          const vP=fc_.forecast[m]||null;
+          if(vR) addRow(dot(clr),nShort.toUpperCase()+' (feito)',fmtV(vR),'');
+          if(vP) addRow(dot(clr,true),nShort.toUpperCase()+' (proj.)',fmtV(vP),'');
+        } else {
+          const v=fc_.forecast[m]||null;
+          if(v) addRow(dot(clr,true),nShort.toUpperCase()+' (MA)',fmtV(v),'');
+        }
+      });
+    }
+    document.body.appendChild(popup);
+    const pw=popup.offsetWidth||220,ph=popup.offsetHeight||160;
+    let left=nativeEvt.clientX+10,top=nativeEvt.clientY-ph/2;
+    if(left+pw>window.innerWidth-10) left=nativeEvt.clientX-pw-10;
+    if(top<8) top=8;
+    if(top+ph>window.innerHeight-8) top=window.innerHeight-ph-8;
+    popup.style.left=left+'px';popup.style.top=top+'px';
+    setTimeout(()=>document.addEventListener('click',function h(){popup.remove();document.removeEventListener('click',h);}),10);
+  }
+
+  // Year button toggles
+  document.querySelectorAll('.trend-yr-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const yr=this.dataset.year;
+      const key=isNaN(yr)?yr:parseInt(yr);
+      if(activeYears.has(key)){activeYears.delete(key);this.classList.remove('active');}
+      else{activeYears.add(key);this.classList.add('active');}
+      if(_chart){_chart.destroy();_chart=null;}
+      drawChart();
+    });
+  });
+
+  window.drawChart=drawChart;
+  drawChart();
+
+
   const EXEC_PALETTE=['#a29bfe','#55efc4','#fdcb6e','#e17055','#81ecec','#fab1a0','#74b9ff','#ff7675','#00cec9','#636e72'];
   let _execSel=new Set();
   let _execColors={};
