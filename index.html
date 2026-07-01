@@ -2673,7 +2673,7 @@ update();
     const grid=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
     const muted=isDark?'#5a6a82':'#8892a0';
     const fmtK=v=>v==null||v===0?'':v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':'R$'+(v/1e3).toFixed(0)+'k';
-    const metaMes_=m=>{const e={cargo:TEAM[nome]?.cargo||'Closer'};return metaMes(e,'2026-'+String(m).padStart(2,'0'));};
+    const metaMes_=m=>{const cargo=TEAM[nome]?.cargo||'Closer';const ym='2026-'+String(m).padStart(2,'0');return cargo==='Closer'?(METAS_CLOSER[ym]||0):(METAS_IS[ym]||0);};
     // Datasets
     const pastD=months.map((_,i)=>i+1<nowMonth?(fc.realized[i+1]||0):null);
     const curD=months.map((_,i)=>i+1===nowMonth?fc.curPartial:null);
