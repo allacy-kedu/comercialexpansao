@@ -405,6 +405,16 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .trend-exec-drop-header button{background:none;border:none;color:var(--accent);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;padding:0;}
 .trend-exec-info{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 4px;}
 .trend-exec-badge{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;border:1px solid;white-space:nowrap;}
+.exec-sm-legend{display:flex;gap:14px;align-items:center;padding:2px 0 14px;flex-wrap:wrap;}
+.exec-sm-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+.exec-sm-legsq{width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0;}
+.exec-sm-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card2);}
+.exec-sm-card:last-child{margin-bottom:0;}
+.exec-sm-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.exec-sm-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;overflow:hidden;}
+.exec-sm-name{font-size:12px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;}
+.exec-sm-cargo{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px;}
+.exec-sm-badge{margin-left:auto;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -874,8 +884,14 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25;display:block;margin:0 auto 10px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Selecione um ou mais executivos para ver a tendência individual
     </div>
-    <div id="exec-trend-chart-wrap" style="position:relative;height:240px;display:none;">
-      <canvas id="exec-trend-chart" role="img" aria-label="Tendência mensal por executivo"></canvas>
+    <div id="exec-trend-chart-wrap" style="display:none;">
+      <div class="exec-sm-legend" id="exec-sm-legend-row">
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:#1D9E75;"></span>Realizado</span>
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:#EF9F27;"></span>Mês atual</span>
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(239,159,39,0.28);border:1px solid rgba(239,159,39,0.6);"></span>Projeção</span>
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(42,120,214,0.5);"></span>Previsão</span>
+      </div>
+      <div id="exec-sm-charts"></div>
     </div>
   </div>
   </section>
@@ -2592,75 +2608,164 @@ update();
     return {forecast,lastRealizedMonth:lastRealized,growthFactor,realized,forecastCnt:{}};
   }
 
-  function tExecDatasets(){
-    const ds=[];
-    const today=new Date(),nowMonth=today.getMonth()+1,nowYear=today.getFullYear();
-    [..._execSel].forEach(nome=>{
-      const clr=tExecColor(nome);
-      const {monthly}=tExecMonthly(nome);
-      const fc=tExecForecast(nome);
-
-      // ── 1. Realized line: Jan → month before current (solid) ──
-      const realizedLine=Array.from({length:12},(_,i)=>{
-        const m=i+1;
-        if(nowYear===2026&&m>=nowMonth) return null; // stop before current month
-        return monthly['2026-'+String(m).padStart(2,'0')]||0;
+  // ── Bar-chart forecast (small multiples) — usado apenas no card "Tendência por Executivo" ──
+  function tExecForecastBar(nome){
+    const {monthly}=tExecMonthly(nome);
+    const today=new Date();
+    const nowMonth=today.getMonth()+1;
+    // Realized array up to current month
+    const realArr=[];
+    for(let m=1;m<=nowMonth;m++){
+      const ym='2026-'+String(m).padStart(2,'0');
+      realArr.push({m,v:monthly[ym]||0});
+    }
+    // Last 3 months with non-zero data
+    const last3=realArr.filter(r=>r.v>0).slice(-3).map(r=>r.v);
+    let maBase,source;
+    if(last3.length>=2){
+      maBase=Math.round(last3.reduce((s,v)=>s+v,0)/last3.length);
+      source='MA pessoal';
+    } else {
+      // Regional fallback
+      const regional=TEAM[nome]?TEAM[nome].regional:'R1';
+      const regMembers=Object.keys(TEAM).filter(n=>TEAM[n]&&TEAM[n].regional===regional&&n!==nome);
+      let regTotal=0,regCount=0;
+      regMembers.forEach(n=>{
+        const {monthly:rm}=tExecMonthly(n);
+        for(let m=Math.max(1,nowMonth-2);m<=nowMonth;m++){
+          const v=rm['2026-'+String(m).padStart(2,'0')]||0;
+          if(v>0){regTotal+=v;regCount++;}
+        }
       });
-      ds.push({
-        label:'exec:'+nome,
-        data:realizedLine,
-        borderColor:clr,borderWidth:1.8,borderDash:[],
-        pointBackgroundColor:clr,pointRadius:3,pointHoverRadius:5,
-        tension:.35,fill:false,spanGaps:false
-      });
+      maBase=regCount>0?Math.round(regTotal/regCount):(last3.length>0?last3[0]:0);
+      source='Média regional';
+    }
+    // Current month: partial realized + projection
+    const curPartial=monthly['2026-'+String(nowMonth).padStart(2,'0')]||0;
+    // Future forecast (chained MA)
+    const forecast={[nowMonth]:maBase};
+    const chain=[...realArr];
+    for(let m=nowMonth+1;m<=12;m++){
+      const recent=[...chain].reverse().filter(r=>r.v>0).slice(0,3).map(r=>r.v);
+      const ma=recent.length>0?Math.round(recent.reduce((s,v)=>s+v,0)/recent.length):maBase;
+      forecast[m]=ma;
+      chain.push({m,v:ma});
+    }
+    // Growth factor vs 2025
+    let rNum=0,rDen=0;
+    for(let m=1;m<nowMonth;m++){
+      const r=monthly['2026-'+String(m).padStart(2,'0')]||0;
+      const p=monthly['2025-'+String(m).padStart(2,'0')]||0;
+      if(r>0&&p>0){rNum+=r;rDen+=p;}
+    }
+    const growthFactor=rDen>0?rNum/rDen:1.0;
+    const realized={};
+    realArr.forEach(r=>realized[r.m]=r.v);
+    return {forecast,realized,curPartial,maBase,growthFactor,source};
+  }
 
-      // ── 2. Current month realized (solid dot) ─────────────────
-      const curRealized=monthly['2026-'+String(nowMonth).padStart(2,'0')]||0;
-      const curPoint=Array.from({length:12},(_,i)=>i+1===nowMonth?curRealized:null);
-      ds.push({
-        label:'exec-cur:'+nome,
-        data:curPoint,
-        borderColor:'transparent',borderWidth:0,
-        pointBackgroundColor:clr,pointBorderColor:clr,
-        pointRadius:5,pointHoverRadius:7,
-        fill:false
+  function buildExecBarChart(nome){
+    const today=new Date(),nowMonth=today.getMonth()+1;
+    const clr=tExecColor(nome);
+    const fc=tExecForecastBar(nome);
+    const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    const grid=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+    const muted=isDark?'#5a6a82':'#8892a0';
+    const fmtK=v=>v==null||v===0?'':v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':'R$'+(v/1e3).toFixed(0)+'k';
+    const metaMes_=m=>{const e={cargo:TEAM[nome]?.cargo||'Closer'};return metaMes(e,'2026-'+String(m).padStart(2,'0'));};
+    // Datasets
+    const pastD=months.map((_,i)=>i+1<nowMonth?(fc.realized[i+1]||0):null);
+    const curD=months.map((_,i)=>i+1===nowMonth?fc.curPartial:null);
+    const curExtD=months.map((_,i)=>i+1===nowMonth?Math.max(0,(fc.forecast[nowMonth]||fc.curPartial)-fc.curPartial):null);
+    const futD=months.map((_,i)=>i+1>nowMonth?(fc.forecast[i+1]||null):null);
+    // Existing chart or create
+    const canvasId='exec-bar-'+nome.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+    let chart=_execCharts[nome];
+    if(chart){
+      chart.data.datasets[0].data=pastD;
+      chart.data.datasets[1].data=curD;
+      chart.data.datasets[2].data=curExtD;
+      chart.data.datasets[3].data=futD;
+      chart.update('none');
+    } else {
+      const canvas=document.getElementById(canvasId);
+      if(!canvas) return;
+      chart=new Chart(canvas,{
+        type:'bar',
+        data:{labels:months,datasets:[
+          {label:'Realizado',data:pastD,backgroundColor:'#1D9E75',borderRadius:4,borderSkipped:false,maxBarThickness:22,stack:'a'},
+          {label:'Parcial',data:curD,backgroundColor:'#EF9F27',borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4},borderSkipped:false,maxBarThickness:22,stack:'b'},
+          {label:'Projeção mês',data:curExtD,backgroundColor:'rgba(239,159,39,0.28)',borderColor:'rgba(239,159,39,0.6)',borderWidth:1,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false,maxBarThickness:22,stack:'b'},
+          {label:'Previsão',data:futD,backgroundColor:'rgba(42,120,214,0.5)',borderRadius:4,borderSkipped:false,maxBarThickness:22,stack:'c'}
+        ]},
+        options:{
+          responsive:true,maintainAspectRatio:false,animation:{duration:350},
+          onClick:(evt,_,ch)=>{
+            const els=ch.getElementsAtEventForMode(evt.native,'index',{intersect:false},true);
+            const m=els&&els.length?els[0].index+1:null;
+            if(m) showBarPopup(nome,m,fc,metaMes_,evt.native);
+          },
+          plugins:{legend:{display:false},tooltip:{enabled:false}},
+          scales:{
+            x:{stacked:true,grid:{display:false},ticks:{color:muted,font:{size:9},maxRotation:0,autoSkip:false}},
+            y:{stacked:false,grid:{color:grid,drawBorder:false},ticks:{color:muted,font:{size:9},maxTicksLimit:4,callback:v=>fmtK(v)},border:{display:false}}
+          }
+        }
       });
+      _execCharts[nome]=chart;
+    }
+  }
 
-      // ── 3. Current month projection (hollow dot, amber) ───────
-      const curProj=fc.forecast[nowMonth]||null;
-      if(curProj){
-        const projPoint=Array.from({length:12},(_,i)=>i+1===nowMonth?curProj:null);
-        ds.push({
-          label:'exec-proj:'+nome,
-          data:projPoint,
-          borderColor:'transparent',borderWidth:0,
-          pointBackgroundColor:'transparent',
-          pointBorderColor:clr,pointBorderWidth:2,
-          pointRadius:5,pointHoverRadius:7,
-          fill:false
-        });
-      }
-
-      // ── 4. Future forecast (dashed, from current month → Dec) ─
-      const fcLine=Array.from({length:12},(_,i)=>{
-        const m=i+1;
-        if(m<nowMonth) return null;
-        return fc.forecast[m]||null;
-      });
-      if(fcLine.some(v=>v!==null)){
-        ds.push({
-          label:'exec-fc:'+nome,
-          data:fcLine,
-          borderColor:clr,borderWidth:1.5,borderDash:[5,4],
-          pointBackgroundColor:'transparent',
-          pointBorderColor:clr,pointBorderWidth:1.5,
-          pointRadius:fcLine.map((v,i)=>v&&i+1>nowMonth?2.5:0),
-          pointHoverRadius:4,
-          tension:0,fill:false,spanGaps:false
-        });
-      }
-    });
-    return ds;
+  function showBarPopup(nome,m,fc,metaMes_,nativeEvt){
+    document.querySelectorAll('.month-popup').forEach(p=>p.remove());
+    const today=new Date(),nowMonth=today.getMonth()+1;
+    const mName=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m-1];
+    const meta=metaMes_(m);
+    const fmtV_=v=>v?'R$ '+Math.round(v).toLocaleString('pt-BR'):'—';
+    const popup=document.createElement('div');
+    popup.className='month-popup';
+    popup.style.cssText='position:fixed;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;z-index:9999;min-width:210px;box-shadow:0 8px 28px rgba(0,0,0,.4);font-family:DM Mono,monospace;font-size:12px;';
+    const clr=tExecColor(nome);
+    const nShort=nome.split(' ').slice(0,2).join(' ');
+    let rows='';
+    if(m<nowMonth){
+      const v=fc.realized[m]||0;
+      const pct=meta>0?Math.round(v/meta*100):0;
+      const pctClr=pct>=100?'#00b894':pct>=70?'#fdcb6e':'#e17055';
+      rows=`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Realizado</span><span style="font-weight:700;color:${clr};">${fmtV_(v)}</span></div>`
+          +`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Meta</span><span>${fmtV_(meta)}</span></div>`
+          +`<div style="height:0.5px;background:rgba(99,179,237,0.1);margin:6px 0;"></div>`
+          +`<div style="display:flex;justify-content:space-between;"><span style="color:#8394aa;">Atingimento</span><span style="font-weight:700;color:${pctClr};">${pct}%</span></div>`;
+    } else if(m===nowMonth){
+      const proj=fc.forecast[m]||fc.curPartial;
+      const pct=meta>0?Math.round(proj/meta*100):0;
+      const pctClr=pct>=100?'#00b894':pct>=70?'#fdcb6e':'#e17055';
+      rows=`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Parcial realizado</span><span style="font-weight:700;color:#EF9F27;">${fmtV_(fc.curPartial)}</span></div>`
+          +`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Projeção mês cheio</span><span style="font-weight:700;color:#2a78d6;">${fmtV_(proj)}</span></div>`
+          +`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Meta</span><span>${fmtV_(meta)}</span></div>`
+          +`<div style="height:0.5px;background:rgba(99,179,237,0.1);margin:6px 0;"></div>`
+          +`<div style="display:flex;justify-content:space-between;"><span style="color:#8394aa;">Proj. vs meta</span><span style="font-weight:700;color:${pctClr};">${pct}%</span></div>`;
+    } else {
+      const v=fc.forecast[m]||0;
+      const pct=meta>0?Math.round(v/meta*100):0;
+      const pctClr=pct>=100?'#00b894':pct>=70?'#fdcb6e':'#e17055';
+      rows=`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Previsão MA</span><span style="font-weight:700;color:#2a78d6;">${fmtV_(v)}</span></div>`
+          +`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Fonte</span><span style="color:var(--muted);">${fc.source}</span></div>`
+          +`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#8394aa;">Meta</span><span>${fmtV_(meta)}</span></div>`
+          +`<div style="height:0.5px;background:rgba(99,179,237,0.1);margin:6px 0;"></div>`
+          +`<div style="display:flex;justify-content:space-between;"><span style="color:#8394aa;">Prev. vs meta</span><span style="font-weight:700;color:${pctClr};">${pct}%</span></div>`;
+    }
+    const icon=m<nowMonth?'<span style="width:9px;height:9px;border-radius:2px;background:#1D9E75;display:inline-block;margin-right:5px;"></span>':m===nowMonth?'<span style="width:9px;height:9px;border-radius:2px;background:#EF9F27;display:inline-block;margin-right:5px;"></span>':'<span style="width:9px;height:9px;border-radius:2px;background:rgba(42,120,214,0.7);display:inline-block;margin-right:5px;"></span>';
+    popup.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-weight:700;font-size:13px;color:var(--text);">${icon}${mName} · ${nShort}</span><span style="cursor:pointer;color:var(--muted);font-size:14px;" onclick="this.parentElement.parentElement.remove()">×</span></div>${rows}`;
+    document.body.appendChild(popup);
+    const pw=popup.offsetWidth||210,ph=popup.offsetHeight||160;
+    let left=nativeEvt.clientX+10,top=nativeEvt.clientY-ph/2;
+    if(left+pw>window.innerWidth-10) left=nativeEvt.clientX-pw-10;
+    if(top<8) top=8;
+    if(top+ph>window.innerHeight-8) top=window.innerHeight-ph-8;
+    popup.style.left=left+'px';popup.style.top=top+'px';
+    setTimeout(()=>document.addEventListener('click',function h(){popup.remove();document.removeEventListener('click',h);}),10);
   }
 
   function tExecBuildDrop(){
@@ -2711,7 +2816,7 @@ update();
     btn.classList.toggle('has-sel',_execSel.size>0);
   }
 
-  let _execTrendChart=null;
+  let _execCharts={};   // nome → Chart instance (small multiples)
 
   function tExecUpdateInfo(){
     const bar=document.getElementById('trend-exec-info');
@@ -2738,120 +2843,59 @@ update();
     const empty=document.getElementById('exec-trend-empty');
     const wrap=document.getElementById('exec-trend-chart-wrap');
     const sub=document.getElementById('exec-trend-sub');
-    if(!wrap) return;
-
+    const container=document.getElementById('exec-sm-charts');
+    if(!wrap||!container) return;
     if(!_execSel.size){
       if(empty) empty.style.display='block';
       wrap.style.display='none';
-      if(_execTrendChart){_execTrendChart.destroy();_execTrendChart=null;}
+      Object.values(_execCharts).forEach(c=>{try{c.destroy();}catch(e){}});
+      _execCharts={};
       if(sub) sub.textContent='Selecione executivos no menu ao lado';
       return;
     }
-
     if(empty) empty.style.display='none';
     wrap.style.display='block';
-
-    const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const datasets=tExecDatasets();
-    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
-    const gridClr=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
-    const textClr=isDark?'#5a6a82':'#8892a0';
-
-    if(_execTrendChart){
-      _execTrendChart.data.datasets=datasets;
-      _execTrendChart.update('none');
-    } else {
-      const canvas=document.getElementById('exec-trend-chart');
-      if(!canvas) return;
-      _execTrendChart=new Chart(canvas,{
-        type:'line',
-        data:{labels:months,datasets},
-        options:{
-          responsive:true,maintainAspectRatio:false,animation:{duration:300},
-          interaction:{mode:'none'},
-          onClick:(evt,_,chart)=>{
-            let closest=null;
-            const els=chart.getElementsAtEventForMode(evt.native,'index',{intersect:false},true);
-            if(els&&els.length) closest=els[0].index+1;
-            if(closest===null){
-              // Fallback: manual pixel distance calc
-              const x=chart.scales.x;
-              if(!x) return;
-              const rect=canvas.getBoundingClientRect();
-              const xPx=evt.native.clientX-rect.left;
-              let minD=Infinity;
-              months.forEach((_,i)=>{
-                const px=(typeof x.getPixelForTick==='function')?x.getPixelForTick(i):x.getPixelForValue(i);
-                const d=Math.abs(xPx-px);
-                if(d<minD){minD=d;closest=i+1;}
-              });
-              if(minD>=80) closest=null;
-            }
-            if(closest!==null) showExecMonthPopup(closest,evt.native);
-          },
-          plugins:{
-            legend:{display:false},
-            tooltip:{enabled:false}
-          },
-          scales:{
-            x:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'}}},
-            y:{grid:{color:gridClr},ticks:{color:textClr,font:{size:10,family:'DM Mono'},maxTicksLimit:5,
-               callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'K':'R$'+v}}
-          }
-        }
-      });
-    }
-
-    const names=[..._execSel].map(n=>n.split(' ')[0]).join(', ');
-    if(sub) sub.textContent=(_execSel.size===1?[..._execSel][0]:_execSel.size+' executivos')+' · Realizado + Projeção MA 3m';
-  }
-
-  function showExecMonthPopup(m, nativeEvt){
-    document.querySelectorAll('.month-popup').forEach(p=>p.remove());
-    const popup=document.createElement('div');
-    popup.className='month-popup';
-    popup.style.cssText='position:fixed;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;z-index:9999;min-width:220px;box-shadow:0 8px 28px rgba(0,0,0,.4);font-family:DM Mono,monospace;';
-    const todayM=new Date().getMonth()+1;
-    const mName=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m-1];
-    const close=document.createElement('div');
-    close.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;';
-    close.innerHTML='<span style="font-weight:700;font-size:13px;color:var(--text);">'+mName+'</span><span style="cursor:pointer;color:var(--muted);font-size:14px;" onclick="this.parentElement.parentElement.remove()">×</span>';
-    popup.appendChild(close);
-
-    [..._execSel].forEach(nome=>{
-      const clr=tExecColor(nome);
-      const {monthly}=tExecMonthly(nome);
-      const fc=tExecForecast(nome);
-      const nShort=nome.split(' ').slice(0,2).join(' ');
-      if(m<todayM){
-        const v=monthly['2026-'+String(m).padStart(2,'0')]||0;
-        const row=document.createElement('div');
-        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
-        row.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+'</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
-        popup.appendChild(row);
-      } else if(m===todayM){
-        const vR=monthly['2026-'+String(m).padStart(2,'0')]||0;
-        const vP=fc.forecast[m]||null;
-        if(vR){const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:4px;';r.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:'+clr+';display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (feito)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(vR)+'</span>';popup.appendChild(r);}
-        if(vP){const r2=document.createElement('div');r2.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';r2.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;border:2px solid '+clr+';background:transparent;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (proj.)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(vP)+'</span>';popup.appendChild(r2);}
-      } else {
-        const v=fc.forecast[m]||null;
-        if(!v) return;
-        const row=document.createElement('div');
-        row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;';
-        row.innerHTML='<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;border:1.5px solid '+clr+';background:transparent;display:inline-block;"></span><span style="color:#8394aa;font-size:11px;">'+nShort.toUpperCase()+' (MA 3m)</span></span><span style="font-weight:700;color:'+clr+';">'+fmtV(v)+'</span>';
-        popup.appendChild(row);
+    // Remove cards for deselected execs
+    container.querySelectorAll('.exec-sm-card').forEach(card=>{
+      if(!_execSel.has(card.dataset.exec)){
+        const n=card.dataset.exec;
+        if(_execCharts[n]){try{_execCharts[n].destroy();}catch(e){} delete _execCharts[n];}
+        card.remove();
       }
     });
-
-    document.body.appendChild(popup);
-    const pw=popup.offsetWidth||220,ph=popup.offsetHeight||160;
-    let left=nativeEvt.clientX+10, top=nativeEvt.clientY-ph/2;
-    if(left+pw>window.innerWidth-10) left=nativeEvt.clientX-pw-10;
-    if(top<8) top=8;
-    if(top+ph>window.innerHeight-8) top=window.innerHeight-ph-8;
-    popup.style.left=left+'px'; popup.style.top=top+'px';
-    setTimeout(()=>document.addEventListener('click',function h(){popup.remove();document.removeEventListener('click',h);}),10);
+    // Add/update cards for selected execs
+    [..._execSel].forEach(nome=>{
+      const canvasId='exec-bar-'+nome.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+      const cargo=TEAM[nome]?TEAM[nome].cargo:'—';
+      const clr=tExecColor(nome);
+      const ini=nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const fc=tExecForecastBar(nome);
+      const gp=((fc.growthFactor-1)*100);
+      const gpSign=gp>=0?'↑':'↓';
+      const gpClr=gp>=0?'#0F6E56':'#A32D2D';
+      const gpBg=gp>=0?'rgba(29,158,117,0.1)':'rgba(226,75,74,0.1)';
+      const gpBrd=gp>=0?'rgba(29,158,117,0.3)':'rgba(226,75,74,0.3)';
+      const existing=document.getElementById('exec-sm-'+canvasId);
+      if(!existing){
+        const div=document.createElement('div');
+        div.className='exec-sm-card';
+        div.dataset.exec=nome;
+        div.innerHTML=`<div class="exec-sm-head">`
+          +`<div class="exec-sm-av" style="background:${clr}22;color:${clr};">`
+          +`<img src="fotos/${nome}.jpg" alt="" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+          +`<span>${ini}</span>`
+          +`</div>`
+          +`<div><div class="exec-sm-name">${nome}</div><div class="exec-sm-cargo">${cargo}</div></div>`
+          +`<div class="exec-sm-badge" style="background:${gpBg};color:${gpClr};border:0.5px solid ${gpBrd};">${gpSign} ${Math.abs(gp).toFixed(1)}% vs 2025</div>`
+          +`</div>`
+          +`<div style="position:relative;height:150px;"><canvas id="${canvasId}" role="img" aria-label="Tendência mensal ${nome} 2026"></canvas></div>`;
+        container.appendChild(div);
+      }
+      // Build/update chart
+      buildExecBarChart(nome);
+    });
+    const names=[..._execSel].map(n=>n.split(' ')[0]).join(', ');
+    if(sub) sub.textContent=(_execSel.size===1?[..._execSel][0]:_execSel.size+' executivos')+' · Barras Jan–Dez 2026';
   }
 
   window.tExecToggle=function(e){
@@ -2865,6 +2909,10 @@ update();
 
   window.tExecClear=function(){
     _execSel.clear(); _execColors={};
+    Object.values(_execCharts).forEach(c=>{try{c.destroy();}catch(e){}});
+    _execCharts={};
+    const container=document.getElementById('exec-sm-charts');
+    if(container) container.innerHTML='';
     tExecUpdateBtn(); tExecUpdateInfo(); buildExecTrendChart();
     const d=document.getElementById('trend-exec-drop'); if(d) d.style.display='none';
   };
