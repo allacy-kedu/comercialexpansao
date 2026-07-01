@@ -3883,31 +3883,41 @@ function buildMelhorMes(){
 
     // Progress bars for all 3 horizons
     const pctFloat = mMes>0?(realM/mMes*100):0;
-    // Escopar Trim e Semestre ao mês da campanha visualizada
-    // Abril → só até Abr; Maio → até Mai; Junho → até Jun
-    const MESES_ATÉ = {
-      'abril':  {trim:['2026-04'],             sem:['2026-01','2026-02','2026-03','2026-04']},
-      'maio':   {trim:['2026-04','2026-05'],   sem:['2026-01','2026-02','2026-03','2026-04','2026-05']},
-      'junho':  {trim:['2026-04','2026-05','2026-06'], sem:['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06']},
-    };
-    const mesesEscopo = MESES_ATÉ[mes] || MESES_ATÉ['junho'];
-    // Q3: 2ª linha = Bimestre Jul+Ago · 3ª linha = Trimestre Jul+Ago+Set
-    const realTrimC = isQ3 ? realBim  : getReal(e.name, mesesEscopo.trim);
-    const mTrimC    = isQ3 ? mBim     : metaTrim(e);
-    const MESES_SEM_C = mesesEscopo.sem;
-    const realSemC = isQ3 ? realTri3 : getReal(e.name,MESES_SEM_C);
-    const metaSemC = isQ3 ? mTri3    : MESES_SEM_C.reduce((s,m2)=>s+metaMes(e,m2),0);
+    // Linhas 2 e 3: escopo varia por aba, sempre espelhando os MESMOS pares real/meta dos tiers abaixo
+    let realTrimC, mTrimC, realSemC, metaSemC, linha2Label, linha3Label;
+    if(isQ3){
+      // Q3: 2ª linha = Bimestre Jul+Ago · 3ª linha = Trimestre Jul+Ago+Set
+      realTrimC=realBim; mTrimC=mBim;
+      realSemC=realTri3; metaSemC=mTri3;
+      linha2Label='Bim.'; linha3Label='Trim.';
+    } else if(mes==='abril'){
+      // Abril: só teve Mês, Bimestre (abr+mai) e Trimestre (abr+mai+jun) — espelha t2/t3
+      realTrimC=realAbr; mTrimC=mA+mM2;
+      realSemC=realAbr;  metaSemC=mA+mM2+mJ;
+      linha2Label='Bim.'; linha3Label='Trim.';
+    } else if(mes==='maio'){
+      // Maio: idem, usando o acumulado abr+mai (antecipação) — espelha tmaijun/tabrmaijun
+      const realAbrMai_=realAbr+realMai;
+      realTrimC=realAbrMai_; mTrimC=mM2+mJ;
+      realSemC=realAbrMai_;  metaSemC=mA+mM2+mJ;
+      linha2Label='Bim.'; linha3Label='Trim.';
+    } else {
+      // Junho: mantém Trimestre (abr+mai+jun) e Semestre (jan–jun)
+      const MESES_SEM_C=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'];
+      realTrimC=realTrim; mTrimC=mT;
+      realSemC=getReal(e.name,MESES_SEM_C); metaSemC=MESES_SEM_C.reduce((s,m2)=>s+metaMes(e,m2),0);
+      linha2Label='Trim.'; linha3Label='Semestre';
+    }
     const pctTrimC = mTrimC>0?(realTrimC/mTrimC*100):0;
     const pctSemC  = metaSemC>0?(realSemC/metaSemC*100):0;
-    const linha2Label = isQ3 ? 'Bim.' : 'Trim.';
-    const linha3Label = isQ3 ? 'Trim.' : 'Semestre';
     const hoje3=new Date();
     const mesFechado={'abril':hoje3>new Date(2026,3,30),'maio':hoje3>new Date(2026,4,31),'junho':hoje3>new Date(2026,5,30),
       'julho':hoje3>new Date(2026,6,31),'agosto':hoje3>new Date(2026,6,31),'setembro':hoje3>new Date(2026,6,31)}[mes];
     const bcE=(p,f)=>p>=100?'#00b894':f?'#e17055':'#fdcb6e';
+    const bcOk=(ok,f)=>ok?'#00b894':f?'#e17055':'#fdcb6e';   // cor da barra/linha segue a trava (mês→bi→tri), não o % bruto
     const pctMesOk = pctFloat>=100;
-    const pctTrimOk = pctMesOk && pctTrimC>=100;   // Trim./Bim. só "batido" se o mês bateu
-    const pctSemOk  = pctTrimOk && pctSemC>=100;   // Semestre/Trim. só "batido" se a etapa anterior bateu
+    const pctTrimOk = pctMesOk && pctTrimC>=100;   // Bim./Trim. só "batido" se o mês bateu
+    const pctSemOk  = pctTrimOk && pctSemC>=100;   // Trim./Semestre só "batido" se a etapa anterior bateu
 
     return `<div class="camp-card">
       <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
@@ -3932,23 +3942,23 @@ function buildMelhorMes(){
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">${isQ3?'Jul.':mes.charAt(0).toUpperCase()+mes.slice(1)+'.'}</div>
             <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctFloat)}%;height:100%;background:${bcE(pctFloat,mesFechado&&!pctMesOk)};border-radius:3px;"></div></div>
-            <div style="font-size:12px;font-weight:700;color:${bcE(pctFloat,mesFechado&&!pctMesOk)};width:42px;text-align:right;">${pctFloat.toFixed(1)}%</div>
+            <div style="font-size:12px;font-weight:700;color:${bcOk(pctMesOk,mesFechado&&!pctMesOk)};width:42px;text-align:right;">${pctFloat.toFixed(1)}%</div>
           </div>
           ${pctMesOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mMes-realM>0?`<div style="font-size:11px;color:#fdcb6e;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mMes-realM))}</div>`:'')}
         </div>
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">${linha2Label}</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrimC)}%;height:100%;background:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
-            <div style="font-size:12px;font-weight:700;color:${bcE(pctTrimC,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">${pctTrimC.toFixed(1)}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctTrimC)}%;height:100%;background:${bcOk(pctTrimOk,mesFechado&&!pctTrimOk)};border-radius:3px;"></div></div>
+            <div style="font-size:12px;font-weight:700;color:${bcOk(pctTrimOk,mesFechado&&!pctTrimOk)};width:42px;text-align:right;">${pctTrimC.toFixed(1)}%</div>
           </div>
           ${pctTrimOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(mTrimC-realTrimC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,mTrimC-realTrimC))}</div>`:'')}
         </div>
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">${linha3Label}</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcE(pctSemC,mesFechado&&!pctSemOk)};border-radius:3px;"></div></div>
-            <div style="font-size:12px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!pctSemOk)};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcOk(pctSemOk,mesFechado&&!pctSemOk)};border-radius:3px;"></div></div>
+            <div style="font-size:12px;font-weight:700;color:${bcOk(pctSemOk,mesFechado&&!pctSemOk)};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
           </div>
           ${pctSemOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(metaSemC-realSemC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,metaSemC-realSemC))}</div>`:'')}
         </div>
