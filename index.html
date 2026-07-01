@@ -2695,16 +2695,17 @@ update();
         type:'bar',
         data:{labels:months,datasets:[
           {label:'Realizado',data:pastD,backgroundColor:'#1D9E75',borderRadius:4,borderSkipped:false,maxBarThickness:22,stack:'a'},
-          {label:'Parcial',data:curD,backgroundColor:'#EF9F27',borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4},borderSkipped:false,maxBarThickness:22,stack:'b'},
-          {label:'Projeção mês',data:curExtD,backgroundColor:'rgba(239,159,39,0.28)',borderColor:'rgba(239,159,39,0.6)',borderWidth:1,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false,maxBarThickness:22,stack:'b'},
-          {label:'Previsão',data:futD,backgroundColor:'rgba(42,120,214,0.5)',borderRadius:4,borderSkipped:false,maxBarThickness:22,stack:'c'}
+          {label:'Parcial',data:curD,backgroundColor:'#EF9F27',borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4},borderSkipped:false,maxBarThickness:22,stack:'a'},
+          {label:'Projeção mês',data:curExtD,backgroundColor:'rgba(239,159,39,0.28)',borderColor:'rgba(239,159,39,0.6)',borderWidth:1,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false,maxBarThickness:22,stack:'a'},
+          {label:'Previsão',data:futD,backgroundColor:'rgba(42,120,214,0.5)',borderRadius:4,borderSkipped:false,maxBarThickness:22,stack:'a'}
         ]},
         options:{
           responsive:true,maintainAspectRatio:false,animation:{duration:350},
-          onClick:(evt,_,ch)=>{
-            const els=ch.getElementsAtEventForMode(evt.native,'index',{intersect:false},true);
-            const m=els&&els.length?els[0].index+1:null;
-            if(m) showBarPopup(nome,m,fc,metaMes_,evt.native);
+          interaction:{mode:'index',intersect:false},
+          onClick:(evt,elements)=>{
+            if(!elements.length) return;
+            const m=elements[0].index+1;
+            showBarPopup(nome,m,fc,metaMes_,evt.native);
           },
           plugins:{legend:{display:false},tooltip:{enabled:false}},
           scales:{
