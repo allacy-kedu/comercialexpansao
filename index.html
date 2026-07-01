@@ -6,6 +6,7 @@
 <title>kedu · Comercial Expansão 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
+/* ── Tema & Variáveis Globais ─────────────────────────────────── */
 :root{--bg:#08090f;--bg2:#0d0f1a;--card:#111320;--card2:#161929;--border:rgba(99,179,237,0.08);--border2:rgba(99,179,237,0.18);--accent:#4ECDC4;--accent2:#FF6B6B;--accent3:#FFE66D;--accent4:#A29BFE;--text:#e8edf5;--muted:#5a6a82;--muted2:#8394aa;--green:#52c77d;--red:#ff6b6b;--orange:#f6ad55;--purple:#b794f4;--pill-h:36px;}
 [data-theme="light"]{
   --bg:#f0f4f8;--bg2:#e2e8f0;--card:#ffffff;--card2:#f7fafc;
@@ -25,6 +26,8 @@
 [data-theme="light"] tr:hover td{background:rgba(14,159,142,0.04);}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;background-image:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(78,205,196,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%,rgba(162,155,254,0.06) 0%,transparent 60%);}
+
+/* ── Header ───────────────────────────────────────────────────── */
 .header{background:rgba(13,15,26,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .hlogo{display:flex;align-items:center;gap:12px;}
 .hmark{width:90px;height:26px;display:flex;align-items:center;justify-content:center;}
@@ -37,6 +40,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 @keyframes loadpulse{0%{width:0;opacity:1}70%{width:90%;opacity:1}100%{width:100%;opacity:0}}
 .header-nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,0.08);}
 .hbadge{background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:13px;font-family:'DM Mono',monospace;}
+
+/* ── Barra de Filtros ─────────────────────────────────────────── */
 .filterbar{background:rgba(13,15,26,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:8px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:65px;z-index:190;}
 [data-theme="light"] .filterbar{background:rgba(240,244,248,0.95);}
 .fb-group{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:5px 10px;}
@@ -66,10 +71,13 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .active-filters{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-left:auto;}
 .afbadge{display:inline-flex;align-items:center;gap:3px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.18);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:12px;font-family:'DM Mono',monospace;}
 .afbadge .x{cursor:pointer;opacity:.5;margin-left:2px;}.afbadge .x:hover{opacity:1;}
+
+/* ── Layout Geral (container principal, títulos de seção) ────── */
 .main{padding:0;max-width:1800px;margin:0 auto;}
 .stitle{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
 
+/* ── Seção: Meta & Regionais ──────────────────────────────────── */
 .regional-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
 .reg-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;;box-sizing:border-box}
 .reg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -82,7 +90,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .reg-track-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent4));transition:width .6s ease;}
 @media(max-width:600px){.regional-grid{grid-template-columns:1fr;}}
 
-
+/* ── Componente compartilhado: dropdown multi-seleção ─────────── */
 .multisel-wrap{position:relative;}
 .multisel-btn{height:var(--pill-h);padding:0 10px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:space-between;transition:border-color .2s;}
 .multisel-btn:hover{border-color:var(--accent);}
@@ -92,6 +100,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .multisel-item input[type=checkbox]{accent-color:var(--accent);width:12px;height:12px;cursor:pointer;}
 .multisel-item.checked{color:var(--accent);}
 
+/* ── Seção: Ranking & Quartil (+ gráfico comparativo por Estado) ── */
 .estado-chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:none;}
 .estado-chart-card.visible{display:block;}
 .ranking-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;box-sizing:border-box;}
@@ -107,6 +116,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-col-title{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
 .ranking-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(78,205,196,0.25);}
+
+/* ── Seção: Campanhas ─────────────────────────────────────────── */
 .camp-section-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .camp-tabs{display:flex;gap:6px;margin-bottom:16px;}
 .camp-tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 14px;border-radius:20px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.06em;transition:.15s;}
@@ -142,6 +153,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .camp-exec-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
 .camp-pill{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);}
 .camp-pill.done{border-color:rgba(0,184,148,0.3);color:#00b894;background:rgba(0,184,148,0.06);}
+
+/* ── Sub-componente: Melhor do Mês (dentro de Ranking) ────────── */
 .melhor-avatar-wrap{position:relative;flex-shrink:0;}
 .melhor-avatar-ring{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);padding:2.5px;display:flex;align-items:center;justify-content:center;}
 .melhor-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
@@ -152,6 +165,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .melhor-label{font-size:11px;color:#FFD700;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'DM Mono',monospace;}
 .melhor-name{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;text-align:center;font-family:'DM Mono',monospace;}
 .melhor-val{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+
+/* ── Ranking: linhas de execução (lista) ──────────────────────── */
 .ranking-avatar-fallback{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);flex-shrink:0;}
 .ranking-row{display:grid;grid-template-columns:28px 44px 1fr 1fr 100px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .ranking-pos{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);width:12px;text-align:right;flex-shrink:0;}
@@ -169,6 +184,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .ranking-bar-row{display:flex;align-items:center;gap:6px;}
 .ranking-ctr{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);}
 
+/* ── Seção: Tendência (gráfico geral + simulador de meta) ─────── */
 .trend-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;;box-sizing:border-box}
 .trend-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .trend-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
@@ -192,6 +208,8 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .meta-pct-wrap{text-align:right;flex:0 0 auto;}
 .meta-pct{font-family:'DM Mono',monospace;font-size:30px;font-weight:800;color:var(--accent);}
 .meta-pct-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+
+/* ── Seção: KPIs Financeiros ───────────────────────────────────── */
 .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px;}
 .kpi-grid-2{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
 /* KPI hierarchy redesign */
@@ -422,6 +440,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 <body>
 
 
+<!-- ── Header ─────────────────────────────────────────────── -->
 <div class="header">
   <div class="hlogo">
     <div class="hmark" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo" style="cursor:pointer;"><img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:contain;" alt="kedu"></div>
@@ -442,6 +461,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
   </div>
 </div>
 
+<!-- ── Barra de Filtros ───────────────────────────────────── -->
 <div class="filterbar">
   <!-- Período -->
   <div class="fb-group">
@@ -519,6 +539,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 </div>
 
 
+<!-- ── Navegação lateral (sidebar) + painel de conteúdo ────── -->
 <div class="app-shell">
 <nav class="sidebar" id="sidebar">
   <a class="sb-item active" data-sec="sec-meta" onclick="sbClick(event,'sec-meta')">
@@ -1200,6 +1221,67 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 </div><!-- /app-shell -->
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════
+// ÍNDICE — kedu · Comercial Expansão 2026
+// Cada bloco abaixo tem um comentário de cabeçalho igual ao nome aqui.
+// Use Ctrl/Cmd+F com o nome do bloco para pular direto pra ele.
+// ═══════════════════════════════════════════════════════════════════════
+//
+//  DADOS & ESTADO COMPARTILHADO
+//    · Export Meta PNG
+//    · Estado (dropdown de UF, usado em vários filtros)
+//    · Equipe & Metas (TEAM, METAS_*, DEPARTURES, getMetaVendedor)
+//    · Base de contratos (RAW) & helpers de formatação (fmt, fmtN...)
+//    · Filtros (populateSelects, applyFilters, getMeses2026, getMeta)
+//
+//  SEÇÃO: RANKING & QUARTIL
+//    · Export Ranking / Quartil (exportRanking, copyRankingNames, exportQuartil)
+//    · Render Quartil & Ranking (renderQuartil, setRankingView)
+//    · Render central do dashboard (update) — atualiza regionais, KPIs, ranking
+//    · rankingAvatar, renderBadges
+//    · Seletor de Meses (filtro de período)
+//    · Filtros 2026 (Regional & Executivo)
+//
+//  SEÇÃO: TENDÊNCIA (gráfico geral + Tendência por Executivo)
+//    · Trend Chart (Chart.js) — gráfico geral, simulador, popup mensal
+//    · Tendência por Executivo — small multiples em barra por executivo
+//
+//  SEÇÃO: META & REGIONAIS (gráfico comparativo por Estado)
+//    · Estado Comparison Chart
+//
+//  DADOS: sincronização (Google Sheets / data.json)
+//    · Parsing de CSV & aplicação de nova base (parseCSVtoRAW, applyNewRAW)
+//    · Auto-load do data.json (autoLoadCSV)
+//
+//  SEÇÃO: RANKING → Melhor do Mês
+//    · buildMelhorMes
+//
+//  SEÇÃO: CAMPANHAS
+//    · Campanhas (tiers, coordenador, meta batida)
+//
+//  TEMA
+//    · Tema claro/escuro (toggleTheme)
+//
+//  SEÇÃO: ANÁLISE DE EQUIPE (AE)
+//    · Análise de Equipe — filtros multi-select + gráfico
+//
+//  MODAL: Contratos (tabela detalhada, abre a partir de vários cards)
+//    · Modal Contratos
+//
+//  SEÇÃO: CAMPANHAS → download de card
+//    · Download camp card
+//
+//  NAVEGAÇÃO
+//    · Sidebar navigation (scroll spy)
+//    · Section toggle
+//
+//  SEÇÃO: CAMPANHAS → Meta Batida (cards de download em imagem)
+//    · Meta Batida card download
+//
+//  SEÇÃO: ANÁLISE DE EQUIPE → KPI Breakdown Panel
+//    · KPI Breakdown Panel
+//
+// ═══════════════════════════════════════════════════════════════════════
 
 // ── Export Meta PNG ───────────────────────────────────────────
 function exportMeta(){
@@ -1254,6 +1336,7 @@ function exportMeta(){
 
 
 var selectedEstados = [];
+// ── Estado (dropdown de UF, usado em filtros de várias seções) ──
 const REGIOES = {
   'Norte':        ['Acre','Amapá','Amazonas','Pará','Rondônia','Roraima','Tocantins'],
   'Nordeste':     ['Alagoas','Bahia','Ceará','Maranhão','Paraíba','Pernambuco','Piauí','Rio Grande do Norte','Sergipe'],
@@ -1443,6 +1526,7 @@ document.addEventListener('click', e=>{
   }
 });
 
+// ── Equipe & Metas (TEAM, metas por cargo/regional, afastamentos) ──
 const R1_STATES = new Set(['Acre','Amapá','Amazonas','Ceará','Distrito Federal','Goiás','Maranhão','Mato Grosso','Mato Grosso do Sul','Pará','Paraíba','Piauí','Rio Grande do Norte','Rondônia','Roraima','Tocantins']);
 const R2_STATES = new Set(['Alagoas','Bahia','Espírito Santo','Minas Gerais','Paraná','Pernambuco','Rio de Janeiro','Rio Grande do Sul','Santa Catarina','São Paulo','Sergipe']);
 // Members with departure dates — removed from ranking/quartil from that month onward
@@ -1497,6 +1581,7 @@ const METAS_R1 = {'2026-01':772600,'2026-02':617400,'2026-03':1080000,'2026-04':
 const METAS_R2 = {'2026-01':728400,'2026-02':582700,'2026-03':1020000,'2026-04':1360000,'2026-05':1186000,'2026-06':1186000,'2026-07':1186000,'2026-08':1186000,'2026-09':1186000,'2026-10':1186000,'2026-11':1186000,'2026-12':1186000};
 const METAS_GERAL = {'2026-01':1500000,'2026-02':1200000,'2026-03':2100000,'2026-04':2800000,'2026-05':2800000,'2026-06':2800000,'2026-07':2800000,'2026-08':2800000,'2026-09':2800000,'2026-10':2800000,'2026-11':2800000,'2026-12':2800000};
 
+// ── Base de contratos (RAW) & helpers de formatação ─────────────
 const RAW=[];
 let _filteredCache = null;
 let _filtersCacheKey = '';
@@ -1525,6 +1610,7 @@ const fmtPct=v=>(v!==null&&v!==undefined&&!isNaN(v))?(v*100).toFixed(2)+'%':'—
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 
 
+// ── Filtros (período, status, modelo, estado) ───────────────────
 let filters={dateFrom:'',dateTo:'',status:'',modelo:'',estados:[],};
 
 function populateSelects(){
@@ -1584,6 +1670,7 @@ function getMeta(){
   return getMeses2026().reduce((s,ym)=>s+(METAS_GERAL[ym]||0),0);
 }
 
+// ── Seção: Ranking & Quartil ─────────────────────────────────────
 let rankingView = 'cargo'; // 'cargo' | 'regional'
 
 function exportRanking(){
@@ -1811,6 +1898,7 @@ function setRankingView(view){
   update();
 }
 
+// ── Render central do dashboard (regionais, KPIs, ranking, etc.) ──
 function update(){
   const data=applyFiltersCached();
   renderBadges();
@@ -2300,6 +2388,7 @@ function renderBadges(){
   else document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{fbRender();fbLabel();},100));
 })();
 
+// ── Filtros: aplicação (onFilterChange) + Regional/Executivo 2026 ──
 function onFilterChange(){
   invalidateCache();
   filters.dateFrom=document.getElementById('f-date-from')?.value||'';
@@ -3711,8 +3800,8 @@ function buildMelhorMes(){
     </div>`;
   }
 
-  function triSection(realTrim,mT){
-    const t130=realTrim>=mT*1.3, t150=realTrim>=mT*1.5;
+  function triSection(realTrim,mT,mesOk){
+    const t130=mesOk&&realTrim>=mT*1.3, t150=mesOk&&realTrim>=mT*1.5;
     return `<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(99,179,237,0.08);margin-top:4px;">Campanha Trimestral</div>`
       +(!t130?tierHtml(false,true,'130% meta trimestral (Abr–Jun)','+R$ 1.000',Math.max(0,mT*1.3-realTrim))+tierHtml(false,false,'150% meta trimestral (Abr–Jun)','+R$ 2.000',0)
         :!t150?tierHtml(true,false,'130% meta trimestral (Abr–Jun)','+R$ 1.000',0)+tierHtml(false,true,'150% meta trimestral (Abr–Jun)','+R$ 2.000',Math.max(0,mT*1.5-realTrim))
@@ -3737,8 +3826,8 @@ function buildMelhorMes(){
 
     if(isQ3){
       const t1Q=realM>=mMes;            // R$ 1.000 — meta julho
-      const t2Q=realBim>=mBim;          // +R$ 1.500 — bimestre Jul+Ago
-      const t3Q=realTri3>=mTri3;        // +R$ 2.500 — trimestre Jul+Ago+Set
+      const t2Q=t1Q&&realBim>=mBim;     // +R$ 1.500 — bimestre Jul+Ago (só se julho batido)
+      const t3Q=t2Q&&realTri3>=mTri3;   // +R$ 2.500 — trimestre Jul+Ago+Set (só se bimestre batido)
       total=(t1Q?1000:0)+(t2Q?1500:0)+(t3Q?2500:0);
       tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha 3º Trimestre · prazo 31/07</div>`
         +tierHtml(t1Q,!t1Q,'100% meta julho ('+fmtR(mMes)+') até 31/07','R$ 1.000',Math.max(0,mMes-realM))
@@ -3750,14 +3839,14 @@ function buildMelhorMes(){
       const t1=realAbr>=mA;
       const t2=realAbr>=mA+mM2;           // bimestre: realAbr cobre abr+mai?
       const t3=realAbr>=mA+mM2+mJ;        // trimestre: realAbr cobre abr+mai+jun?
-      const tri130=realAbr>=mT*1.3;
-      const tri150=realAbr>=mT*1.5;
+      const tri130=t1&&realAbr>=mT*1.3;
+      const tri150=t1&&realAbr>=mT*1.5;
       total=(t1?500:0)+(t2?500:0)+(t3?1000:0)+(tri130?1000:0)+(tri150?2000:0);
       tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Abril</div>`
         +tierHtml(t1,!t1,'100% meta abril ('+fmtR(mA)+')','R$ 500',Math.max(0,mA-realAbr))
         +tierHtml(t2,t1&&!t2,'100% meta abr+mai até 30/04 ('+fmtR(mA+mM2)+')','+R$ 500',Math.max(0,mA+mM2-realAbr))
         +tierHtml(t3,t2&&!t3,'100% meta abr+mai+jun até 30/04 ('+fmtR(mA+mM2+mJ)+')','+R$ 1.000',Math.max(0,mA+mM2+mJ-realAbr))
-        +triSection(realAbr,mT);          // passa só realAbr, não realTrim
+        +triSection(realAbr,mT,t1);          // passa só realAbr, não realTrim
     } else if(mes==='maio'){
       // ── REGRA: só contratos assinados até 31/05 contam (abr+mai) ──
       const realAbrMai = realAbr + realMai;   // contratos de abr+mai apenas
@@ -3767,15 +3856,15 @@ function buildMelhorMes(){
       const tgap=naoAbr&&tmeta&&sobreMai>=gapAbr;
       const tmaijun=tmeta&&realAbrMai>=mM2+mJ;         // abr+mai cobre mai+jun?
       const tabrmaijun=tmaijun&&realAbrMai>=mA+mM2+mJ; // abr+mai cobre abr+mai+jun?
-      const tri130=realAbrMai>=mT*1.3;
-      const tri150=realAbrMai>=mT*1.5;
+      const tri130=tmeta&&realAbrMai>=mT*1.3;
+      const tri150=tmeta&&realAbrMai>=mT*1.5;
       total=(tmeta?1000:0)+(tgap?500:0)+(tmaijun?750:0)+(tabrmaijun?750:0)+(tri130?1000:0)+(tri150?2000:0);
       tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Maio</div>`
         +tierHtml(tmeta,!tmeta,'100% meta maio ('+fmtR(mM2)+')','R$ 1.000',Math.max(0,mM2-realMai))
         +(naoAbr?tierHtml(tgap,tmeta&&!tgap,'Recuperou gap de abril','+R$ 500',Math.max(0,gapAbr-sobreMai)):'')
         +tierHtml(tmaijun,tmeta&&!tmaijun,'100% meta mai+jun até 31/05 ('+fmtR(mM2+mJ)+')','+R$ 750',Math.max(0,mM2+mJ-realAbrMai))
         +tierHtml(tabrmaijun,tmaijun&&!tabrmaijun,'100% meta abr+mai+jun até 31/05 ('+fmtR(mA+mM2+mJ)+')','+R$ 750',Math.max(0,mA+mM2+mJ-realAbrMai))
-        +triSection(realAbrMai,mT);       // passa realAbrMai, não realTrim
+        +triSection(realAbrMai,mT,tmeta);       // passa realAbrMai, não realTrim
     } else {
       // ── Campanha Junho ───────────────────────────────────────
       const realJun=getReal(e.name,['2026-06']);
@@ -3783,8 +3872,8 @@ function buildMelhorMes(){
       const metaSemEx=MESES_SEM_EX.reduce((s,m)=>s+metaMes(e,m),0);
       const realSemEx=getReal(e.name,MESES_SEM_EX);
       const t1Jun=realJun>=mJ;                    // R$ 1.000
-      const t2Jun=realTrim>=mT;                   // +R$ 500
-      const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 1.000 (only if t2 done)
+      const t2Jun=t1Jun&&realTrim>=mT;             // +R$ 1.500 (só desbloqueia se meta do mês batida)
+      const t3Jun=t2Jun&&realSemEx>=metaSemEx;     // +R$ 2.500 (só desbloqueia se trimestre batido)
       total=(t1Jun?1000:0)+(t2Jun?1500:0)+(t3Jun?2500:0);
       tiersHtml=`<div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:2px 0 6px;">Campanha Junho</div>`
         +tierHtml(t1Jun,!t1Jun,'100% meta junho ('+fmtR(mJ)+')','R$ 1.000',Math.max(0,mJ-realJun))
@@ -3817,7 +3906,8 @@ function buildMelhorMes(){
       'julho':hoje3>new Date(2026,6,31),'agosto':hoje3>new Date(2026,6,31),'setembro':hoje3>new Date(2026,6,31)}[mes];
     const bcE=(p,f)=>p>=100?'#00b894':f?'#e17055':'#fdcb6e';
     const pctMesOk = pctFloat>=100;
-    const pctTrimOk = pctTrimC>=100;
+    const pctTrimOk = pctMesOk && pctTrimC>=100;   // Trim./Bim. só "batido" se o mês bateu
+    const pctSemOk  = pctTrimOk && pctSemC>=100;   // Semestre/Trim. só "batido" se a etapa anterior bateu
 
     return `<div class="camp-card">
       <div class="camp-card-head" style="align-items:flex-start;margin-bottom:14px;">
@@ -3857,10 +3947,10 @@ function buildMelhorMes(){
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-size:11px;color:#5a6a82;width:54px;flex-shrink:0;">${linha3Label}</div>
-            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};border-radius:3px;"></div></div>
-            <div style="font-size:12px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!(pctSemC>=100))};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
+            <div style="flex:1;height:5px;background:rgba(99,179,237,0.08);border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100,pctSemC)}%;height:100%;background:${bcE(pctSemC,mesFechado&&!pctSemOk)};border-radius:3px;"></div></div>
+            <div style="font-size:12px;font-weight:700;color:${bcE(pctSemC,mesFechado&&!pctSemOk)};width:42px;text-align:right;">${pctSemC.toFixed(1)}%</div>
           </div>
-          ${pctSemC>=100?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(metaSemC-realSemC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,metaSemC-realSemC))}</div>`:'')}
+          ${pctSemOk?'<div style="font-size:11px;color:#00b894;margin-top:2px;padding-left:62px;">✓ Meta batida</div>':(metaSemC-realSemC>0?`<div style="font-size:11px;color:#5a6a82;margin-top:2px;padding-left:62px;">↘ Faltam ${fmtR(Math.max(0,metaSemC-realSemC))}</div>`:'')}
         </div>
       </div>
 
@@ -4006,8 +4096,8 @@ function buildMelhorMes(){
       const pctSem  = c.metaSem  > 0 ? (realSem  / c.metaSem  * 100) : 0;
 
       const t1 = realJun  >= c.metaJun;   // R$ 1.000
-      const t2 = realTrim >= c.metaTrim;  // +R$ 2.000
-      const t3 = realSem  >= c.metaSem;   // +R$ 1.000
+      const t2 = t1 && realTrim >= c.metaTrim;  // +R$ 2.000 (só se junho batido)
+      const t3 = t2 && realSem  >= c.metaSem;   // +R$ 1.000 (só se trimestre batido)
 
       const premBase = (t1?1000:0) + (t2?2000:0) + (t3?1000:0);
       // Bônus geral: meta consolidada batida E esta regional individualmente bateu junho
