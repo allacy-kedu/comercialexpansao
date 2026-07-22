@@ -237,7 +237,7 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .margem-calc-card{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;}
 .mc-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
 .mc-field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-family:'DM Mono',monospace;}
-.mc-field select,.mc-field input[type=number]{width:100%;height:32px;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:0 10px;}
+.mc-field select,.mc-field input[type=number],.mc-field input[type=text]{width:100%;height:32px;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:0 10px;}
 .mc-slider-row{display:flex;align-items:center;gap:10px;}
 .mc-slider-row input[type=range]{flex:1;accent-color:var(--accent);}
 .mc-slider-val{font-size:14px;font-weight:700;min-width:48px;text-align:right;font-family:'DM Mono',monospace;}
@@ -246,6 +246,10 @@ input[type=month]{background-image:none;padding-right:10px;min-width:130px;color
 .mc-number-wrap input[type=number]::-webkit-outer-spin-button,
 .mc-number-wrap input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .mc-number-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:12px;font-family:'DM Mono',monospace;pointer-events:none;}
+.mc-mask-input{font-variant-numeric:tabular-nums;letter-spacing:.01em;}
+.mc-mask-input::placeholder{color:var(--muted);opacity:.65;}
+.mc-mask-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(78,205,196,.08);outline:none;}
+.mc-mask-input:disabled{cursor:not-allowed;opacity:.5;}
 .mc-summary{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--muted);padding:10px 0 2px;border-top:1px solid var(--border);margin-top:2px;font-family:'DM Mono',monospace;}
 .mc-summary b{color:var(--text);font-weight:700;}
 .mc-results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
@@ -786,7 +790,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 .kpi-hero-sub,.kpi-m-sub,.kpi-mg-sub,.kpi-ops-main-sub,.kpi-ops-sm-sub{line-height:1.4;}
 .kpi-hero-avg{margin-top:14px!important;padding-top:12px!important;}
 .margem-calc-card{padding:18px 20px;}
-.mc-field select,.mc-field input[type=number]{height:36px;border-radius:9px;}
+.mc-field select,.mc-field input[type=number],.mc-field input[type=text]{height:36px;border-radius:9px;}
 .mc-result{border:1px solid var(--border);border-radius:11px;padding:14px 15px;}
 .mc-summary{line-height:1.6;}
 
@@ -1136,7 +1140,7 @@ body{
 .camp-tab.active{background:rgba(78,205,196,.09);}
 .rv-pill-circle{border-radius:10px;}
 .mc-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-.mc-field select,.mc-field input[type=number],.mc-number-wrap{
+.mc-field select,.mc-field input[type=number],.mc-field input[type=text],.mc-number-wrap{
   min-height:38px;
   border-radius:10px;
 }
@@ -1837,33 +1841,32 @@ body{
         <div class="mc-field">
           <label>Modalidade</label>
           <select id="mc-modelo">
+            <option value="" selected disabled>Selecione uma modalidade</option>
             <option value="Garantia Prevista">Garantia Prevista</option>
             <option value="Outras Garantias">Outras Garantias</option>
           </select>
         </div>
         <div class="mc-field">
           <label>Faturamento da escola (R$)</label>
-          <input type="number" id="mc-fatescola" value="1000000" step="50000" min="0">
+          <input type="text" id="mc-fatescola" class="mc-mask-input" inputmode="decimal" autocomplete="off" placeholder="R$ 0,00" data-format="currency" data-min="0" aria-label="Faturamento da escola">
         </div>
       </div>
       <div class="mc-row">
         <div class="mc-field">
           <label>Taxa (%)</label>
-          <input type="number" id="mc-taxa" value="6" step="0.1" min="0" max="30">
+          <input type="text" id="mc-taxa" class="mc-mask-input" inputmode="decimal" autocomplete="off" placeholder="0,00%" data-format="percent" data-min="0" data-max="30" aria-label="Taxa percentual">
         </div>
         <div class="mc-field" id="mc-pctgar-field">
           <label for="mc-pctgar">% Garantido (Garantia Prevista)</label>
           <div class="mc-number-wrap">
-            <input type="number" id="mc-pctgar" min="50" max="100" step="1" value="80" inputmode="numeric" aria-label="Percentual garantido">
-            <span class="mc-number-suffix" aria-hidden="true">%</span>
+            <input type="text" id="mc-pctgar" class="mc-mask-input" inputmode="decimal" autocomplete="off" placeholder="0,00%" data-format="percent" data-min="50" data-max="100" aria-label="Percentual garantido">
           </div>
         </div>
       </div>
       <div class="mc-field" style="margin-bottom:4px;">
         <label for="mc-margem">Margem esperada (sobre o garantido)</label>
         <div class="mc-number-wrap">
-          <input type="number" id="mc-margem" min="-2" max="8" step="0.1" value="1.6" inputmode="decimal" aria-label="Margem esperada">
-          <span class="mc-number-suffix" aria-hidden="true">%</span>
+          <input type="text" id="mc-margem" class="mc-mask-input" inputmode="decimal" autocomplete="off" placeholder="0,00%" data-format="percent" data-min="-2" data-max="8" aria-label="Margem esperada">
         </div>
       </div>
       <div class="mc-summary">
@@ -3166,8 +3169,57 @@ function rankingAvatar(nome, metaHit){
 }
 
 // ── Simulador de margem (nova negociação) ───────────────────────
-function mcFmtR(v){ return 'R$ '+Math.round(v).toLocaleString('pt-BR'); }
-function mcFmtP(v){ return v.toFixed(2).replace('.',',')+'%'; }
+const mcCurrencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style:'currency', currency:'BRL', minimumFractionDigits:2, maximumFractionDigits:2
+});
+const mcDecimalFormatter = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits:2, maximumFractionDigits:2
+});
+
+function mcParseNumber(value){
+  if(typeof value==='number') return Number.isFinite(value)?value:null;
+  const raw=String(value??'').trim();
+  if(!raw) return null;
+
+  let clean=raw.replace(/\s/g,'').replace(/R\$/gi,'').replace(/%/g,'');
+  const lastComma=clean.lastIndexOf(',');
+  const lastDot=clean.lastIndexOf('.');
+
+  if(lastComma>-1 && lastDot>-1){
+    if(lastComma>lastDot) clean=clean.replace(/\./g,'').replace(',','.');
+    else clean=clean.replace(/,/g,'');
+  }else if(lastComma>-1){
+    clean=clean.replace(/\./g,'').replace(',','.');
+  }else if(lastDot>-1){
+    const parts=clean.split('.');
+    if(parts.length>2 || (parts.length===2 && parts[1].length===3 && parts[0].length>=1)) clean=parts.join('');
+  }
+
+  clean=clean.replace(/[^0-9.-]/g,'');
+  if(!clean || clean==='-' || clean==='.' || clean==='-.') return null;
+  const parsed=Number(clean);
+  return Number.isFinite(parsed)?parsed:null;
+}
+
+function mcFmtR(v){ return mcCurrencyFormatter.format(v); }
+function mcFmtP(v){ return mcDecimalFormatter.format(v)+'%'; }
+function mcEditableValue(v){
+  return mcDecimalFormatter.format(v).replace(/\./g,'');
+}
+function mcSetEmptyResults(){
+  ['mc-fatkedu-out','mc-garantido-out','mc-margemrs-out','mc-geral-depois','mc-mod-depois','mc-geral-delta','mc-mod-delta']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
+  const base=window._mcBase;
+  const geralAntes=base&&base.gerGar>0 ? base.gerMrs/base.gerGar*100 : null;
+  const geral=document.getElementById('mc-geral-antes');
+  if(geral) geral.textContent=geralAntes===null?'—':mcFmtP(geralAntes);
+  const modAntes=document.getElementById('mc-mod-antes');
+  if(modAntes) modAntes.textContent='—';
+  const dG=document.getElementById('mc-geral-delta');
+  const dM=document.getElementById('mc-mod-delta');
+  if(dG) dG.style.color='var(--muted)';
+  if(dM) dM.style.color='var(--muted)';
+}
 
 function mcRecalc(){
   const base=window._mcBase;
@@ -3179,41 +3231,46 @@ function mcRecalc(){
   const margemEl=document.getElementById('mc-margem');
   if(!modeloEl||!fatEl||!taxaEl||!pctGarEl||!margemEl) return;
 
-  const isGP = modeloEl.value==='Garantia Prevista';
+  const hasModelo=Boolean(modeloEl.value);
+  const isGP=modeloEl.value==='Garantia Prevista';
   const pctGarField=document.getElementById('mc-pctgar-field');
-  if(pctGarField) pctGarField.style.opacity = isGP?'1':'0.35';
-  pctGarEl.disabled = !isGP;
+  if(pctGarField) pctGarField.style.opacity=isGP?'1':hasModelo?'0.35':'0.55';
+  pctGarEl.disabled=!isGP;
 
-  const fatEscola = parseFloat(fatEl.value)||0;
-  const taxaPct = parseFloat(taxaEl.value)||0;
-  const pctGarDigitado = parseFloat(pctGarEl.value);
-  const margemDigitada = parseFloat(margemEl.value);
-  const pctGar = isGP ? (Number.isFinite(pctGarDigitado) ? pctGarDigitado : 0) : 100;
-  const margemPct = Number.isFinite(margemDigitada) ? margemDigitada : 0;
+  const modeloLabel=document.getElementById('mc-modelo-label');
+  if(modeloLabel) modeloLabel.textContent=hasModelo?modeloEl.value:'modalidade';
 
-  const fatKedu = fatEscola * (taxaPct/100);
-  const garantidoNovo = fatEscola * (pctGar/100);
-  const margemRsNovo = garantidoNovo * (margemPct/100);
+  const fatEscola=mcParseNumber(fatEl.value);
+  const taxaPct=mcParseNumber(taxaEl.value);
+  const pctGarDigitado=mcParseNumber(pctGarEl.value);
+  const margemPct=mcParseNumber(margemEl.value);
+  const preenchido=hasModelo && fatEscola!==null && taxaPct!==null && margemPct!==null && (!isGP || pctGarDigitado!==null);
 
-  document.getElementById('mc-fatkedu-out').textContent = mcFmtR(fatKedu);
-  document.getElementById('mc-garantido-out').textContent = mcFmtR(garantidoNovo);
-  document.getElementById('mc-margemrs-out').textContent = mcFmtR(margemRsNovo);
+  if(!preenchido){ mcSetEmptyResults(); return; }
 
-  const geralAntes = base.gerGar>0 ? base.gerMrs/base.gerGar*100 : 0;
-  const novoGerGar = base.gerGar+garantidoNovo;
-  const geralDepois = novoGerGar>0 ? (base.gerMrs+margemRsNovo)/novoGerGar*100 : 0;
+  const pctGar=isGP?pctGarDigitado:100;
+  const fatKedu=fatEscola*(taxaPct/100);
+  const garantidoNovo=fatEscola*(pctGar/100);
+  const margemRsNovo=garantidoNovo*(margemPct/100);
 
-  const modBaseGar = isGP?base.gpGar:base.ogGar;
-  const modBaseMrs = isGP?base.gpMrs:base.ogMrs;
-  const modAntes = modBaseGar>0 ? modBaseMrs/modBaseGar*100 : 0;
-  const novoModGar = modBaseGar+garantidoNovo;
-  const modDepois = novoModGar>0 ? (modBaseMrs+margemRsNovo)/novoModGar*100 : 0;
+  document.getElementById('mc-fatkedu-out').textContent=mcFmtR(fatKedu);
+  document.getElementById('mc-garantido-out').textContent=mcFmtR(garantidoNovo);
+  document.getElementById('mc-margemrs-out').textContent=mcFmtR(margemRsNovo);
 
-  document.getElementById('mc-geral-antes').textContent = mcFmtP(geralAntes);
-  document.getElementById('mc-geral-depois').textContent = mcFmtP(geralDepois);
-  document.getElementById('mc-mod-antes').textContent = mcFmtP(modAntes);
-  document.getElementById('mc-mod-depois').textContent = mcFmtP(modDepois);
-  document.getElementById('mc-modelo-label').textContent = modeloEl.value;
+  const geralAntes=base.gerGar>0?base.gerMrs/base.gerGar*100:0;
+  const novoGerGar=base.gerGar+garantidoNovo;
+  const geralDepois=novoGerGar>0?(base.gerMrs+margemRsNovo)/novoGerGar*100:0;
+
+  const modBaseGar=isGP?base.gpGar:base.ogGar;
+  const modBaseMrs=isGP?base.gpMrs:base.ogMrs;
+  const modAntes=modBaseGar>0?modBaseMrs/modBaseGar*100:0;
+  const novoModGar=modBaseGar+garantidoNovo;
+  const modDepois=novoModGar>0?(modBaseMrs+margemRsNovo)/novoModGar*100:0;
+
+  document.getElementById('mc-geral-antes').textContent=mcFmtP(geralAntes);
+  document.getElementById('mc-geral-depois').textContent=mcFmtP(geralDepois);
+  document.getElementById('mc-mod-antes').textContent=mcFmtP(modAntes);
+  document.getElementById('mc-mod-depois').textContent=mcFmtP(modDepois);
 
   const dG=document.getElementById('mc-geral-delta');
   const diffG=geralDepois-geralAntes;
@@ -3227,28 +3284,44 @@ function mcRecalc(){
 }
 
 (function(){
-  ['mc-fatescola','mc-taxa','mc-pctgar','mc-margem'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('input', mcRecalc);
-  });
-
-  // Mantém nos campos digitáveis os mesmos limites dos antigos controles deslizantes.
-  ['mc-pctgar','mc-margem'].forEach(id=>{
+  const ids=['mc-fatescola','mc-taxa','mc-pctgar','mc-margem'];
+  ids.forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
-    el.addEventListener('blur',()=>{
-      const valor=parseFloat(el.value);
-      const minimo=parseFloat(el.min);
-      const maximo=parseFloat(el.max);
-      if(!Number.isFinite(valor)) return;
-      if(Number.isFinite(minimo)&&valor<minimo) el.value=minimo;
-      if(Number.isFinite(maximo)&&valor>maximo) el.value=maximo;
+
+    el.addEventListener('focus',()=>{
+      const value=mcParseNumber(el.value);
+      if(value!==null) el.value=mcEditableValue(value);
+    });
+
+    el.addEventListener('input',()=>{
+      const isNegative=el.dataset.min && Number(el.dataset.min)<0;
+      const cleaned=el.value
+        .replace(isNegative?/[^0-9,.-]/g:/[^0-9,.]/g,'')
+        .replace(/(?!^)-/g,'');
+      if(cleaned!==el.value) el.value=cleaned;
       mcRecalc();
+    });
+
+    el.addEventListener('blur',()=>{
+      let value=mcParseNumber(el.value);
+      if(value===null){ el.value=''; mcRecalc(); return; }
+      const min=mcParseNumber(el.dataset.min);
+      const max=mcParseNumber(el.dataset.max);
+      if(min!==null && value<min) value=min;
+      if(max!==null && value>max) value=max;
+      el.value=el.dataset.format==='currency'?mcFmtR(value):mcFmtP(value);
+      mcRecalc();
+    });
+
+    el.addEventListener('keydown',event=>{
+      if(event.key==='Enter'){ event.preventDefault(); el.blur(); }
     });
   });
 
   const modeloEl=document.getElementById('mc-modelo');
-  if(modeloEl) modeloEl.addEventListener('change', mcRecalc);
+  if(modeloEl) modeloEl.addEventListener('change',mcRecalc);
+  mcRecalc();
 })();
 
 const LABELS={dateFrom:'De',dateTo:'Até',status:'Status',modelo:'Modelo',estados:'Estado'};
