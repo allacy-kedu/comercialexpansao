@@ -1267,7 +1267,168 @@ body{
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    </head>
+    
+<style id="team-exec-ux-v3">
+/* ── Experiência analítica: Equipe e Tendência por Executivo ───── */
+.team-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 14px;}
+.team-flow-step{display:flex;align-items:center;gap:11px;min-height:62px;padding:12px 14px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.012));border:1px solid var(--border);border-radius:13px;}
+.team-flow-step-index{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:rgba(78,205,196,.09);border:1px solid rgba(78,205,196,.22);color:var(--accent);font:800 11px 'DM Mono',monospace;}
+.team-flow-step strong{display:block;font:700 12px 'DM Sans',sans-serif;color:var(--text);margin-bottom:2px;}
+.team-flow-step small{display:block;font:400 10.5px/1.35 'DM Sans',sans-serif;color:var(--muted);}
+[data-theme="light"] .team-flow-step{background:rgba(255,255,255,.7);}
+
+.ae-workbench{padding:0!important;overflow:visible!important;}
+.ae-panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 18px 14px;border-bottom:1px solid var(--border);}
+.panel-step{display:inline-flex;align-items:center;min-height:20px;padding:2px 8px;border-radius:999px;background:rgba(78,205,196,.09);border:1px solid rgba(78,205,196,.2);color:var(--accent);font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.ae-panel-title{font:700 14px 'DM Sans',sans-serif;color:var(--text);margin-bottom:2px;}
+.ae-panel-subtitle,.kp-subtitle{font:400 11px/1.45 'DM Sans',sans-serif;color:var(--muted);}
+.ae-filter-groups{display:grid;grid-template-columns:1.05fr 1.55fr .95fr 1.05fr;gap:10px;padding:15px 18px;}
+.ae-filter-group{min-width:0;padding:11px 12px;background:rgba(255,255,255,.018);border:1px solid var(--border);border-radius:11px;}
+[data-theme="light"] .ae-filter-group{background:rgba(15,23,42,.018);}
+.ae-filter-group-title{display:flex;align-items:center;gap:6px;margin-bottom:9px;font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:var(--muted2);}
+.ae-filter-group-title span{color:var(--accent);}
+.ae-filter-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.ae-filter-controls .ae-drop-wrap{min-width:0;}
+.ae-filter-group .ae-drop-btn{width:100%;justify-content:space-between;}
+.ae-filter-group-period .ae-drop-wrap{flex:1 1 92px;}
+.ae-filter-group-structure .ae-drop-wrap{flex:1 1 92px;}
+.ae-filter-group-person .ae-drop-wrap{width:100%;}
+.ae-filter-group-metric select{width:100%;max-width:none!important;height:34px!important;font-family:'DM Sans',sans-serif!important;font-weight:700;}
+.ae-context-bar{display:flex;align-items:center;gap:8px;min-height:38px;padding:9px 18px;border-top:1px solid var(--border);background:rgba(78,205,196,.025);font:500 11px 'DM Sans',sans-serif;color:var(--muted2);}
+.ae-context-icon{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:rgba(78,205,196,.08);color:var(--accent);flex:0 0 auto;}
+.ae-context-bar strong{color:var(--text);font-weight:700;}
+.ae-filter-count{margin-left:auto;padding:3px 8px;border:1px solid var(--border2);border-radius:999px;color:var(--muted);font-size:10px;white-space:nowrap;}
+
+.ae-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px;}
+.ae-summary-card{min-height:88px;padding:14px 15px;background:var(--card);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow-sm);}
+.ae-summary-label{font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.ae-summary-value{font:700 21px/1.05 'DM Mono',monospace;color:var(--text);letter-spacing:-.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ae-summary-value.accent{color:var(--accent);}
+.ae-summary-sub{font:500 10.5px/1.35 'DM Sans',sans-serif;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.ae-analysis-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;}
+.ae-analysis-head .trend-title{font-family:'DM Sans',sans-serif;text-transform:none;letter-spacing:0;font-size:15px;}
+.ae-chart-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px;align-items:stretch;}
+.ae-chart-main{min-width:0;padding:14px 14px 10px;background:var(--card2);border:1px solid var(--border);border-radius:13px;}
+#ae-canvas-wrap{height:260px!important;}
+#ae-totals{border-top:1px solid var(--border);margin-top:10px;}
+.ae-insights{padding:14px;background:linear-gradient(180deg,rgba(78,205,196,.04),rgba(78,205,196,.012));border:1px solid rgba(78,205,196,.14);border-radius:13px;}
+.ae-insights-title{display:flex;align-items:center;gap:7px;font:800 10px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:10px;}
+.ae-insight-item{padding:10px 0;border-bottom:1px solid var(--border);}
+.ae-insight-item:last-child{border-bottom:0;padding-bottom:0;}
+.ae-insight-label{font:700 10px 'DM Sans',sans-serif;color:var(--muted);margin-bottom:3px;}
+.ae-insight-value{font:700 12px/1.35 'DM Sans',sans-serif;color:var(--text);}
+.ae-insight-note{font:400 10px/1.35 'DM Sans',sans-serif;color:var(--muted);margin-top:2px;}
+.ae-empty-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+.ae-quick-btn{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--muted2);font:700 10.5px 'DM Sans',sans-serif;cursor:pointer;transition:.15s;}
+.ae-quick-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(78,205,196,.07);}
+.kp-title{font-family:'DM Sans',sans-serif!important;font-size:15px!important;}
+.kp-exec-table-head{display:grid;grid-template-columns:28px 44px minmax(0,1fr) auto 100px;gap:10px;padding:0 4px 7px;border-bottom:1px solid var(--border);font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+
+/* Tendência por executivo */
+#exec-trend-card{padding:0!important;overflow:visible!important;}
+.exec-trend-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px 15px;border-bottom:1px solid var(--border);}
+.exec-trend-title{font:700 15px 'DM Sans',sans-serif;color:var(--text);margin-bottom:3px;}
+.exec-trend-sub{font:400 11px/1.45 'DM Sans',sans-serif;color:var(--muted);}
+.exec-trend-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.exec-clear-btn{height:30px;padding:0 11px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:8px;font:700 10.5px 'DM Sans',sans-serif;cursor:pointer;transition:.15s;}
+.exec-clear-btn:hover{border-color:var(--red);color:var(--red);background:rgba(255,107,107,.06);}
+.trend-exec-drop{min-width:300px!important;max-height:340px!important;}
+.trend-exec-search-wrap{padding:4px 5px 7px;}
+.trend-exec-search{width:100%;height:32px;padding:0 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);outline:none;font:500 11px 'DM Sans',sans-serif;}
+.trend-exec-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(78,205,196,.08);}
+.exec-trend-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);}
+.exec-guide-item{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;background:rgba(255,255,255,.018);border:1px solid var(--border);border-radius:10px;}
+.exec-guide-num{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:rgba(78,205,196,.09);color:var(--accent);font:800 9px 'DM Mono',monospace;}
+.exec-guide-item strong{display:block;font:700 11px 'DM Sans',sans-serif;color:var(--text);margin-bottom:2px;}
+.exec-guide-item small{display:block;font:400 10px/1.35 'DM Sans',sans-serif;color:var(--muted);}
+.exec-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:14px 20px 0;}
+.exec-summary-card{padding:12px 13px;background:var(--card2);border:1px solid var(--border);border-radius:11px;}
+.exec-summary-label{font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;}
+.exec-summary-value{font:700 18px/1.1 'DM Mono',monospace;color:var(--text);letter-spacing:-.035em;}
+.exec-summary-value.accent{color:var(--accent);}
+.exec-summary-sub{font:500 10px/1.35 'DM Sans',sans-serif;color:var(--muted);margin-top:4px;}
+#trend-exec-info{padding:12px 20px 0!important;margin:0!important;}
+.trend-exec-badge{min-height:28px;padding:4px 7px 4px 9px!important;font-family:'DM Sans',sans-serif!important;font-weight:700;}
+.trend-exec-badge-remove{width:18px;height:18px;border:0;border-radius:6px;background:transparent;color:currentColor;opacity:.55;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;}
+.trend-exec-badge-remove:hover{opacity:1;background:rgba(255,255,255,.08);}
+#exec-trend-empty{padding:44px 20px!important;}
+#exec-trend-chart-wrap{padding:14px 20px 20px;}
+.exec-sm-legend{padding:0 0 10px!important;}
+#exec-sm-charts{display:grid;grid-template-columns:1fr;gap:12px;}
+.exec-sm-card{padding:0!important;margin:0!important;overflow:hidden;background:var(--card2)!important;}
+.exec-sm-head{display:flex;align-items:center;gap:10px;margin:0!important;padding:13px 14px;border-bottom:1px solid var(--border);}
+.exec-sm-title-block{min-width:0;flex:1;}
+.exec-sm-name{font-family:'DM Sans',sans-serif!important;font-size:13px!important;}
+.exec-sm-cargo{font-family:'DM Sans',sans-serif!important;}
+.exec-sm-status-stack{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.exec-sm-status{padding:4px 8px;border-radius:999px;font:800 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;border:1px solid;white-space:nowrap;}
+.exec-sm-status.good{background:rgba(82,199,125,.08);border-color:rgba(82,199,125,.24);color:var(--green);}
+.exec-sm-status.watch{background:rgba(246,173,85,.08);border-color:rgba(246,173,85,.25);color:var(--orange);}
+.exec-sm-status.risk{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.24);color:var(--red);}
+.exec-sm-badge{font-family:'DM Sans',sans-serif!important;}
+.exec-sm-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.exec-sm-metric{min-width:0;padding:11px 13px;background:var(--card);}
+.exec-sm-metric-label{font:700 9px 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px;}
+.exec-sm-metric-value{font:700 14px/1.1 'DM Mono',monospace;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exec-sm-metric-value.accent{color:var(--accent);}
+.exec-sm-target{padding:10px 14px;border-bottom:1px solid var(--border);}
+.exec-sm-target-row{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px;font:600 10.5px 'DM Sans',sans-serif;color:var(--muted);}
+.exec-sm-target-row strong{color:var(--text);}
+.exec-sm-target-track{height:5px;background:var(--border);border-radius:999px;overflow:hidden;}
+.exec-sm-target-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent4));}
+.exec-sm-chart{position:relative;height:170px;padding:10px 10px 4px;}
+.exec-sm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px 11px;border-top:1px solid var(--border);font:500 10px 'DM Sans',sans-serif;color:var(--muted);}
+.exec-sm-foot strong{color:var(--muted2);}
+
+@media(max-width:1180px){
+  .ae-filter-groups{grid-template-columns:1fr 1.3fr;}
+  .ae-chart-layout{grid-template-columns:1fr;}
+  .ae-insights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;}
+  .ae-insights-title{grid-column:1/-1;}
+  .ae-insight-item{padding:8px 10px;border-bottom:0;border-right:1px solid var(--border);}
+  .ae-insight-item:last-child{border-right:0;}
+}
+@media(max-width:900px){
+  .team-flow{grid-template-columns:1fr;}
+  .team-flow-step{min-height:54px;}
+  .ae-summary-grid,.exec-summary-grid{grid-template-columns:1fr 1fr;}
+  .exec-trend-guide{grid-template-columns:1fr;}
+  .exec-sm-metrics{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:680px){
+  .ae-panel-head,.exec-trend-toolbar{align-items:stretch;flex-direction:column;}
+  .ae-filter-groups{grid-template-columns:1fr;padding:12px;}
+  .ae-context-bar{align-items:flex-start;flex-wrap:wrap;padding:10px 12px;}
+  .ae-filter-count{margin-left:30px;}
+  .ae-summary-grid{grid-template-columns:1fr 1fr;}
+  .ae-summary-value{font-size:17px;}
+  .ae-analysis-head{flex-direction:column;}
+  .ae-chart-main{padding:10px 8px 8px;}
+  .ae-insights{grid-template-columns:1fr 1fr;padding:11px;}
+  .ae-insights-title{grid-column:1/-1;}
+  .ae-insight-item:nth-last-child(2){border-right:0;}
+  .trend-exec-drop{position:fixed!important;left:12px!important;right:12px!important;top:auto!important;bottom:76px!important;min-width:0!important;max-height:55vh!important;}
+  .exec-trend-actions{width:100%;}
+  .trend-exec-wrap{flex:1;}
+  .trend-exec-btn{width:100%;justify-content:space-between;}
+  .exec-summary-grid{padding:12px 12px 0;}
+  #trend-exec-info{padding:10px 12px 0!important;}
+  #exec-trend-chart-wrap{padding:12px;}
+  .exec-sm-head{align-items:flex-start;flex-wrap:wrap;}
+  .exec-sm-status-stack{width:100%;justify-content:flex-start;padding-left:42px;}
+  .exec-sm-chart{height:155px;}
+  .kp-exec-table-head{display:none;}
+}
+@media(max-width:430px){
+  .ae-summary-grid,.exec-summary-grid{grid-template-columns:1fr;}
+  .ae-insights{grid-template-columns:1fr;}
+  .ae-insight-item{border-right:0;border-bottom:1px solid var(--border);}
+  .exec-sm-metrics{grid-template-columns:1fr 1fr;}
+}
+</style>
+
+</head>
 <body>
 
 
@@ -1724,37 +1885,53 @@ body{
 
   <!-- ── Tendência por Executivo ───────────────────────────── -->
   <div class="trend-card" id="exec-trend-card" style="margin-top:0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <div class="exec-trend-toolbar">
       <div>
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text);">Tendência por Executivo</div>
-        <div id="exec-trend-sub" style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;">Selecione executivos no menu ao lado</div>
+        <span class="panel-step">Leitura individual</span>
+        <div class="exec-trend-title">Tendência por Executivo</div>
+        <div id="exec-trend-sub" class="exec-trend-sub">Selecione executivos para comparar ritmo, projeção e atingimento de meta.</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
+      <div class="exec-trend-actions">
         <div class="trend-exec-wrap" id="trend-exec-wrap">
           <button class="trend-exec-btn" id="trend-exec-btn" onclick="tExecToggle(event)">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span id="trend-exec-lbl">Executivos</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span id="trend-exec-lbl">Selecionar executivos</span>
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="trend-exec-drop" id="trend-exec-drop" style="display:none;">
-            <div class="trend-exec-drop-header"><span>Executivos 2026</span><button onclick="tExecClear()">limpar</button></div>
+            <div class="trend-exec-drop-header"><span>Executivos com dados em 2026</span><button onclick="tExecClear()">limpar</button></div>
+            <div class="trend-exec-search-wrap"><input id="trend-exec-search" class="trend-exec-search" type="search" placeholder="Buscar executivo..." oninput="tExecSearch(this.value)" autocomplete="off"></div>
             <div id="trend-exec-list"></div>
           </div>
         </div>
-        <button onclick="tExecClear()" style="height:28px;padding:0 12px;background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);color:var(--red);border-radius:8px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;">↺ Limpar</button>
+        <button onclick="tExecClear()" class="exec-clear-btn">Limpar seleção</button>
       </div>
     </div>
-    <div class="trend-exec-info" id="trend-exec-info" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
-    <div id="exec-trend-empty" style="text-align:center;padding:40px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.03em;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25;display:block;margin:0 auto 10px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Selecione um ou mais executivos para ver a tendência individual
+
+    <div class="exec-trend-guide" id="exec-trend-guide">
+      <div class="exec-guide-item"><span class="exec-guide-num">1</span><span><strong>Selecione as pessoas</strong><small>Use a busca para localizar um ou mais executivos.</small></span></div>
+      <div class="exec-guide-item"><span class="exec-guide-num">2</span><span><strong>Leia o ritmo anual</strong><small>Compare realizado, projeção, meta e percentual de atingimento.</small></span></div>
+      <div class="exec-guide-item"><span class="exec-guide-num">3</span><span><strong>Analise os meses</strong><small>Clique em uma barra para abrir o detalhe daquele mês.</small></span></div>
+    </div>
+
+    <div class="exec-summary-grid" id="exec-summary-grid" style="display:none;">
+      <div class="exec-summary-card"><div class="exec-summary-label">Executivos analisados</div><div class="exec-summary-value" id="exec-summary-count">—</div><div class="exec-summary-sub" id="exec-summary-count-sub">—</div></div>
+      <div class="exec-summary-card"><div class="exec-summary-label">Realizado em 2026</div><div class="exec-summary-value" id="exec-summary-ytd">—</div><div class="exec-summary-sub">Acumulado até o mês atual</div></div>
+      <div class="exec-summary-card"><div class="exec-summary-label">Projeção anual</div><div class="exec-summary-value accent" id="exec-summary-projected">—</div><div class="exec-summary-sub" id="exec-summary-projected-sub">—</div></div>
+      <div class="exec-summary-card"><div class="exec-summary-label">No ritmo da meta</div><div class="exec-summary-value" id="exec-summary-ontrack">—</div><div class="exec-summary-sub" id="exec-summary-ontrack-sub">—</div></div>
+    </div>
+
+    <div class="trend-exec-info" id="trend-exec-info" style="display:none;"></div>
+    <div id="exec-trend-empty" style="text-align:center;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25;display:block;margin:0 auto 10px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Comece selecionando um ou mais executivos no botão acima.
     </div>
     <div id="exec-trend-chart-wrap" style="display:none;">
       <div class="exec-sm-legend" id="exec-sm-legend-row">
         <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:#1D9E75;"></span>Realizado</span>
         <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:#EF9F27;"></span>Mês atual</span>
-        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(239,159,39,0.28);border:1px solid rgba(239,159,39,0.6);"></span>Projeção</span>
-        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(42,120,214,0.5);"></span>Previsão</span>
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(239,159,39,0.28);border:1px solid rgba(239,159,39,0.6);"></span>Complemento projetado</span>
+        <span class="exec-sm-leg"><span class="exec-sm-legsq" style="background:rgba(42,120,214,0.5);"></span>Previsão futura</span>
       </div>
       <div id="exec-sm-charts"></div>
     </div>
@@ -1948,135 +2125,102 @@ body{
     </div>
     <div class="stitle" style="display:none;" id="analise-stitle-hidden"></div>
 
+  <div class="team-flow" aria-label="Etapas da análise de equipe">
+    <div class="team-flow-step"><span class="team-flow-step-index">01</span><span><strong>Defina o recorte</strong><small>Escolha período, estrutura ou pessoas.</small></span></div>
+    <div class="team-flow-step"><span class="team-flow-step-index">02</span><span><strong>Escolha o indicador</strong><small>Selecione o KPI mais útil para a pergunta.</small></span></div>
+    <div class="team-flow-step"><span class="team-flow-step-index">03</span><span><strong>Compare e interprete</strong><small>Use evolução, liderança e distância entre séries.</small></span></div>
+  </div>
+
   <!-- Filtros de Análise -->
-  <div class="trend-card" id="ae-panel" style="margin-bottom:14px;">
-    <div class="ae-filter-row">
-
-      <div class="ae-drop-wrap" id="ae-wrap-anos">
-        <button class="ae-drop-btn" id="ae-btn-anos" onclick="aeToggleDrop(event,'anos')">
-          <span id="ae-lbl-anos">Anos</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list" id="ae-list-anos" style="display:none;">
-          <div class="ae-drop-list-header"><span>Anos</span><button onclick="aeClearDrop('anos')">limpar</button></div>
-          <div id="ae-anos"></div>
-        </div>
-      </div>
-
-      <div class="ae-drop-wrap" id="ae-wrap-meses">
-        <button class="ae-drop-btn" id="ae-btn-meses" onclick="aeToggleDrop(event,'meses')">
-          <span id="ae-lbl-meses">Meses</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list" id="ae-list-meses" style="display:none;">
-          <div class="ae-drop-list-header"><span>Meses</span><button onclick="aeClearDrop('meses')">limpar</button></div>
-          <div id="ae-meses"></div>
-        </div>
-      </div>
-
-      <div class="ae-drop-wrap" id="ae-wrap-regionais">
-        <button class="ae-drop-btn" id="ae-btn-regionais" onclick="aeToggleDrop(event,'regionais')">
-          <span id="ae-lbl-regionais">Regional</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list" id="ae-list-regionais" style="display:none;">
-          <div class="ae-drop-list-header"><span>Regional / Liderança</span><button onclick="aeClearDrop('regionais')">limpar</button></div>
-          <div id="ae-regionais"></div>
-        </div>
-      </div>
-
-      <div class="ae-drop-wrap" id="ae-wrap-cargos">
-        <button class="ae-drop-btn" id="ae-btn-cargos" onclick="aeToggleDrop(event,'cargos')">
-          <span id="ae-lbl-cargos">Cargo</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list" id="ae-list-cargos" style="display:none;">
-          <div class="ae-drop-list-header"><span>Cargo</span><button onclick="aeClearDrop('cargos')">limpar</button></div>
-          <div id="ae-cargos"></div>
-        </div>
-      </div>
-
-      <div class="ae-drop-wrap" id="ae-wrap-executivos">
-        <button class="ae-drop-btn" id="ae-btn-executivos" onclick="aeToggleDrop(event,'executivos')">
-          <span id="ae-lbl-executivos">Executivos</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list ae-list-wide" id="ae-list-executivos" style="display:none;">
-          <div class="ae-drop-list-header"><span>Executivos</span><button onclick="aeClearDrop('executivos')">limpar</button></div>
-          <div id="ae-executivos" style="display:contents;"></div>
-        </div>
-      </div>
-
-      <div class="ae-drop-wrap" id="ae-wrap-estados">
-        <button class="ae-drop-btn" id="ae-btn-estados" onclick="aeToggleDrop(event,'estados')">
-          <span id="ae-lbl-estados">Estado</span>
-          <svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ae-drop-list ae-list-wide" id="ae-list-estados" style="display:none;">
-          <div class="ae-drop-list-header"><span>Estado</span><button onclick="aeClearDrop('estados')">limpar</button></div>
-          <div id="ae-estados"></div>
-        </div>
-      </div>
-
-      <button onclick="aeReset()" class="ae-reset-btn">↺ Limpar tudo</button>
+  <div class="trend-card ae-workbench" id="ae-panel" style="margin-bottom:14px;">
+    <div class="ae-panel-head">
+      <div><span class="panel-step">Etapa 1</span><div class="ae-panel-title">Monte o recorte da análise</div><div class="ae-panel-subtitle">Combine filtros para responder uma pergunta específica. Os filtros de uma mesma categoria aceitam múltiplas escolhas.</div></div>
+      <button onclick="aeReset()" class="ae-reset-btn">↺ Restaurar análise</button>
     </div>
-    <div class="ae-kpi-row">
-      <span class="ae-kpi-label">KPI</span>
-      <select id="ae-kpi-sel" onchange="aeSetKpi(this.value)" style="height:30px;padding:0 10px;background:var(--card2);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;outline:none;max-width:220px;">
-        <optgroup label="Faturamento">
-          <option value="fat_escola">Fat. Escola</option>
-          <option value="fat_escola_med">Fat. Escola médio</option>
-          <option value="fat_kedu" selected>Fat. Kedu</option>
-          <option value="fat_kedu_med">Fat. Kedu médio</option>
-        </optgroup>
-        <optgroup label="Taxas">
-          <option value="taxa">Taxa Média</option>
-          <option value="ticket">Ticket Médio</option>
-          <option value="spread">Spread Médio</option>
-          <option value="inadim">Inadimplência Prevista</option>
-        </optgroup>
-        <optgroup label="Volume">
-          <option value="alunos">Total de Alunos</option>
-          <option value="unidades">Total de Unidades</option>
-          <option value="confessional">% Confessional</option>
-        </optgroup>
-        <optgroup label="Margem">
-          <option value="margem_med">Média de Margem</option>
-          <option value="margem_rs">Margem geral</option>
-          <option value="margem_gp">Margem Garantia Prevista</option>
-          <option value="margem_og">Margem Outras Garantias</option>
-        </optgroup>
-        <optgroup label="Quantidade">
-          <option value="qtd_ctr">Qtd. Contratos</option>
-          <option value="qtd_escola">Qtd. Escolas</option>
-        </optgroup>
-      </select>
-      <span class="ae-yoy-tip">💡 Selecione múltiplos anos para comparar</span>
+
+    <div class="ae-filter-groups">
+      <div class="ae-filter-group ae-filter-group-period">
+        <div class="ae-filter-group-title"><span>01</span> Período</div>
+        <div class="ae-filter-controls">
+          <div class="ae-drop-wrap" id="ae-wrap-anos">
+            <button class="ae-drop-btn" id="ae-btn-anos" onclick="aeToggleDrop(event,'anos')"><span id="ae-lbl-anos">Anos</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+            <div class="ae-drop-list" id="ae-list-anos" style="display:none;"><div class="ae-drop-list-header"><span>Anos</span><button onclick="aeClearDrop('anos')">limpar</button></div><div id="ae-anos"></div></div>
+          </div>
+          <div class="ae-drop-wrap" id="ae-wrap-meses">
+            <button class="ae-drop-btn" id="ae-btn-meses" onclick="aeToggleDrop(event,'meses')"><span id="ae-lbl-meses">Meses</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+            <div class="ae-drop-list" id="ae-list-meses" style="display:none;"><div class="ae-drop-list-header"><span>Meses</span><button onclick="aeClearDrop('meses')">limpar</button></div><div id="ae-meses"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ae-filter-group ae-filter-group-structure">
+        <div class="ae-filter-group-title"><span>02</span> Estrutura comercial</div>
+        <div class="ae-filter-controls">
+          <div class="ae-drop-wrap" id="ae-wrap-regionais"><button class="ae-drop-btn" id="ae-btn-regionais" onclick="aeToggleDrop(event,'regionais')"><span id="ae-lbl-regionais">Regional</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button><div class="ae-drop-list" id="ae-list-regionais" style="display:none;"><div class="ae-drop-list-header"><span>Regional / Liderança</span><button onclick="aeClearDrop('regionais')">limpar</button></div><div id="ae-regionais"></div></div></div>
+          <div class="ae-drop-wrap" id="ae-wrap-cargos"><button class="ae-drop-btn" id="ae-btn-cargos" onclick="aeToggleDrop(event,'cargos')"><span id="ae-lbl-cargos">Cargo</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button><div class="ae-drop-list" id="ae-list-cargos" style="display:none;"><div class="ae-drop-list-header"><span>Cargo</span><button onclick="aeClearDrop('cargos')">limpar</button></div><div id="ae-cargos"></div></div></div>
+          <div class="ae-drop-wrap" id="ae-wrap-estados"><button class="ae-drop-btn" id="ae-btn-estados" onclick="aeToggleDrop(event,'estados')"><span id="ae-lbl-estados">Estado</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button><div class="ae-drop-list ae-list-wide" id="ae-list-estados" style="display:none;"><div class="ae-drop-list-header"><span>Estado</span><button onclick="aeClearDrop('estados')">limpar</button></div><div id="ae-estados"></div></div></div>
+        </div>
+      </div>
+
+      <div class="ae-filter-group ae-filter-group-person">
+        <div class="ae-filter-group-title"><span>03</span> Pessoas</div>
+        <div class="ae-filter-controls">
+          <div class="ae-drop-wrap" id="ae-wrap-executivos"><button class="ae-drop-btn" id="ae-btn-executivos" onclick="aeToggleDrop(event,'executivos')"><span id="ae-lbl-executivos">Executivos</span><svg class="ae-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button><div class="ae-drop-list ae-list-wide" id="ae-list-executivos" style="display:none;"><div class="ae-drop-list-header"><span>Executivos</span><button onclick="aeClearDrop('executivos')">limpar</button></div><div id="ae-executivos" style="display:contents;"></div></div></div>
+        </div>
+      </div>
+
+      <div class="ae-filter-group ae-filter-group-metric">
+        <div class="ae-filter-group-title"><span>04</span> Indicador principal</div>
+        <select id="ae-kpi-sel" onchange="aeSetKpi(this.value)">
+          <optgroup label="Faturamento"><option value="fat_escola">Fat. Escola</option><option value="fat_escola_med">Fat. Escola médio</option><option value="fat_kedu" selected>Fat. Kedu</option><option value="fat_kedu_med">Fat. Kedu médio</option></optgroup>
+          <optgroup label="Taxas"><option value="taxa">Taxa Média</option><option value="ticket">Ticket Médio</option><option value="spread">Spread Médio</option><option value="inadim">Inadimplência Prevista</option></optgroup>
+          <optgroup label="Volume"><option value="alunos">Total de Alunos</option><option value="unidades">Total de Unidades</option><option value="confessional">% Confessional</option></optgroup>
+          <optgroup label="Margem"><option value="margem_med">Média de Margem</option><option value="margem_rs">Margem geral</option><option value="margem_gp">Margem Garantia Prevista</option><option value="margem_og">Margem Outras Garantias</option></optgroup>
+          <optgroup label="Quantidade"><option value="qtd_ctr">Qtd. Contratos</option><option value="qtd_escola">Qtd. Escolas</option></optgroup>
+        </select>
+      </div>
     </div>
+
+    <div class="ae-context-bar"><span class="ae-context-icon">⌁</span><span id="ae-context-text"><strong>2026</strong> · escolha Regional, Cargo, Executivo ou Estado para iniciar.</span><span class="ae-filter-count" id="ae-filter-count">Sem recorte de equipe</span></div>
+  </div>
+
+  <div class="ae-summary-grid" id="ae-summary-grid" style="display:none;">
+    <div class="ae-summary-card"><div class="ae-summary-label">Séries comparadas</div><div class="ae-summary-value" id="ae-summary-series">—</div><div class="ae-summary-sub" id="ae-summary-series-sub">—</div></div>
+    <div class="ae-summary-card"><div class="ae-summary-label" id="ae-summary-total-label">Total consolidado</div><div class="ae-summary-value accent" id="ae-summary-total">—</div><div class="ae-summary-sub" id="ae-summary-total-sub">—</div></div>
+    <div class="ae-summary-card"><div class="ae-summary-label">Média por série</div><div class="ae-summary-value" id="ae-summary-average">—</div><div class="ae-summary-sub">Ajuda a comparar recortes de tamanhos diferentes</div></div>
+    <div class="ae-summary-card"><div class="ae-summary-label">Líder do recorte</div><div class="ae-summary-value" id="ae-summary-leader">—</div><div class="ae-summary-sub" id="ae-summary-leader-sub">—</div></div>
   </div>
 
   <!-- Gráfico de Análise -->
   <div class="trend-card" id="ae-chart-card">
-    <div class="trend-header">
-      <div>
-        <div class="trend-title" id="ae-chart-title">—</div>
-        <div class="trend-sub" id="ae-chart-sub">Selecione filtros acima para visualizar</div>
+    <div class="ae-analysis-head">
+      <div><span class="panel-step">Etapa 2</span><div class="trend-title" id="ae-chart-title">Evolução do indicador</div><div class="trend-sub" id="ae-chart-sub">Selecione um recorte acima para visualizar.</div></div>
+    </div>
+    <div class="ae-chart-layout">
+      <div class="ae-chart-main">
+        <div id="ae-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;color:var(--muted);font-size:12px;font-family:'DM Sans',sans-serif;gap:8px;text-align:center;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <strong style="color:var(--muted2);font-size:12px;">Escolha como deseja comparar a equipe</strong>
+          <span>Você pode começar por uma visão pronta:</span>
+          <div class="ae-empty-actions"><button class="ae-quick-btn" onclick="aeQuickView('regionais')">Comparar regionais</button><button class="ae-quick-btn" onclick="aeQuickView('cargos')">Comparar cargos</button></div>
+        </div>
+        <div id="ae-canvas-wrap" style="display:none;position:relative;"><canvas id="ae-chart"></canvas></div>
+        <div id="ae-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;"></div>
       </div>
+      <aside class="ae-insights" id="ae-insights-panel">
+        <div class="ae-insights-title"><span>◇</span> Leitura rápida</div>
+        <div class="ae-insight-item"><div class="ae-insight-label">Liderança</div><div class="ae-insight-value" id="ae-insight-leader">Aguardando recorte</div><div class="ae-insight-note" id="ae-insight-leader-note">O líder será calculado pela métrica selecionada.</div></div>
+        <div class="ae-insight-item"><div class="ae-insight-label">Melhor ponto do período</div><div class="ae-insight-value" id="ae-insight-best">—</div><div class="ae-insight-note" id="ae-insight-best-note">—</div></div>
+        <div class="ae-insight-item"><div class="ae-insight-label">Distância para o líder</div><div class="ae-insight-value" id="ae-insight-gap">—</div><div class="ae-insight-note" id="ae-insight-gap-note">Compare pelo menos duas séries.</div></div>
+        <div class="ae-insight-item"><div class="ae-insight-label">Contexto analisado</div><div class="ae-insight-value" id="ae-insight-context">2026</div><div class="ae-insight-note" id="ae-insight-context-note">Escolha um recorte de equipe.</div></div>
+      </aside>
     </div>
-    <div id="ae-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;gap:8px;">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Selecione ao menos um filtro de equipe para ver o gráfico
-    </div>
-    <div id="ae-canvas-wrap" style="display:none;position:relative;height:240px;">
-      <canvas id="ae-chart"></canvas>
-    </div>
-    <div id="ae-totals" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;"></div>
   </div>
 
   <!-- ── KPI Breakdown Panel ─────────────────────────────────── -->
   <div class="trend-card" id="ae-kpi-panel" style="margin-top:14px;">
     <div class="kp-header">
-      <div class="kp-title">📊 Visão Geral por KPI</div>
+      <div><span class="panel-step">Etapa 3</span><div class="kp-title">Detalhamento por KPI</div><div class="kp-subtitle">Compare a evolução anual, o resultado por regional e o ranking individual.</div></div>
       <div class="kp-controls">
         <select id="kp-kpi-sel" class="kp-select" onchange="buildKpiPanel()">
           <optgroup label="Faturamento">
@@ -3821,6 +3965,42 @@ update();
     return {forecast,realized,curPartial,maBase,growthFactor,source};
   }
 
+  function tExecAnnualSummary(nome){
+    const today=new Date();
+    const nowMonth=Math.min(12,today.getMonth()+1);
+    const fc=tExecForecastBar(nome);
+    let ytd=0,projected=0,annualMeta=0,currentMeta=0;
+    for(let m=1;m<=12;m++){
+      const ym='2026-'+String(m).padStart(2,'0');
+      const meta=getMetaVendedor(nome,ym)||0;
+      annualMeta+=meta;
+      if(m===nowMonth) currentMeta=meta;
+      if(m<nowMonth){
+        const v=fc.realized[m]||0;
+        ytd+=v; projected+=v;
+      }else if(m===nowMonth){
+        const partial=fc.realized[m]||fc.curPartial||0;
+        const monthProjection=Math.max(partial,fc.forecast[m]||partial);
+        ytd+=partial; projected+=monthProjection;
+      }else{
+        projected+=fc.forecast[m]||0;
+      }
+    }
+    const currentProjection=Math.max(fc.curPartial||0,fc.forecast[nowMonth]||0);
+    return {
+      ...fc,ytd,projected,annualMeta,currentMeta,currentProjection,
+      annualPct:annualMeta>0?projected/annualMeta*100:0,
+      currentPct:currentMeta>0?currentProjection/currentMeta*100:0
+    };
+  }
+
+  function tExecFmt(v){
+    if(v===null||v===undefined||isNaN(v)) return '—';
+    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2).replace('.',',')+' mi';
+    if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1).replace('.',',')+' mil';
+    return 'R$ '+Math.round(v).toLocaleString('pt-BR');
+  }
+
   function buildExecBarChart(nome){
     const today=new Date(),nowMonth=today.getMonth()+1;
     const clr=tExecColor(nome);
@@ -3939,6 +4119,7 @@ update();
       const clr=checked?tExecColor(nome):'var(--muted)';
       const item=document.createElement('div');
       item.className='ae-item'+(checked?' checked':'');
+      item.dataset.search=(nome+' '+(TEAM[nome]?.cargo||'')).toLocaleLowerCase('pt-BR');
       item.style.cssText='display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-family:DM Mono,monospace;transition:background .12s;';
       const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=checked;
       cb.style.accentColor=checked?tExecColor(nome):'';
@@ -3968,7 +4149,7 @@ update();
     const btn=document.getElementById('trend-exec-btn');
     const lbl=document.getElementById('trend-exec-lbl');
     if(!btn||!lbl) return;
-    lbl.textContent=_execSel.size===0?'Executivos':
+    lbl.textContent=_execSel.size===0?'Selecionar executivos':
       _execSel.size===1?[..._execSel][0].split(' ')[0]:
       'Executivos ('+_execSel.size+')';
     btn.classList.toggle('has-sel',_execSel.size>0);
@@ -3979,22 +4160,31 @@ update();
   function tExecUpdateInfo(){
     const bar=document.getElementById('trend-exec-info');
     if(!bar) return;
-    if(!_execSel.size){ bar.style.display='none'; bar.innerHTML=''; return; }
+    if(!_execSel.size){bar.style.display='none';bar.innerHTML='';return;}
     bar.style.display='flex';
-    bar.innerHTML=[..._execSel].map(nome=>{
+    bar.innerHTML='';
+    [..._execSel].forEach(nome=>{
       const clr=tExecColor(nome);
       const fc=tExecForecast(nome);
       const gp=((fc.growthFactor-1)*100);
-      const sign=gp>=0?'+':'';
-      const arrow=gp>=0?'↑':'↓';
-      const arrowClr=gp>=0?'#52c77d':'#e17055';
-      const nShort=nome.split(' ').slice(0,2).join(' ');
-      return '<div class="trend-exec-badge" style="background:'+clr+'18;border-color:'+clr+'44;color:'+clr+';">'+
-        '<span style="width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;"></span>'+
-        nShort+
-        ' <span style="color:'+arrowClr+';font-weight:700;">'+arrow+' '+Math.abs(gp).toFixed(1)+'% vs 2025</span>'+
-      '</div>';
-    }).join('');
+      const badge=document.createElement('div');
+      badge.className='trend-exec-badge';
+      badge.style.cssText='background:'+clr+'18;border-color:'+clr+'44;color:'+clr+';';
+      const dot=document.createElement('span');
+      dot.style.cssText='width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0;display:inline-block;';
+      const name=document.createElement('span');
+      name.textContent=nome.split(' ').slice(0,2).join(' ');
+      const growth=document.createElement('span');
+      growth.style.cssText='color:'+(gp>=0?'var(--green)':'var(--red)')+';font-weight:800;';
+      growth.textContent=(gp>=0?'↑ ':'↓ ')+Math.abs(gp).toFixed(1)+'%';
+      growth.title='Variação acumulada versus 2025';
+      const remove=document.createElement('button');
+      remove.className='trend-exec-badge-remove';
+      remove.type='button';remove.title='Remover da comparação';remove.textContent='×';
+      remove.onclick=(e)=>{e.stopPropagation();window.tExecRemove(nome);};
+      badge.append(dot,name,growth,remove);
+      bar.appendChild(badge);
+    });
   }
 
   function buildExecTrendChart(){
@@ -4002,59 +4192,82 @@ update();
     const wrap=document.getElementById('exec-trend-chart-wrap');
     const sub=document.getElementById('exec-trend-sub');
     const container=document.getElementById('exec-sm-charts');
+    const guide=document.getElementById('exec-trend-guide');
+    const summaryGrid=document.getElementById('exec-summary-grid');
     if(!wrap||!container) return;
+
+    Object.values(_execCharts).forEach(c=>{try{c.destroy();}catch(e){}});
+    _execCharts={};
+    container.innerHTML='';
+
     if(!_execSel.size){
       if(empty) empty.style.display='block';
       wrap.style.display='none';
-      Object.values(_execCharts).forEach(c=>{try{c.destroy();}catch(e){}});
-      _execCharts={};
-      if(sub) sub.textContent='Selecione executivos no menu ao lado';
+      if(guide) guide.style.display='grid';
+      if(summaryGrid) summaryGrid.style.display='none';
+      if(sub) sub.textContent='Selecione executivos para comparar ritmo, projeção e atingimento de meta.';
       return;
     }
+
     if(empty) empty.style.display='none';
     wrap.style.display='block';
-    // Remove cards for deselected execs
-    container.querySelectorAll('.exec-sm-card').forEach(card=>{
-      if(!_execSel.has(card.dataset.exec)){
-        const n=card.dataset.exec;
-        if(_execCharts[n]){try{_execCharts[n].destroy();}catch(e){} delete _execCharts[n];}
-        card.remove();
-      }
-    });
-    // Add/update cards for selected execs
-    [..._execSel].forEach(nome=>{
+    if(guide) guide.style.display='none';
+    if(summaryGrid) summaryGrid.style.display='grid';
+
+    const summaries=[..._execSel].map(nome=>({nome,...tExecAnnualSummary(nome)}));
+    const totalYtd=summaries.reduce((s,x)=>s+x.ytd,0);
+    const totalProjected=summaries.reduce((s,x)=>s+x.projected,0);
+    const totalMeta=summaries.reduce((s,x)=>s+x.annualMeta,0);
+    const withMeta=summaries.filter(x=>x.annualMeta>0);
+    const onTrack=withMeta.filter(x=>x.annualPct>=100).length;
+    const strongest=[...withMeta].sort((a,b)=>b.annualPct-a.annualPct)[0];
+    const setTxt=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+    setTxt('exec-summary-count',String(summaries.length));
+    setTxt('exec-summary-count-sub',summaries.length===1?'Análise individual':'Comparação lado a lado');
+    setTxt('exec-summary-ytd',tExecFmt(totalYtd));
+    setTxt('exec-summary-projected',tExecFmt(totalProjected));
+    setTxt('exec-summary-projected-sub',totalMeta>0?(totalProjected/totalMeta*100).toFixed(1).replace('.',',')+'% da meta conjunta':'Sem meta conjunta cadastrada');
+    setTxt('exec-summary-ontrack',withMeta.length?onTrack+' de '+withMeta.length:'—');
+    setTxt('exec-summary-ontrack-sub',strongest?'Melhor ritmo: '+strongest.nome.split(' ')[0]+' ('+strongest.annualPct.toFixed(0)+'%)':'—');
+
+    summaries.forEach(s=>{
+      const nome=s.nome;
       const canvasId='exec-bar-'+nome.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
       const cargo=TEAM[nome]?TEAM[nome].cargo:'—';
       const clr=tExecColor(nome);
       const ini=nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-      const fc=tExecForecastBar(nome);
-      const gp=((fc.growthFactor-1)*100);
+      const gp=((s.growthFactor-1)*100);
       const gpSign=gp>=0?'↑':'↓';
-      const gpClr=gp>=0?'#0F6E56':'#A32D2D';
-      const gpBg=gp>=0?'rgba(29,158,117,0.1)':'rgba(226,75,74,0.1)';
-      const gpBrd=gp>=0?'rgba(29,158,117,0.3)':'rgba(226,75,74,0.3)';
-      const existing=document.getElementById('exec-sm-'+canvasId);
-      if(!existing){
-        const div=document.createElement('div');
-        div.className='exec-sm-card';
-        div.id='exec-sm-'+canvasId;
-        div.dataset.exec=nome;
-        div.innerHTML=`<div class="exec-sm-head">`
-          +`<div class="exec-sm-av" style="background:${clr}22;color:${clr};">`
-          +`<img src="fotos/${nome}.jpg" alt="" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-          +`<span>${ini}</span>`
-          +`</div>`
-          +`<div><div class="exec-sm-name">${nome}</div><div class="exec-sm-cargo">${cargo}</div></div>`
-          +`<div class="exec-sm-badge" style="background:${gpBg};color:${gpClr};border:0.5px solid ${gpBrd};">${gpSign} ${Math.abs(gp).toFixed(1)}% vs 2025</div>`
-          +`</div>`
-          +`<div style="position:relative;height:150px;"><canvas id="${canvasId}" role="img" aria-label="Tendência mensal ${nome} 2026"></canvas></div>`;
-        container.appendChild(div);
-      }
-      // Build/update chart
+      const gpClr=gp>=0?'var(--green)':'var(--red)';
+      const gpBg=gp>=0?'rgba(82,199,125,.08)':'rgba(255,107,107,.08)';
+      const gpBrd=gp>=0?'rgba(82,199,125,.24)':'rgba(255,107,107,.24)';
+      const hasMeta=s.annualMeta>0;
+      const statusClass=!hasMeta?'watch':s.annualPct>=100?'good':s.annualPct>=80?'watch':'risk';
+      const statusText=!hasMeta?'Sem meta':s.annualPct>=100?'No ritmo':s.annualPct>=80?'Atenção':'Abaixo do ritmo';
+      const progress=hasMeta?Math.max(0,Math.min(100,s.annualPct)):0;
+      const div=document.createElement('div');
+      div.className='exec-sm-card';
+      div.id='exec-sm-'+canvasId;
+      div.dataset.exec=nome;
+      div.innerHTML=`<div class="exec-sm-head">`
+        +`<div class="exec-sm-av" style="background:${clr}22;color:${clr};"><img src="fotos/${nome}.jpg" alt="" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><span>${ini}</span></div>`
+        +`<div class="exec-sm-title-block"><div class="exec-sm-name">${nome}</div><div class="exec-sm-cargo">${cargo}</div></div>`
+        +`<div class="exec-sm-status-stack"><span class="exec-sm-status ${statusClass}">${statusText}</span><span class="exec-sm-badge" style="background:${gpBg};color:${gpClr};border:1px solid ${gpBrd};">${gpSign} ${Math.abs(gp).toFixed(1)}% vs 2025</span></div>`
+        +`</div>`
+        +`<div class="exec-sm-metrics">`
+          +`<div class="exec-sm-metric"><div class="exec-sm-metric-label">Realizado 2026</div><div class="exec-sm-metric-value">${tExecFmt(s.ytd)}</div></div>`
+          +`<div class="exec-sm-metric"><div class="exec-sm-metric-label">Projeção 2026</div><div class="exec-sm-metric-value accent">${tExecFmt(s.projected)}</div></div>`
+          +`<div class="exec-sm-metric"><div class="exec-sm-metric-label">Meta anual</div><div class="exec-sm-metric-value">${tExecFmt(s.annualMeta)}</div></div>`
+          +`<div class="exec-sm-metric"><div class="exec-sm-metric-label">Atingimento projetado</div><div class="exec-sm-metric-value" style="color:${!hasMeta?'var(--muted)':s.annualPct>=100?'var(--green)':s.annualPct>=80?'var(--orange)':'var(--red)'};">${hasMeta?s.annualPct.toFixed(1).replace('.',',')+'%':'—'}</div></div>`
+        +`</div>`
+        +`<div class="exec-sm-target"><div class="exec-sm-target-row"><span>Ritmo para a meta anual</span><strong>${hasMeta?tExecFmt(s.projected)+' de '+tExecFmt(s.annualMeta):'Meta não cadastrada'}</strong></div><div class="exec-sm-target-track"><div class="exec-sm-target-fill" style="width:${progress}%;"></div></div></div>`
+        +`<div class="exec-sm-chart"><canvas id="${canvasId}" role="img" aria-label="Tendência mensal ${nome} 2026"></canvas></div>`
+        +`<div class="exec-sm-foot"><span>${s.currentMeta>0?'Mês atual projetado em <strong>'+s.currentPct.toFixed(0)+'% da meta</strong>':'Meta mensal não cadastrada'}</span><span>Fonte da projeção: <strong>${s.source}</strong></span></div>`;
+      container.appendChild(div);
       buildExecBarChart(nome);
     });
-    const names=[..._execSel].map(n=>n.split(' ')[0]).join(', ');
-    if(sub) sub.textContent=(_execSel.size===1?[..._execSel][0]:_execSel.size+' executivos')+' · Barras Jan–Dez 2026';
+
+    if(sub) sub.textContent=(summaries.length===1?'1 executivo':summaries.length+' executivos')+' · visão anual e evolução mensal de 2026';
   }
 
   window.tExecToggle=function(e){
@@ -4063,7 +4276,24 @@ update();
     if(!drop) return;
     const isOpen=drop.style.display!=='none';
     drop.style.display=isOpen?'none':'';
-    if(!isOpen) tExecBuildDrop();
+    if(!isOpen){
+      tExecBuildDrop();
+      const search=document.getElementById('trend-exec-search');
+      if(search){search.value='';window.tExecSearch('');setTimeout(()=>search.focus(),30);}
+    }
+  };
+
+  window.tExecSearch=function(value){
+    const q=String(value||'').trim().toLocaleLowerCase('pt-BR');
+    document.querySelectorAll('#trend-exec-list .ae-item').forEach(item=>{
+      item.style.display=!q||String(item.dataset.search||'').includes(q)?'flex':'none';
+    });
+  };
+
+  window.tExecRemove=function(nome){
+    if(!_execSel.has(nome)) return;
+    _execSel.delete(nome);delete _execColors[nome];
+    tExecUpdateBtn();tExecUpdateInfo();buildExecTrendChart();tExecBuildDrop();
   };
 
   window.tExecClear=function(){
@@ -5653,6 +5883,7 @@ function toggleTheme(){
 
   const AE_PCT_KPIS  = ['taxa','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
   const AE_QTD_KPIS  = ['qtd_ctr','qtd_escola','alunos','unidades'];
+  const AE_AVG_KPIS  = ['fat_escola_med','fat_kedu_med','taxa','ticket','spread','inadim','confessional','margem_med','margem_gp','margem_og'];
   const AE_KPI_LABELS = {
     fat_escola:'Fat. Escola', fat_escola_med:'Fat. Escola médio',
     fat_kedu:'Fat. Kedu',     fat_kedu_med:'Fat. Kedu médio',
@@ -5696,10 +5927,38 @@ function toggleTheme(){
     if(AE_QTD_KPIS.includes(aeKpi)) return Math.round(v);
     if(AE_PCT_KPIS.includes(aeKpi)) return v.toFixed(2)+'%';
     // R$ KPIs: fat_escola, fat_kedu, medians, ticket, margem_rs
-    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2)+'M';
-    if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1)+'k';
+    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2).replace('.',',')+' mi';
+    if(v>=1e3) return 'R$ '+(v/1e3).toFixed(1).replace('.',',')+' mil';
     return 'R$ '+Math.round(v).toLocaleString('pt-BR');
   }
+  function aeTickFmt(v){
+    if(v===null||v===undefined||isNaN(v)) return '';
+    if(AE_QTD_KPIS.includes(aeKpi)) return Math.round(v).toLocaleString('pt-BR');
+    if(AE_PCT_KPIS.includes(aeKpi)) return Number(v).toFixed(1).replace('.',',')+'%';
+    if(v>=1e6) return 'R$'+(v/1e6).toFixed(1).replace('.',',')+'M';
+    if(v>=1e3) return 'R$'+(v/1e3).toFixed(0)+'k';
+    return 'R$'+Math.round(v).toLocaleString('pt-BR');
+  }
+  function aeSeriesScore(ds){
+    const vals=ds.data.filter(v=>v!==null&&v!==undefined&&!isNaN(v));
+    if(!vals.length) return 0;
+    return AE_AVG_KPIS.includes(aeKpi)?vals.reduce((s,v)=>s+v,0)/vals.length:vals.reduce((s,v)=>s+v,0);
+  }
+  function aeUpdateContext(){
+    const years=[...aeAnos].sort().join(', ')||'Sem ano';
+    const months=aeMeses.size?([...aeMeses].sort((a,b)=>a-b).map(m=>MONTHS_SHORT[m-1]).join(', ')):'Ano completo';
+    const groups=[];
+    if(aeRegs.size) groups.push(aeRegs.size+' regional'+(aeRegs.size>1?'is':''));
+    if(aeCargos.size) groups.push(aeCargos.size+' cargo'+(aeCargos.size>1?'s':''));
+    if(aeExecs.size) groups.push(aeExecs.size+' executivo'+(aeExecs.size>1?'s':''));
+    if(aeEstados.size) groups.push(aeEstados.size+' estado'+(aeEstados.size>1?'s':''));
+    const ctx=document.getElementById('ae-context-text');
+    const count=document.getElementById('ae-filter-count');
+    if(ctx) ctx.innerHTML='<strong>'+years+'</strong> · '+months+' · '+(groups.length?groups.join(' · '):'escolha Regional, Cargo, Executivo ou Estado para iniciar');
+    const n=aeRegs.size+aeCargos.size+aeExecs.size+aeEstados.size+aeMeses.size+Math.max(0,aeAnos.size-1);
+    if(count) count.textContent=groups.length?(n===1?'1 seleção ativa':n+' seleções ativas'):'Sem recorte de equipe';
+  }
+
   function aeAgg(){
     const agg={};
     const meses=aeMeses.size>0?[...aeMeses].sort((a,b)=>a-b):null;
@@ -5726,6 +5985,9 @@ function toggleTheme(){
           mg_n_og:0,mg_d_og:0,
           sp_n:0,sp_d:0,
           tk_n:0,tk_d:0,
+          taxa_n:0,taxa_d:0,
+          inadim_n:0,inadim_d:0,
+          alunos_s:0,unidades_s:0,confessional_s:0,
           escolas:new Set(),nums:new Set()
         };
         const c=agg[k][yr][mo];
@@ -5760,13 +6022,20 @@ function toggleTheme(){
     const empty=document.getElementById('ae-empty');
     const wrap=document.getElementById('ae-canvas-wrap');
     const totals=document.getElementById('ae-totals');
+    const summaryGrid=document.getElementById('ae-summary-grid');
+    aeUpdateContext();
 
     if(!keys.length||keys[0]==='Todos'&&!aeRegs.size&&!aeCargos.size&&!aeExecs.size&&!aeEstados.size){
       empty.style.display='flex'; wrap.style.display='none';
       if(aeChart){aeChart.destroy();aeChart=null;}
       totals.innerHTML='';
-      document.getElementById('ae-chart-title').textContent='—';
-      document.getElementById('ae-chart-sub').textContent='Selecione filtros acima para visualizar';
+      if(summaryGrid) summaryGrid.style.display='none';
+      document.getElementById('ae-chart-title').textContent='Evolução do indicador';
+      document.getElementById('ae-chart-sub').textContent='Selecione um recorte acima para visualizar.';
+      const _set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+      _set('ae-insight-leader','Aguardando recorte');_set('ae-insight-leader-note','O líder será calculado pela métrica selecionada.');
+      _set('ae-insight-best','—');_set('ae-insight-best-note','—');_set('ae-insight-gap','—');_set('ae-insight-gap-note','Compare pelo menos duas séries.');
+      _set('ae-insight-context',[...aeAnos].sort().join(' vs ')||'—');_set('ae-insight-context-note','Escolha um recorte de equipe.');
       return;
     }
     empty.style.display='none'; wrap.style.display='block';
@@ -5774,7 +6043,7 @@ function toggleTheme(){
     const titleEl=document.getElementById('ae-chart-title');
     const subEl=document.getElementById('ae-chart-sub');
     const kpiLabel=AE_KPI_LABELS[aeKpi]||aeKpi;
-    titleEl.textContent=keys.length===1?keys[0]+' — Evolução Mensal':keys.length+' séries — Evolução Mensal';
+    titleEl.textContent=keys.length===1?'Evolução mensal de '+keys[0]:'Comparação mensal de '+keys.length+' séries';
     const perStr=aeMeses.size>0?labels.join(', '):'Jan a Dez';
     subEl.textContent=kpiLabel+' · '+anos.join(' vs ')+' · '+perStr;
 
@@ -5787,6 +6056,7 @@ function toggleTheme(){
         const data=meses.map(m=>{
           if(yr===today.getFullYear()&&m>today.getMonth()+1)return null;
           const cell=agg[k]&&agg[k][yr]&&agg[k][yr][m];
+          if(!cell) return null;
           const v=aeExtract(cell);
           return v===null?null:(v||0);
         });
@@ -5800,8 +6070,37 @@ function toggleTheme(){
     // Totals — with % gap from leader
     totals.innerHTML='';
     const AE_SW=["#4ECDC4", "#A29BFE", "#FFE66D", "#FF6B6B", "#fd79a8", "#74b9ff", "#00b894", "#e17055", "#fdcb6e", "#55efc4", "#6c5ce7", "#d63031"];
-    const dsWithTotal=datasets.map(ds=>({ds,total:ds.data.reduce((s,v)=>s+(v||0),0)})).filter(d=>d.total>0);
+    const dsWithTotal=datasets.map(ds=>({ds,total:aeSeriesScore(ds)})).filter(d=>d.total>0);
     const maxTotal=dsWithTotal.reduce((m,d)=>Math.max(m,d.total),0);
+    if(summaryGrid) summaryGrid.style.display=dsWithTotal.length?'grid':'none';
+    if(dsWithTotal.length){
+      const ranked=[...dsWithTotal].sort((a,b)=>b.total-a.total);
+      const leader=ranked[0],runner=ranked[1];
+      const isAvg=AE_AVG_KPIS.includes(aeKpi);
+      const consolidated=isAvg?(dsWithTotal.reduce((s,d)=>s+d.total,0)/dsWithTotal.length):dsWithTotal.reduce((s,d)=>s+d.total,0);
+      const avgPer=dsWithTotal.reduce((s,d)=>s+d.total,0)/dsWithTotal.length;
+      const setTxt=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+      setTxt('ae-summary-series',String(dsWithTotal.length));
+      setTxt('ae-summary-series-sub',keys.length+' grupo'+(keys.length!==1?'s':'')+' · '+anos.length+' ano'+(anos.length!==1?'s':''));
+      setTxt('ae-summary-total-label',isAvg?'Média consolidada':'Total consolidado');
+      setTxt('ae-summary-total',aeFmt(consolidated));
+      setTxt('ae-summary-total-sub',(AE_KPI_LABELS[aeKpi]||aeKpi)+' no período selecionado');
+      setTxt('ae-summary-average',aeFmt(avgPer));
+      setTxt('ae-summary-leader',leader.ds.label);
+      setTxt('ae-summary-leader-sub',aeFmt(leader.total)+' no período');
+      setTxt('ae-insight-leader',leader.ds.label);
+      setTxt('ae-insight-leader-note',aeFmt(leader.total)+' · melhor resultado do recorte');
+      let best=null;
+      datasets.forEach(ds=>ds.data.forEach((v,i)=>{if(v!==null&&v!==undefined&&(!best||v>best.v))best={v,i,ds};}));
+      if(best){setTxt('ae-insight-best',labels[best.i]+' · '+best.ds.label);setTxt('ae-insight-best-note',aeFmt(best.v));}
+      if(runner&&leader.total>0){
+        const gap=(leader.total-runner.total)/leader.total*100;
+        setTxt('ae-insight-gap',gap.toFixed(1).replace('.',',')+'%');
+        setTxt('ae-insight-gap-note',runner.ds.label+' está atrás do líder');
+      }else{setTxt('ae-insight-gap','Série única');setTxt('ae-insight-gap-note','Adicione outra série para comparar.');}
+      setTxt('ae-insight-context',anos.join(' vs '));
+      setTxt('ae-insight-context-note',(aeMeses.size?labels.join(', '):'Jan a Dez')+' · '+(AE_KPI_LABELS[aeKpi]||aeKpi));
+    }
     dsWithTotal.forEach(({ds,total},pi)=>{
       const p=document.createElement('div');
       p.style.cssText='border:1px solid '+hexA(ds.borderColor,.25)+';border-radius:8px;font-family:DM Mono,monospace;overflow:hidden;background:'+hexA(ds.borderColor,.06)+';';
@@ -5875,14 +6174,15 @@ function toggleTheme(){
     });
     // Grand total pill — only when more than one series
     if(dsWithTotal.length>1){
-      const grandTotal=dsWithTotal.reduce((s,d)=>s+d.total,0);
+      const grandTotal=AE_AVG_KPIS.includes(aeKpi)?dsWithTotal.reduce((s,d)=>s+d.total,0)/dsWithTotal.length:dsWithTotal.reduce((s,d)=>s+d.total,0);
+      const grandLabel=AE_AVG_KPIS.includes(aeKpi)?'Média consolidada':'Total consolidado';
       const sep=document.createElement('div');
       sep.style.cssText='width:1px;height:28px;background:var(--border);align-self:center;margin:0 2px;';
       totals.appendChild(sep);
       const gt=document.createElement('div');
       gt.style.cssText='display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:4px 12px;font-family:DM Mono,monospace;';
-      gt.innerHTML='<span style="font-size:11px;color:var(--muted);">Total consolidado</span>'
-        +'<span style="font-size:13px;font-weight:700;color:var(--text);">'+fmtV(grandTotal)+'</span>';
+      gt.innerHTML='<span style="font-size:11px;color:var(--muted);">'+grandLabel+'</span>'
+        +'<span style="font-size:13px;font-weight:700;color:var(--text);">'+aeFmt(grandTotal)+'</span>';
       totals.appendChild(gt);
     }
 
@@ -5922,8 +6222,7 @@ function toggleTheme(){
             callbacks:{
               label:ctx=>{
                 const v=ctx.raw; if(!v) return null;
-                const fv=v=>v>=1e6?'R$ '+Math.round(v).toLocaleString('pt-BR'):v>=1e3?'R$ '+Math.round(v).toLocaleString('pt-BR'):'R$ '+v.toFixed(0);
-                return ' '+ctx.dataset.label+':  '+fv(v);
+                return ' '+ctx.dataset.label+':  '+aeFmt(v);
               },
               afterLabel:ctx=>{
                 const v=ctx.raw; if(!v) return null;
@@ -5939,7 +6238,7 @@ function toggleTheme(){
         },
         scales:{
           x:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxRotation:0},border:{display:false}},
-          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>'R$'+(Math.round(v).toLocaleString('pt-BR'))},border:{display:false}}
+          y:{grid:{color:'rgba(99,179,237,0.06)',drawBorder:false},ticks:{color:'rgba(90,106,130,0.8)',font:{family:'DM Mono,monospace',size:9},maxTicksLimit:5,callback:v=>aeTickFmt(v)},border:{display:false}}
         }
       }
     })
@@ -5959,6 +6258,18 @@ function toggleTheme(){
     });
     aeBuildFilters();
     aeRedraw();
+  };
+
+  window.aeQuickView=function(type){
+    aeRegs.clear();aeCargos.clear();aeExecs.clear();aeEstados.clear();
+    if(type==='regionais'){
+      [...new Set(RAW.map(r=>r.lideranca).filter(Boolean))].forEach(v=>aeRegs.add(v));
+    }else if(type==='cargos'){
+      const cargos=new Set();
+      RAW.forEach(r=>{const c=r.cargo||(TEAM[r.executivo]&&TEAM[r.executivo].cargo)||null;if(c&&c!=='Coordenador Comercial'&&c!=='Coordenadora Comercial')cargos.add(c);});
+      cargos.forEach(v=>aeCargos.add(v));
+    }
+    aeBuildFilters();aeRedraw();
   };
 
   window._aeRedraw=aeRedraw;
@@ -6571,6 +6882,7 @@ window.triggerMBDownload = function(name){
       '<div class="kp-section-label" style="margin-bottom:10px;">Por Regional · '+kpiLabel+'</div>'+
       '<div class="kp-reg-grid">'+regHtml+'</div>'+
       '<div class="kp-section-label" style="margin-top:16px;margin-bottom:8px;">Por Executivo · '+kpiLabel+'</div>'+
+      '<div class="kp-exec-table-head"><span>#</span><span></span><span>Executivo</span><span>Resultado</span><span>Comparação</span></div>'+
       '<div>'+execHtml+'</div>';
   };
 
